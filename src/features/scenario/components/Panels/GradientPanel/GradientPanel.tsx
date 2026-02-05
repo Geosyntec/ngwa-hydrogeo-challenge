@@ -7,6 +7,7 @@ import {
   TextField,
   Typography,
   Stack,
+  Box,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { useAppDispatch, useAppSelector } from "../../../../../app/hooks";
@@ -22,7 +23,8 @@ import {
   selectFlowStep3Complete,
 } from "../../../flowDirection/flowSlice";
 import { selectScenarioState, setSelectedPanel } from "../../../ScenarioSlice";
-import { useCallback, useEffect } from "react";
+import RealityCheck from "../../RealityCheck/RealityCheck";
+import { useCallback, useEffect, useState } from "react";
 
 export default function GradientPanel() {
   const dispatch = useAppDispatch();
@@ -63,6 +65,8 @@ export default function GradientPanel() {
       />
     );
   };
+  const [rcOpen, setRcOpen] = useState(false);
+
   return (
     <Accordion
       defaultExpanded
@@ -74,108 +78,130 @@ export default function GradientPanel() {
         <Typography variant="subtitle1">Gradient</Typography>
       </AccordionSummary>
       <AccordionDetails>
-        {!flowReady && (
-          <Typography variant="body2" color="text.secondary">
-            Complete <strong>Flow Direction – Step 3</strong> to unlock
-            Gradient.
-          </Typography>
-        )}
-        {flowReady && ready && (
-          <Stack spacing={3}>
-            <div>
-              <Typography variant="h6">Step 1</Typography>
-              <Typography variant="body2" color="text.secondary">
-                Determine <strong>Y</strong> (ft) using the contour geometry.
-              </Typography>
-              <Grid container spacing={1} sx={{ mt: 1 }}>
-                <Grid item xs={12} md={6}>
-                  {bind("WhatIsDistanceYValue", "What is distance Y (ft)?")}
+        <Box sx={{ position: "relative", overflow: "visible" }}>
+          {!flowReady && (
+            <Typography variant="body2" color="text.secondary">
+              Complete <strong>Flow Direction – Step 3</strong> to unlock
+              Gradient.
+            </Typography>
+          )}
+          {flowReady && ready && (
+            <Stack spacing={3}>
+              <div>
+                <Typography variant="h6">Step 1</Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Determine <strong>Y</strong> (ft) using the contour geometry.
+                </Typography>
+                <Grid container spacing={1} sx={{ mt: 1 }}>
+                  <Grid item xs={12} md={6}>
+                    {bind("WhatIsDistanceYValue", "What is distance Y (ft)?")}
+                  </Grid>
                 </Grid>
-              </Grid>
-              <Stack direction="row" spacing={1} sx={{ mt: 1 }}>
-                <Button
-                  variant="outlined"
-                  onClick={() =>
-                    dispatch(
-                      checkStep1({
-                        s: (window as any).store?.getState?.() ?? ({} as any),
-                        check: true,
-                      }),
-                    )
-                  }
-                >
-                  Check Step 1
-                </Button>
-                <Button
-                  variant="outlined"
-                  onClick={() =>
-                    dispatch(
-                      checkStep1({
-                        s: (window as any).store?.getState?.() ?? ({} as any),
-                        show: true,
-                      }),
-                    )
-                  }
-                >
-                  Show Step 1 Solution
-                </Button>
-              </Stack>
-            </div>
-            <div>
-              <Typography variant="h6">Step 2</Typography>
-              <Typography variant="body2" color="text.secondary">
-                Verify elevations, Y, and compute the <strong>Gradient</strong>{" "}
-                (4 dp).
-              </Typography>
-              <Grid container spacing={1} sx={{ mt: 1 }}>
-                <Grid item xs={12} md={6}>
-                  {bind("HighestWaterTableValue", "Highest elevation (ft)")}
+                <Stack direction="row" spacing={1} sx={{ mt: 1 }}>
+                  <Button
+                    variant="outlined"
+                    onClick={() =>
+                      dispatch(
+                        checkStep1({
+                          s: (window as any).store?.getState?.() ?? ({} as any),
+                          check: true,
+                        }),
+                      )
+                    }
+                  >
+                    Check Step 1
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    onClick={() =>
+                      dispatch(
+                        checkStep1({
+                          s: (window as any).store?.getState?.() ?? ({} as any),
+                          show: true,
+                        }),
+                      )
+                    }
+                  >
+                    Show Step 1 Solution
+                  </Button>
+                </Stack>
+              </div>
+              <div>
+                <Typography variant="h6">Step 2</Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Verify elevations, Y, and compute the{" "}
+                  <strong>Gradient</strong> (4 dp).
+                </Typography>
+                <Grid container spacing={1} sx={{ mt: 1 }}>
+                  <Grid item xs={12} md={6}>
+                    {bind("HighestWaterTableValue", "Highest elevation (ft)")}
+                  </Grid>
+                  <Grid item xs={12} md={6}>
+                    {bind("RemainingWellValue", "Middle elevation (ft)")}
+                  </Grid>
+                  <Grid item xs={12} md={6}>
+                    {bind("WhatIsDistanceYValue2", "Distance Y (ft)")}
+                  </Grid>
+                  <Grid item xs={12} md={6}>
+                    {bind("Gradient", "Gradient (4 dp)")}
+                  </Grid>
                 </Grid>
-                <Grid item xs={12} md={6}>
-                  {bind("RemainingWellValue", "Middle elevation (ft)")}
-                </Grid>
-                <Grid item xs={12} md={6}>
-                  {bind("WhatIsDistanceYValue2", "Distance Y (ft)")}
-                </Grid>
-                <Grid item xs={12} md={6}>
-                  {bind("Gradient", "Gradient (4 dp)")}
-                </Grid>
-              </Grid>
-              <Stack direction="row" spacing={1} sx={{ mt: 1 }}>
-                <Button
-                  variant="outlined"
-                  onClick={() =>
-                    dispatch(
-                      checkStep2({
-                        s: (window as any).store?.getState?.() ?? ({} as any),
-                        hi,
-                        mid,
-                        check: true,
-                      }),
-                    )
-                  }
-                >
-                  Check Step 2
-                </Button>
-                <Button
-                  variant="outlined"
-                  onClick={() =>
-                    dispatch(
-                      checkStep2({
-                        s: (window as any).store?.getState?.() ?? ({} as any),
-                        hi,
-                        mid,
-                        show: true,
-                      }),
-                    )
-                  }
-                >
-                  Show Step 2 Solution
-                </Button>
-              </Stack>
-            </div>
-          </Stack>
-        )}
+                <Stack direction="row" spacing={1} sx={{ mt: 1 }}>
+                  <Button
+                    variant="outlined"
+                    onClick={() =>
+                      dispatch(
+                        checkStep2({
+                          s: (window as any).store?.getState?.() ?? ({} as any),
+                          hi,
+                          mid,
+                          check: true,
+                        }),
+                      )
+                    }
+                  >
+                    Check Step 2
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    onClick={() =>
+                      dispatch(
+                        checkStep2({
+                          s: (window as any).store?.getState?.() ?? ({} as any),
+                          hi,
+                          mid,
+                          show: true,
+                        }),
+                      )
+                    }
+                  >
+                    Show Step 2 Solution
+                  </Button>
+                </Stack>
+              </div>
+            </Stack>
+          )}
+
+          <RealityCheck
+            title="Reality Check: Gradient"
+            open={rcOpen}
+            onToggle={() => setRcOpen((o) => !o)}
+            available={selectedPanel === "gradient"}
+          >
+            <Typography paragraph>
+              Think of gradient as the slope of the water table. In the
+              challenge it’s treated as a straight, constant slope between
+              points, but in reality it varies and the pumping cone depresses
+              elevations near a well.{" "}
+              {/* mirrors the Gradient reality‑check text from scenario.html */}{" "}
+              [1](https://geosyntec-my.sharepoint.com/personal/aang_geosyntec_com/Documents/Microsoft%20Copilot%20Chat%20Files/scenario.html)
+            </Typography>
+            <Typography variant="caption" color="text.secondary">
+              Distance “Y” is always measured perpendicular to the water‑table
+              contour through the middle well.
+            </Typography>
+          </RealityCheck>
+        </Box>
       </AccordionDetails>
     </Accordion>
   );
