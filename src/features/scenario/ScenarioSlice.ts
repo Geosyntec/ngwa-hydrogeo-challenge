@@ -1,111 +1,111 @@
-import { createSlice, PayloadAction, createSelector } from '@reduxjs/toolkit'
-import type { RootState } from '../../app/store'
-import type { ScenarioDefinition, ScenarioState, PanelKey } from './scenarioTypes'
+import { createSlice, PayloadAction, createSelector } from "@reduxjs/toolkit";
+import type { RootState } from "../../app/store";
+import type {
+  ScenarioDefinition,
+  ScenarioState,
+  PanelKey,
+} from "./scenarioTypes";
 
 const initialState: ScenarioState = {
   isLoaded: false,
   hasBeenAttached: false,
   hasBeenComposed: false,
   isTest: false,
-
   scenarios: [],
   scenarioIndex: -1,
-
-  title: '',
+  title: "",
   map: null,
   allowPumping: false,
   allowCollapsing: false,
-
   wells: [],
   selectedWells: { one: null, two: null, three: null },
   sortedWells: [],
   wellsVertSorted: [],
   wellsHorizSorted: [],
-
   distanceRatioFtPerPx: 0,
-
   showCheckAnswerButton: false,
   showSolutionButton: false,
-
   selectedPanel: null,
-
-  teamName: '',
-  testLocation: '',
-  submitResultText: '',
-
-  flowDirection: {},
-  gradient: {},
-  horizontalVelocity: {},
-
+  teamName: "",
+  testLocation: "",
+  submitResultText: "",
   openWellPopoverId: null,
-}
+};
 
 export const scenarioSlice = createSlice({
-  name: 'scenario',
+  name: "scenario",
   initialState,
   reducers: {
-    setIsTest(state, action: PayloadAction<boolean>) {
-      state.isTest = action.payload
+    setIsTest(s, a: PayloadAction<boolean>) {
+      s.isTest = a.payload;
     },
-    setScenarios(state, action: PayloadAction<ScenarioDefinition[]>) {
-      state.scenarios = action.payload ?? []
+    setScenarios(s, a: PayloadAction<ScenarioDefinition[]>) {
+      s.scenarios = a.payload ?? [];
     },
-    selectScenarioByIndex(state, action: PayloadAction<number>) {
-      const idx = action.payload
-      state.scenarioIndex = idx
-      const s = state.scenarios[idx]
-      if (!s) return
-      state.title = s.name
-      state.map = s.map
-      state.allowPumping = s.allowPumping
-      state.showCheckAnswerButton = s.showCheckAnswerButton
-      state.showSolutionButton = s.showSolutionButton
-      state.wells = s.wells
-      state.selectedWells = { one: null, two: null, three: null }
-      state.sortedWells = []
-      state.wellsVertSorted = []
-      state.wellsHorizSorted = []
-      state.distanceRatioFtPerPx = s.map ? (s.map.physicalWidth * 5280) / s.map.width : 0
-      state.allowCollapsing = false
+    selectScenarioByIndex(s, a: PayloadAction<number>) {
+      const idx = a.payload;
+      s.scenarioIndex = idx;
+      const d = s.scenarios[idx];
+      if (!d) return;
+      s.title = d.name;
+      s.map = d.map;
+      s.allowPumping = d.allowPumping;
+      s.showCheckAnswerButton = d.showCheckAnswerButton;
+      s.showSolutionButton = d.showSolutionButton;
+      s.wells = d.wells;
+      s.selectedWells = { one: null, two: null, three: null };
+      s.distanceRatioFtPerPx = d.map
+        ? (d.map.physicalWidth * 5280) / d.map.width
+        : 0;
+      s.allowCollapsing = false;
     },
-    selectWell(state, action: PayloadAction<string>) {
-      const id = action.payload
-      const already = Object.values(state.selectedWells).includes(id)
-      if (already) return
-      const slot = !state.selectedWells.one ? 'one' : !state.selectedWells.two ? 'two' : !state.selectedWells.three ? 'three' : null
+    selectWell(s, a: PayloadAction<string>) {
+      const id = a.payload;
+      const used = Object.values(s.selectedWells).includes(id);
+      if (used) return;
+      const slot = !s.selectedWells.one
+        ? "one"
+        : !s.selectedWells.two
+          ? "two"
+          : !s.selectedWells.three
+            ? "three"
+            : null;
       if (slot) {
-        ;(state.selectedWells as any)[slot] = id
-        const w = state.wells.find(w => w.id === id)
-        if (w) w.IsSelected = true
+        (s.selectedWells as any)[slot] = id;
+        const w = s.wells.find((w) => w.id === id);
+        if (w) w.IsSelected = true;
       }
     },
-    clearWell(state, action: PayloadAction<1 | 2 | 3>) {
-      const slot = action.payload === 1 ? 'one' : action.payload === 2 ? 'two' : 'three'
-      const id = state.selectedWells[slot as 'one'|'two'|'three']
+    clearWell(s, a: PayloadAction<1 | 2 | 3>) {
+      const slot = a.payload === 1 ? "one" : a.payload === 2 ? "two" : "three";
+      const id = (s.selectedWells as any)[slot];
       if (id) {
-        const w = state.wells.find(w => w.id === id)
-        if (w) w.IsSelected = false
+        const w = s.wells.find((w) => w.id === id);
+        if (w) w.IsSelected = false;
       }
-      ;(state.selectedWells as any)[slot] = null
+      (s.selectedWells as any)[slot] = null;
     },
-    setSelectedPanel(state, action: PayloadAction<PanelKey>) {
-      const vm = action.payload
-      state.selectedPanel = state.selectedPanel === vm ? null : vm
+    setSelectedPanel(s, a: PayloadAction<PanelKey>) {
+      s.selectedPanel = s.selectedPanel === a.payload ? null : a.payload;
     },
-    setWellPumping(state, action: PayloadAction<{ id: string; on: boolean }>) {
-      const { id, on } = action.payload
-      const w = state.wells.find(w => w.id === id)
-      if (w) w.IsPumpingOn = on
+    setWellPumping(s, a: PayloadAction<{ id: string; on: boolean }>) {
+      const w = s.wells.find((w) => w.id === a.payload.id);
+      if (w) w.IsPumpingOn = a.payload.on;
     },
-    setOpenWellPopover(state, action: PayloadAction<string | null>) {
-      state.openWellPopoverId = action.payload
+    setOpenWellPopover(s, a: PayloadAction<string | null>) {
+      s.openWellPopoverId = a.payload;
     },
-    setTeamName(state, action: PayloadAction<string>) { state.teamName = action.payload },
-    setTestLocation(state, action: PayloadAction<string>) { state.testLocation = action.payload },
-    setSubmitResultText(state, action: PayloadAction<string>) { state.submitResultText = action.payload },
-  }
-})
-
+    setTeamName(s, a: PayloadAction<string>) {
+      s.teamName = a.payload;
+    },
+    setTestLocation(s, a: PayloadAction<string>) {
+      s.testLocation = a.payload;
+    },
+    setSubmitResultText(s, a: PayloadAction<string>) {
+      s.submitResultText = a.payload;
+    },
+  },
+});
 export const {
   setIsTest,
   setScenarios,
@@ -118,32 +118,16 @@ export const {
   setTeamName,
   setTestLocation,
   setSubmitResultText,
-} = scenarioSlice.actions
+} = scenarioSlice.actions;
+export default scenarioSlice.reducer;
 
-export default scenarioSlice.reducer
-
-// Selectors
-export const selectScenarioState = (s: RootState) => s.scenario
-export const selectMap = (s: RootState) => s.scenario.map
-export const selectWells = (s: RootState) => s.scenario.wells
-
+export const selectScenarioState = (s: RootState) => s.scenario;
+export const selectMap = (s: RootState) => s.scenario.map;
+export const selectWells = (s: RootState) => s.scenario.wells;
 export const selectWellById = (id: string) =>
-  createSelector(selectWells, wells => wells.find(w => w.id === id) || null)
-
-export const selectSelectedWellIds = (s: RootState) => s.scenario.selectedWells
-
+  createSelector(selectWells, (ws) => ws.find((w) => w.id === id) || null);
+export const selectSelectedWellIds = (s: RootState) => s.scenario.selectedWells;
 export const selectAllWellsSelected = createSelector(
   selectSelectedWellIds,
-  (sel) => !!sel.one && !!sel.two && !!sel.three
-)
-
-export const selectDistanceRatioFtPerPx = (s: RootState) => s.scenario.distanceRatioFtPerPx
-
-export const selectSelectedWellLetters = createSelector(
-  selectSelectedWellIds,
-  selectWells,
-  (sel, wells) => {
-    const byId = (id: string | null) => wells.find(w => w.id === id)?.Name ?? ''
-    return [byId(sel.one), byId(sel.two), byId(sel.three)].filter(Boolean) as string[]
-  }
-)
+  (sel) => !!sel.one && !!sel.two && !!sel.three,
+);
