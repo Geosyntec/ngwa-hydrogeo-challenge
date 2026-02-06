@@ -1,4 +1,4 @@
-import { memo, useMemo } from "react";
+import React, { memo, useMemo } from "react";
 import { useAppSelector } from "../../../../app/hooks";
 import { selectMap } from "../../ScenarioSlice";
 import {
@@ -18,18 +18,23 @@ import {
 } from "../../services/drawingMath";
 
 export default memo(function MapOverlay() {
+  // ✅ Always call hooks in the same order on every render
   const map = useAppSelector(selectMap);
   const flow = useAppSelector(selectFlow);
   const g = useAppSelector(selectGradient);
   const sorted = useAppSelector(selectSortedByElevation);
-  if (!map || sorted.length < 3) return null;
-  const { width, height, physicalWidth } = map;
-  const ratioFtPerPx = (physicalWidth * 5280) / width;
-  const lo = sorted[0],
-    mid = sorted[1],
-    hi = sorted[2];
 
-  const geom = useMemo(() => {
+  // ✅ Compute everything in a single memo; return `null` if not ready
+  const computed = useMemo(() => {
+    if (!map || !sorted || sorted.length < 3) return null;
+
+    const { width, height, physicalWidth } = map;
+    const lo = sorted[0],
+      mid = sorted[1],
+      hi = sorted[2];
+
+    const ratioFtPerPx = (physicalWidth * 5280) / width;
+
     const dHM_Ft = Math.round(distPx(hi.Point, mid.Point) * ratioFtPerPx);
     const dML_Ft = Math.round(distPx(mid.Point, lo.Point) * ratioFtPerPx);
     const dLH_Ft = Math.round(distPx(lo.Point, hi.Point) * ratioFtPerPx);
@@ -59,16 +64,19 @@ export default memo(function MapOverlay() {
       intersection,
     );
 
+    // UI engagement flags (same logic as before)
     const step2Engaged =
       !!flow.ElevResult_X_DistanceHighMid.input ||
       !!flow.ElevResult_X_DistanceHighMid.answer ||
       !!flow.DistanceHighestLowest.input ||
       !!flow.DistanceHighestLowest.answer;
+
     const step3Engaged =
       !!flow.SelectedDirection.input || !!flow.SelectedDirection.answer;
     const step1YEngaged =
       !!g.WhatIsDistanceYValue.input || !!g.WhatIsDistanceYValue.answer;
 
+    // Optional user line for step 3
     let userLine: { end: { x: number; y: number } } | null = null;
     if (step3Engaged) {
       const angle =
@@ -83,16 +91,24 @@ export default memo(function MapOverlay() {
         intersection,
       );
       let lenPx = 100;
-      if (hit && tRay > 0 && isPointOnSegment(hit, mid.Point, intersection))
+      if (hit && tRay > 0 && isPointOnSegment(hit, mid.Point, intersection)) {
         lenPx = distPx(hi.Point, hit) + 80;
-      const end = {
-        x: hi.Point.x + dir.x * lenPx,
-        y: hi.Point.y + dir.y * lenPx,
+      }
+      userLine = {
+        end: { x: hi.Point.x + dir.x * lenPx, y: hi.Point.y + dir.y * lenPx },
       };
-      userLine = { end };
     }
 
     return {
+      // map dims
+      width,
+      height,
+      // wells + ratio (used in render)
+      hi,
+      mid,
+      lo,
+      ratioFtPerPx,
+      // geometry
       dHM_Ft,
       dML_Ft,
       dLH_Ft,
@@ -105,21 +121,27 @@ export default memo(function MapOverlay() {
       step1YEngaged,
       userLine,
     };
-  }, [hi, mid, lo, ratioFtPerPx, flow, g]);
+  }, [map, sorted, flow, g]);
 
+  // ✅ Second memo also called unconditionally; safe to read from `computed`
   const ticks = useMemo(() => {
+    if(!computed) return null;
     const alongContour = {
-      x: geom.intersection.x - mid.Point.x,
-      y: geom.intersection.y - mid.Point.y,
+      x: computed.intersection.x - computed.mid.Point.x,
+      y: computed.intersection.y - computed.mid.Point.y,
     };
     const alongPerp = {
-      x: geom.foot.x - hi.Point.x,
-      y: geom.foot.y - hi.Point.y,
+      x: computed.foot.x - computed.hi.Point.x,
+      y: computed.foot.y - computed.hi.Point.y,
     };
-    return rightAngleTicks(geom.foot, alongContour, alongPerp, 12);
-  }, [geom, mid, hi]);
+    return rightAngleTicks(computed.foot, alongContour, alongPerp, 12);
+  }, [computed]);
 
-  const showY = geom.step1YEngaged || geom.step2Engaged;
+  // If we’re not ready, render nothing (hooks still ran above, so no violation)
+  if (!computed) return null;
+
+  const { width, height, hi, mid, lo } = computed;
+  const showY = computed.step1YEngaged || computed.step2Engaged;
 
   return (
     <svg
@@ -160,13 +182,15 @@ export default memo(function MapOverlay() {
           <path d="M0 0 L10 5 L0 10 z" fill="#2e7d32" />
         </marker>
       </defs>
+
+      {/* side lengths */}
       <LineWithLabel
         a={hi.Point}
         b={mid.Point}
         color="#666"
         width={2}
         bothArrows
-        label={`${geom.dHM_Ft.toLocaleString()} ft.`}
+        label={`${computed.dHM_Ft.toLocaleString()} ft.`}
       />
       <LineWithLabel
         a={mid.Point}
@@ -174,7 +198,7 @@ export default memo(function MapOverlay() {
         color="#666"
         width={2}
         bothArrows
-        label={`${geom.dML_Ft.toLocaleString()} ft.`}
+        label={`${computed.dML_Ft.toLocaleString()} ft.`}
       />
       <LineWithLabel
         a={lo.Point}
@@ -182,10 +206,11 @@ export default memo(function MapOverlay() {
         color="#666"
         width={2}
         bothArrows
-        label={`${geom.dLH_Ft.toLocaleString()} ft.`}
+        label={`${computed.dLH_Ft.toLocaleString()} ft.`}
       />
 
-      {geom.step2Engaged && (
+      {/* highlighted segments once step 2 is engaged */}
+      {computed.step2Engaged && (
         <>
           <line
             x1={hi.Point.x}
@@ -199,8 +224,8 @@ export default memo(function MapOverlay() {
           <line
             x1={mid.Point.x}
             y1={mid.Point.y}
-            x2={geom.intersection.x}
-            y2={geom.intersection.y}
+            x2={computed.intersection.x}
+            y2={computed.intersection.y}
             stroke="#998675"
             strokeWidth={7}
             opacity={0.9}
@@ -208,19 +233,20 @@ export default memo(function MapOverlay() {
         </>
       )}
 
+      {/* Y distance */}
       {showY && (
         <>
           <line
             x1={hi.Point.x}
             y1={hi.Point.y}
-            x2={geom.foot.x}
-            y2={geom.foot.y}
+            x2={computed.foot.x}
+            y2={computed.foot.y}
             stroke="red"
             strokeWidth={3}
           />
           <text
-            x={(hi.Point.x + geom.foot.x) / 2}
-            y={(hi.Point.y + geom.foot.y) / 2 - 8}
+            x={(hi.Point.x + computed.foot.x) / 2}
+            y={(hi.Point.y + computed.foot.y) / 2 - 8}
             fontSize={12}
             fill="red"
             textAnchor="middle"
@@ -228,18 +254,18 @@ export default memo(function MapOverlay() {
             Y
           </text>
           <text
-            x={(hi.Point.x + geom.foot.x) / 2}
-            y={(hi.Point.y + geom.foot.y) / 2 + 12}
+            x={(hi.Point.x + computed.foot.x) / 2}
+            y={(hi.Point.y + computed.foot.y) / 2 + 12}
             fontSize={12}
             fill="#6CB5F4"
             textAnchor="middle"
           >
-            {geom.yLen_Ft.toLocaleString()} ft.
+            {computed.yLen_Ft.toLocaleString()} ft.
           </text>
-          {!geom.actualOnSegment && (
+          {!computed.actualOnSegment && (
             <ExtendedLine
               a={mid.Point}
-              b={geom.intersection}
+              b={computed.intersection}
               color="#998675"
               width={4}
               dash="6 6"
@@ -269,24 +295,25 @@ export default memo(function MapOverlay() {
         </>
       )}
 
-      {geom.step3Engaged && (
+      {/* actual vs user direction (step 3) */}
+      {computed.step3Engaged && (
         <line
           x1={hi.Point.x}
           y1={hi.Point.y}
-          x2={geom.foot.x}
-          y2={geom.foot.y}
+          x2={computed.foot.x}
+          y2={computed.foot.y}
           stroke="#0071BC"
           strokeWidth={4}
           strokeDasharray="6 6"
           markerEnd="url(#arrowEndBlue)"
         />
       )}
-      {geom.step3Engaged && geom.userLine && (
+      {computed.step3Engaged && computed.userLine && (
         <line
           x1={hi.Point.x}
           y1={hi.Point.y}
-          x2={geom.userLine.end.x}
-          y2={geom.userLine.end.y}
+          x2={computed.userLine.end.x}
+          y2={computed.userLine.end.y}
           stroke="#2e7d32"
           strokeWidth={4}
           strokeDasharray="6 6"
@@ -338,6 +365,7 @@ function LineWithLabel({
     </>
   );
 }
+
 function ExtendedLine({
   a,
   b,
