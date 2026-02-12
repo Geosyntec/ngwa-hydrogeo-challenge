@@ -1,5 +1,4 @@
 import { createSlice, PayloadAction, createSelector } from "@reduxjs/toolkit";
-import type { RootState } from "../../../app/store";
 import type {
   FlowDirectionUIState,
   AnswerField,
@@ -57,7 +56,6 @@ const initialState: FlowDirectionUIState = {
   wrongAnswers: 0,
 };
 
-export const selectFlow = (s: RootState) => s.flowDirection;
 const selectSelectedWellTriplet = createSelector(
   selectWells,
   selectSelectedWellIds,
@@ -302,107 +300,3 @@ export const {
 } = flowSlice.actions;
 export default flowSlice.reducer;
 
-export const runCheckStep1 =
-  (options: StepCheckOptions = {}) =>
-  (dispatch: any, getState: () => RootState) => {
-    const s = getState();
-    const sorted = (selectSortedByElevation as any)(s);
-    if (sorted.length < 3) return;
-    const lo = sorted[0],
-      mid = sorted[1],
-      hi = sorted[2];
-    const diffHighLow = precise_round(hi.Elevation - lo.Elevation, 1);
-    const diffHighMid = precise_round(hi.Elevation - mid.Elevation, 1);
-    dispatch(
-      _applyStep1Result({
-        hiName: hi.Name,
-        hiVal: hi.Elevation,
-        loName: lo.Name,
-        loVal: lo.Elevation,
-        midName: mid.Name,
-        midVal: mid.Elevation,
-        diffHighLow,
-        diffHighMid,
-        options,
-      }),
-    );
-  };
-export const runCheckStep2 =
-  (options: StepCheckOptions = {}) =>
-  (dispatch: any, getState: () => RootState) => {
-    const s = getState();
-    const sorted = (selectSortedByElevation as any)(s);
-    if (sorted.length < 3) return;
-    const lo = sorted[0],
-      mid = sorted[1],
-      hi = sorted[2];
-    const diffHighLow = precise_round(hi.Elevation - lo.Elevation, 1);
-    const diffHighMid = precise_round(hi.Elevation - mid.Elevation, 1);
-    const elevationRatio = precise_round(diffHighMid / diffHighLow, 2).toFixed(
-      2,
-    );
-    const map = selectMap(s);
-    const ratio = map ? (map.physicalWidth * 5280) / map.width : 1;
-    const distHighLow = Math.round(
-      Math.hypot(hi.Point.x - lo.Point.x, hi.Point.y - lo.Point.y) * ratio,
-    );
-    const formulaResult = precise_round(
-      distHighLow * parseFloat(elevationRatio),
-      0,
-    );
-    dispatch(
-      _applyStep2Result({
-        diffHighLow,
-        diffHighMid,
-        elevationRatio,
-        distHighLow,
-        formulaResult,
-        options,
-      }),
-    );
-  };
-export const runCheckStep3 =
-  (options: StepCheckOptions = {}, actualAngle?: number) =>
-  (dispatch: any, getState: () => RootState) => {
-    const s = getState();
-    const computed = computeActualFlowDirectionAngle(s);
-    const fallbackAngle = 90;
-    dispatch(
-      _applyStep3Result({
-        actualAngle: actualAngle ?? computed ?? fallbackAngle,
-        threshold: 10,
-        options,
-      }),
-    );
-  };
-
-// completion gates
-const _filled = (f?: { input?: string; showAnswer?: boolean }) =>
-  !!(f && ((f.input ?? "").trim() !== "" || f.showAnswer));
-export const selectFlowStep1Complete = (s: RootState) => {
-  const f: any = s.flowDirection;
-  return (
-    _filled(f.HighestWaterTableName) &&
-    _filled(f.HighestWaterTableValue) &&
-    _filled(f.LowestWaterTableName) &&
-    _filled(f.LowestWaterTableValue) &&
-    _filled(f.RemainingWellName) &&
-    _filled(f.RemainingWellValue) &&
-    _filled(f.DiffBtwnHighestLowest) &&
-    _filled(f.DiffBtwnHighestMiddle)
-  );
-};
-export const selectFlowStep2Complete = (s: RootState) => {
-  const f: any = s.flowDirection;
-  return (
-    _filled(f.DiffBtwnHighestLowest2) &&
-    _filled(f.DiffBtwnHighestMiddle2) &&
-    _filled(f.ElevationRatio) &&
-    _filled(f.DistanceHighestLowest) &&
-    _filled(f.ElevResult_X_DistanceHighMid)
-  );
-};
-export const selectFlowStep3Complete = (s: RootState) => {
-  const f: any = s.flowDirection;
-  return _filled(f.SelectedDirection);
-};

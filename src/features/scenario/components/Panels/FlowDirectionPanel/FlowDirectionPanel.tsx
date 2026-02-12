@@ -9,21 +9,20 @@ import {
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { useAppDispatch, useAppSelector } from "../../../../../app/hooks";
+import { selectAllWellsChosen } from "../../../flowDirection/flowSlice";
 import {
-  selectAllWellsChosen,
   runCheckStep1,
   runCheckStep2,
   runCheckStep3,
   selectFlow,
   selectFlowStep3Complete,
-} from "../../../flowDirection/flowSlice";
+} from "../../../flowDirection/flowSelectors";
 import { selectScenarioState, setSelectedPanel } from "../../../ScenarioSlice";
 import { useEffect, useCallback, useState } from "react";
 import FDStep1 from "./FD_Step1";
 import FDStep2 from "./FD_Step2";
 import FDStep3 from "./FD_Step3";
-import RealityCheck from '../../RealityCheck/RealityCheck'
-
+import RealityCheck from "../../RealityCheck/RealityCheck";
 
 export default function FlowDirectionPanel() {
   const dispatch = useAppDispatch();
