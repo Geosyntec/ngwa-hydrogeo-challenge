@@ -1,11 +1,9 @@
 import React, { memo, useMemo } from "react";
 import { useAppSelector } from "../../../../app/hooks";
 import { selectMap } from "../../ScenarioSlice";
-import {
-  selectFlow,
-  selectSortedByElevation,
-} from "../../flowDirection/flowSlice";
-import { selectGradient } from "../../gradient/gradientSlice";
+import { selectSortedByElevation } from "../../flowDirection/flowSlice";
+import { selectFlow } from "../../flowDirection/flowSelectors";
+import { selectGradient } from "../../gradient/gradientSelectors";
 import {
   distance as distPx,
   pointOnLine,
@@ -125,7 +123,7 @@ export default memo(function MapOverlay() {
 
   // ✅ Second memo also called unconditionally; safe to read from `computed`
   const ticks = useMemo(() => {
-    if(!computed) return null;
+    if (!computed) return null;
     const alongContour = {
       x: computed.intersection.x - computed.mid.Point.x,
       y: computed.intersection.y - computed.mid.Point.y,

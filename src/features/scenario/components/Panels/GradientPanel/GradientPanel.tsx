@@ -13,15 +13,13 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { useAppDispatch, useAppSelector } from "../../../../../app/hooks";
 import {
   selectGradient,
-  setField,
   checkStep1,
   checkStep2,
   selectGradientStep2Complete,
-} from "../../../gradient/gradientSlice";
-import {
-  selectSortedByElevation,
-  selectFlowStep3Complete,
-} from "../../../flowDirection/flowSlice";
+} from "../../../gradient/gradientSelectors";
+import { setField } from "../../../gradient/gradientSlice";
+import { selectSortedByElevation } from "../../../flowDirection/flowSlice";
+import { selectFlowStep3Complete } from "../../../flowDirection/flowSelectors";
 import { selectScenarioState, setSelectedPanel } from "../../../ScenarioSlice";
 import RealityCheck from "../../RealityCheck/RealityCheck";
 import { useCallback, useEffect, useState } from "react";

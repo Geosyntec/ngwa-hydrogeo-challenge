@@ -1,10 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Box } from "@mui/material";
 import { useAppDispatch, useAppSelector } from "../../../../../app/hooks";
-import {
-  selectFlow,
-  setDirectionAngle,
-} from "../../../flowDirection/flowSlice";
+import { setDirectionAngle } from "../../../flowDirection/flowSlice";
+import { selectFlow } from "../../../flowDirection/flowSelectors";
 import { unitVectorFromRaphaelAngle } from "../../../services/drawingMath";
 
 export default function CompassSelector({ display = true }: { display?: boolean }) {

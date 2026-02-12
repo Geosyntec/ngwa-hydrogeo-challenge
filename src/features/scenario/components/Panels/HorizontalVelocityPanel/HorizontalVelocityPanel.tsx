@@ -13,12 +13,12 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { useAppDispatch, useAppSelector } from "../../../../../app/hooks";
 import {
   selectVelocity,
-  setField,
   checkStep1,
   checkStep2,
-} from "../../../velocity/velocitySlice";
+} from "../../../velocity/velocitySelectors";
+import{setField} from "../../../velocity/velocitySlice";
 import { selectSortedByElevation } from "../../../flowDirection/flowSlice";
-import { selectGradientStep2Complete } from "../../../gradient/gradientSlice";
+import { selectGradientStep2Complete } from "../../../gradient/gradientSelectors";
 import { selectScenarioState, setSelectedPanel } from "../../../ScenarioSlice";
 import { useCallback, useState } from "react";
 import RealityCheck from '../../RealityCheck/RealityCheck'

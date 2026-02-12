@@ -1,5 +1,4 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import type { RootState } from "../../../app/store";
 import {
   computeGradientValue,
   pickHydraulicPropsForHighWell,
@@ -47,22 +46,27 @@ export const velocitySlice = createSlice({
   name: "velocity",
   initialState,
   reducers: {
-    setField(s, a: PayloadAction<{ key: keyof VelocityState; value: string }>) {
+    setField(s:any, a: PayloadAction<{ key: keyof VelocityState; value: string }>) {
       const f = (s as any)[a.payload.key] as any;
       if (f && typeof f === "object" && "input" in f) {
         f.input = a.payload.value;
       }
     },
-    checkStep1(
-      s,
-      a: PayloadAction<{ s: RootState; check?: boolean; show?: boolean }>,
+
+    checkStep1Applied(
+      s:any,
+      a: PayloadAction<{
+        gradient?: number;
+        conductivity?: number;
+        porosityFrac?: number;
+        check?: boolean;
+        show?: boolean;
+      }>,
     ) {
-      const { s: rs, check, show } = a.payload;
-      const g = computeGradientValue(rs);
-      const { conductivity, porosityFrac } = pickHydraulicPropsForHighWell(rs);
-      if (g != null) {
-        s.Gradient.answer = String(g);
-        s.Gradient.isCorrect = g === parseFloat(s.Gradient.input || "");
+      const { gradient, conductivity, porosityFrac, check, show } = a.payload;
+      if (gradient != null) {
+        s.Gradient.answer = String(gradient);
+        s.Gradient.isCorrect = gradient === parseFloat(s.Gradient.input || "");
       }
       if (conductivity != null) {
         s.Conductivity.answer = String(conductivity);
@@ -85,16 +89,24 @@ export const velocitySlice = createSlice({
         s.isSolutionShowingStep1 = true;
       }
     },
-    checkStep2(
-      s,
-      a: PayloadAction<{ s: RootState; check?: boolean; show?: boolean }>,
+
+    checkStep2Applied(
+      s:any,
+      a: PayloadAction<{
+        gradient?: number;
+        conductivity?: number;
+        porosityFrac?: number;
+        hv?: number;
+        check?: boolean;
+        show?: boolean;
+      }>,
     ) {
-      const { s: rs, check, show } = a.payload;
-      const g = computeGradientValue(rs);
-      const { conductivity, porosityFrac } = pickHydraulicPropsForHighWell(rs);
-      if (g != null) {
-        s.Gradient2.answer = String(g);
-        s.Gradient2.isCorrect = g === parseFloat(s.Gradient2.input || "");
+      const { gradient, conductivity, porosityFrac, hv, check, show } =
+        a.payload;
+      if (gradient != null) {
+        s.Gradient2.answer = String(gradient);
+        s.Gradient2.isCorrect =
+          gradient === parseFloat(s.Gradient2.input || "");
       }
       if (conductivity != null) {
         s.Conductivity2.answer = String(conductivity);
@@ -106,8 +118,7 @@ export const velocitySlice = createSlice({
         s.Porosity2.isCorrect =
           parseFloat(s.Porosity2.input || "") === porosityFrac;
       }
-      if (g != null && conductivity != null && porosityFrac) {
-        const hv = round2((g * conductivity) / porosityFrac);
+      if (hv != null) {
         s.HorizontalVelocity.answer = String(hv);
         s.HorizontalVelocity.isCorrect =
           hv === parseFloat(s.HorizontalVelocity.input || "");
@@ -128,6 +139,7 @@ export const velocitySlice = createSlice({
         s.isSolutionShowingStep2 = true;
       }
     },
+
     resetVelocity(s) {
       Object.assign(s, initialState);
     },
@@ -136,4 +148,3 @@ export const velocitySlice = createSlice({
 export const { setField, checkStep1, checkStep2, resetVelocity } =
   velocitySlice.actions;
 export default velocitySlice.reducer;
-export const selectVelocity = (s: RootState) => s.velocity;

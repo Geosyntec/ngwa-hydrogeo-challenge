@@ -1,12 +1,7 @@
 import { Stack, TextField, Typography,Button } from "@mui/material";
 import { useAppDispatch, useAppSelector } from "../../../../../app/hooks";
-import {
-  selectFlow,
-  setDirectionAngle,
-  setField,
-  runCheckStep3,
-  selectFlowStep2Complete
-} from "../../../flowDirection/flowSlice";
+import { setDirectionAngle, setField } from "../../../flowDirection/flowSlice";
+import { selectFlow } from "../../../flowDirection/flowSelectors";
 import CompassSelector from "./CompassSelector";
 
 export default function FDStep3() {
