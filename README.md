@@ -1,7 +1,9 @@
 # Hydro App (Minimal Working Repo)
 
-This is the minimal working scaffold for the Knockout → React rewrite using **Vite + React + TypeScript + Material UI + Redux Toolkit**. It includes:
+This is the minimal working scaffold for the Knockout → React rewrite using **Vite + React + TypeScript + Material UI + Redux Toolkit + React Router**. It includes:
 
+- **SPA with multiple pages**: Home (landing), Getting Started, The Challenge (scenario), Reference, About, Teacher Grading (placeholder)
+- **Top menu** (legacy-style): brand, scenario dropdown on The Challenge page, nav pills with vertical dividers
 - Global Redux store (`ScenarioSlice`) with a demo scenario
 - Map view with clickable **well markers** and an info **popover** (right-click to open)
 - "Choose 3 Wells" panel with clear buttons
