@@ -29,8 +29,7 @@ export default memo(function WellMarker({ wellId }: { wellId: string }) {
     [dispatch, well?.id],
   );
 
-  // The card is “rendered” for selected wells, but only visible if hovered/focused.
-  const showCard = !!well.IsSelected && (hover || focus);
+  const showCard = well.IsSelected || hover || focus;
 
   return (
     <>
@@ -69,7 +68,7 @@ export default memo(function WellMarker({ wellId }: { wellId: string }) {
           </Box>
 
           {/* Non-modal, anchored info card (rendered for selected wells) */}
-          {!!well.IsSelected && (
+          {(
             <WellInfoCard
               well={{
                 Name: well.Name,
