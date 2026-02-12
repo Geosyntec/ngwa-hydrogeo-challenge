@@ -95,6 +95,28 @@ export default function Scenario() {
             },
           ],
         },
+        {
+          id: "D",
+          Name: "D",
+          Elevation: 105,
+          GroundElevationFt: 100,
+          StaticElevationFt: 95,
+          PumpingElevationFt: 92,
+          IsPumpingOn: false,
+          IsSelected: false,
+          IsCollapsed: true,
+          Top: 450,
+          Left: 300,
+          Point: { x: 300, y: 450 },
+          GeologyNew: [
+            {
+              depthFt: 0,
+              lithology: "sand",
+              conductivityK: 50,
+              porosityPct: 25,
+            },
+          ],
+        },
       ],
     };
     dispatch(setIsTest(false));
