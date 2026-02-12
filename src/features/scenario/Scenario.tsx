@@ -24,7 +24,7 @@ export default function Scenario() {
     const demo = {
       id: "demo-1",
       name: "Demo Scenario",
-      map: { url: "", width: 800, height: 600, physicalWidth: 1 },
+      map: { url: "", width: 800, height: 600, physicalWidth: 1 }, //url:"./assets/img/map.jpeg"
       allowPumping: true,
       showCheckAnswerButton: true,
       showSolutionButton: true,
@@ -40,8 +40,8 @@ export default function Scenario() {
           IsSelected: false,
           IsCollapsed: true,
           Top: 120,
-          Left: 150,
-          Point: { x: 150, y: 120 },
+          Left: 300,
+          Point: { x: 300, y: 120 },
           GeologyNew: [
             {
               depthFt: 0,
@@ -62,8 +62,8 @@ export default function Scenario() {
           IsSelected: false,
           IsCollapsed: true,
           Top: 300,
-          Left: 300,
-          Point: { x: 300, y: 300 },
+          Left: 100,
+          Point: { x: 100, y: 300 },
           GeologyNew: [
             {
               depthFt: 0,

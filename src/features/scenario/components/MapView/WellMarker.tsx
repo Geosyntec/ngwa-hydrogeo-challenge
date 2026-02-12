@@ -12,6 +12,7 @@ import {
 import WellInfoCard from "./WellInfoCard";
 
 export default memo(function WellMarker({ wellId }: { wellId: string }) {
+  console.log("rendering well popover: ",wellId)
   const dispatch = useAppDispatch();
   const well = useAppSelector(selectWellById(wellId));
   const allSelected = useAppSelector(selectAllWellsSelected);

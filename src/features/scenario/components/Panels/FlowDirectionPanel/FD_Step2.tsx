@@ -1,10 +1,11 @@
-import { Grid, TextField, Typography } from "@mui/material";
+import { Grid, TextField, Typography,Stack,Button } from "@mui/material";
 import { useAppDispatch, useAppSelector } from "../../../../../app/hooks";
-import { selectFlow, setField } from "../../../flowDirection/flowSlice";
+import { selectFlow, setField,runCheckStep2,selectFlowStep1Complete } from "../../../flowDirection/flowSlice";
 
 export default function FDStep2() {
   const flow = useAppSelector(selectFlow);
   const dispatch = useAppDispatch();
+  const stepReady = useAppSelector(selectFlowStep1Complete);
   const bind = (key: any, label: string, helper?: string) => {
     const f = (flow as any)[key];
     return (
@@ -12,6 +13,7 @@ export default function FDStep2() {
         size="small"
         label={label}
         value={f.input}
+        disabled={!stepReady}
         onChange={(e) => dispatch(setField({ key, value: e.target.value }))}
         error={f.checked && !f.isCorrect}
         helperText={f.showAnswer ? `Answer: ${f.answer}` : helper}
@@ -42,6 +44,22 @@ export default function FDStep2() {
           {bind("ElevResult_X_DistanceHighMid", "X * Distance High-Mid (ft)")}
         </Grid>
       </Grid>
+      <Stack direction="row" spacing={1}>
+        <Button
+          variant="outlined"
+          onClick={() => dispatch(runCheckStep2({ checkAnswers: true }))}
+          disabled={!stepReady}
+        >
+          Check Step 2
+        </Button>
+        <Button
+          variant="outlined"
+          onClick={() => dispatch(runCheckStep2({ showAnswers: true }))}
+          disabled={!stepReady}
+        >
+          Show Step 2 Solution
+        </Button>
+      </Stack>
     </>
   );
 }

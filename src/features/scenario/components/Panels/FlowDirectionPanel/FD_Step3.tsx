@@ -1,15 +1,18 @@
-import { Stack, TextField, Typography } from "@mui/material";
+import { Stack, TextField, Typography,Button } from "@mui/material";
 import { useAppDispatch, useAppSelector } from "../../../../../app/hooks";
 import {
   selectFlow,
   setDirectionAngle,
   setField,
+  runCheckStep3,
+  selectFlowStep2Complete
 } from "../../../flowDirection/flowSlice";
 import CompassSelector from "./CompassSelector";
 
 export default function FDStep3() {
   const flow = useAppSelector(selectFlow);
   const dispatch = useAppDispatch();
+  const stepReady = useAppSelector(selectFlowStep2Complete)
   return (
     <>
       <Typography variant="h6">Step 3</Typography>
@@ -23,7 +26,7 @@ export default function FDStep3() {
         alignItems="center"
         sx={{ mt: 1 }}
       >
-        <CompassSelector size={150} />
+        <CompassSelector display={stepReady} />
         <Stack
           spacing={2}
           direction={{ xs: "column", md: "row" }}
@@ -33,9 +36,10 @@ export default function FDStep3() {
             size="small"
             label="Direction (degrees)"
             value={flow.SelectedDirection.input}
+            disabled={!stepReady}
             onChange={(e) =>
               dispatch(
-                setField({ key: "SelectedDirection", value: e.target.value }),
+                setField({ key: "SelectedDirection", value: e.target.value })
               )
             }
             error={
@@ -57,11 +61,28 @@ export default function FDStep3() {
               dispatch(setDirectionAngle(parseFloat(e.target.value) || 0))
             }
             sx={{ width: 220 }}
+            disabled={!stepReady}
           />
           <Typography variant="body2">
             Display Angle: {Math.round(flow.DirectionAngleDisplay)}°
           </Typography>
         </Stack>
+      </Stack>
+      <Stack direction="row" spacing={1}>
+        <Button
+          variant="outlined"
+          onClick={() => dispatch(runCheckStep3({ checkAnswers: true }))}
+          disabled={!stepReady}
+        >
+          Check Step 3
+        </Button>
+        <Button
+          variant="outlined"
+          onClick={() => dispatch(runCheckStep3({ showAnswers: true }))}
+          disabled={!stepReady}
+        >
+          Show Step 3 Solution
+        </Button>
       </Stack>
     </>
   );

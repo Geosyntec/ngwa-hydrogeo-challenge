@@ -69,7 +69,7 @@ const selectSelectedWellTriplet = createSelector(
 );
 export const selectSortedByElevation = createSelector(
   selectSelectedWellTriplet,
-  (arr) => [...arr].sort((a, b) => a.Elevation - b.Elevation),
+  (arr) => [...arr].sort((a, b) => a.StaticElevationFt - b.StaticElevationFt),
 );
 export const selectAllWellsChosen = createSelector(
   selectSelectedWellTriplet,
@@ -311,16 +311,16 @@ export const runCheckStep1 =
     const lo = sorted[0],
       mid = sorted[1],
       hi = sorted[2];
-    const diffHighLow = precise_round(hi.Elevation - lo.Elevation, 1);
-    const diffHighMid = precise_round(hi.Elevation - mid.Elevation, 1);
+    const diffHighLow = precise_round(hi.StaticElevationFt - lo.StaticElevationFt, 1);
+    const diffHighMid = precise_round(hi.StaticElevationFt - mid.StaticElevationFt, 1);
     dispatch(
       _applyStep1Result({
         hiName: hi.Name,
-        hiVal: hi.Elevation,
+        hiVal: hi.StaticElevationFt,
         loName: lo.Name,
-        loVal: lo.Elevation,
+        loVal: lo.StaticElevationFt,
         midName: mid.Name,
-        midVal: mid.Elevation,
+        midVal: mid.StaticElevationFt,
         diffHighLow,
         diffHighMid,
         options,

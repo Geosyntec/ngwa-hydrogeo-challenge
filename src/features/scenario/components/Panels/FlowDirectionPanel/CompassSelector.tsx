@@ -7,7 +7,8 @@ import {
 } from "../../../flowDirection/flowSlice";
 import { unitVectorFromRaphaelAngle } from "../../../services/drawingMath";
 
-export default function CompassSelector({ size = 150 }: { size?: number }) {
+export default function CompassSelector({ display = true }: { display?: boolean }) {
+  const size = 150;
   const dispatch = useAppDispatch();
   const { DirectionAngle } = useAppSelector(selectFlow);
   const [dragging, setDragging] = useState(false);
@@ -67,6 +68,7 @@ export default function CompassSelector({ size = 150 }: { size?: number }) {
     const v = unitVectorFromRaphaelAngle(deg);
     return { x: cx + v.x * r, y: cy + v.y * r };
   };
+  if(!display) return null
   return (
     <Box sx={{ display: "inline-block", touchAction: "none" }}>
       <svg

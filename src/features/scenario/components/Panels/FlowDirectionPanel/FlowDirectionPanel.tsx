@@ -6,14 +6,12 @@ import {
   Stack,
   Typography,
   Button,
+  Box,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { useAppDispatch, useAppSelector } from "../../../../../app/hooks";
 import {
   selectAllWellsChosen,
-  runCheckStep1,
-  runCheckStep2,
-  runCheckStep3,
   selectFlow,
   selectFlowStep3Complete,
 } from "../../../flowDirection/flowSlice";
@@ -22,8 +20,7 @@ import { useEffect, useCallback, useState } from "react";
 import FDStep1 from "./FD_Step1";
 import FDStep2 from "./FD_Step2";
 import FDStep3 from "./FD_Step3";
-import RealityCheck from '../../RealityCheck/RealityCheck'
-
+import RealityCheck from "../../RealityCheck/RealityCheck";
 
 export default function FlowDirectionPanel() {
   const dispatch = useAppDispatch();
@@ -42,7 +39,7 @@ export default function FlowDirectionPanel() {
     (_e: any, expanded: boolean) => {
       dispatch(setSelectedPanel(expanded ? "flow" : null));
     },
-    [dispatch],
+    [dispatch]
   );
 
   return (
@@ -50,6 +47,10 @@ export default function FlowDirectionPanel() {
       disabled={!ready}
       expanded={selectedPanel === "flow"}
       onChange={onToggle}
+      sx={{
+        maxHeight: "20%",
+        overflow:"scroll"
+      }}
     >
       <AccordionSummary expandIcon={<ExpandMoreIcon />}>
         <Typography variant="subtitle1">Flow Direction</Typography>
@@ -70,54 +71,6 @@ export default function FlowDirectionPanel() {
               <FDStep2 />
               <Divider />
               <FDStep3 />
-              <Stack direction="row" spacing={1}>
-                <Button
-                  variant="outlined"
-                  onClick={() =>
-                    dispatch(runCheckStep1({ checkAnswers: true }))
-                  }
-                >
-                  Check Step 1
-                </Button>
-                <Button
-                  variant="outlined"
-                  onClick={() => dispatch(runCheckStep1({ showAnswers: true }))}
-                >
-                  Show Step 1 Solution
-                </Button>
-              </Stack>
-              <Stack direction="row" spacing={1}>
-                <Button
-                  variant="outlined"
-                  onClick={() =>
-                    dispatch(runCheckStep2({ checkAnswers: true }))
-                  }
-                >
-                  Check Step 2
-                </Button>
-                <Button
-                  variant="outlined"
-                  onClick={() => dispatch(runCheckStep2({ showAnswers: true }))}
-                >
-                  Show Step 2 Solution
-                </Button>
-              </Stack>
-              <Stack direction="row" spacing={1}>
-                <Button
-                  variant="outlined"
-                  onClick={() =>
-                    dispatch(runCheckStep3({ checkAnswers: true }))
-                  }
-                >
-                  Check Step 3
-                </Button>
-                <Button
-                  variant="outlined"
-                  onClick={() => dispatch(runCheckStep3({ showAnswers: true }))}
-                >
-                  Show Step 3 Solution
-                </Button>
-              </Stack>
               <Typography variant="caption" color="text.secondary">
                 Right: {flow.rightAnswers} &nbsp; Wrong: {flow.wrongAnswers}
               </Typography>

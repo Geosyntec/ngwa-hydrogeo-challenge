@@ -1,6 +1,6 @@
-import { Grid, TextField, Typography } from "@mui/material";
+import { Grid, TextField, Typography,Stack,Button } from "@mui/material";
 import { useAppDispatch, useAppSelector } from "../../../../../app/hooks";
-import { selectFlow, setField } from "../../../flowDirection/flowSlice";
+import { selectFlow, setField,runCheckStep1 } from "../../../flowDirection/flowSlice";
 
 export default function FDStep1() {
   const flow = useAppSelector(selectFlow);
@@ -9,7 +9,7 @@ export default function FDStep1() {
     key: any,
     label: string,
     helper?: string,
-    maxLength?: number,
+    maxLength?: number
   ) => {
     const f: any = (flow as any)[key];
     return (
@@ -24,7 +24,7 @@ export default function FDStep1() {
               value: maxLength
                 ? e.target.value.slice(0, maxLength)
                 : e.target.value,
-            }),
+            })
           )
         }
         error={f.checked && !f.isCorrect}
@@ -45,7 +45,7 @@ export default function FDStep1() {
             "HighestWaterTableName",
             "Highest well (letter)",
             "Enter A/B/C…",
-            1,
+            1
           )}
         </Grid>
         <Grid item xs={12} md={6}>
@@ -56,7 +56,7 @@ export default function FDStep1() {
             "LowestWaterTableName",
             "Lowest well (letter)",
             "Enter A/B/C…",
-            1,
+            1
           )}
         </Grid>
         <Grid item xs={12} md={6}>
@@ -67,7 +67,7 @@ export default function FDStep1() {
             "RemainingWellName",
             "Remaining well (letter)",
             "Enter A/B/C…",
-            1,
+            1
           )}
         </Grid>
         <Grid item xs={12} md={6}>
@@ -80,6 +80,20 @@ export default function FDStep1() {
           {bind("DiffBtwnHighestMiddle", "Δ Elev (High - Mid)")}
         </Grid>
       </Grid>
+      <Stack direction="row" spacing={1}>
+        <Button
+          variant="outlined"
+          onClick={() => dispatch(runCheckStep1({ checkAnswers: true }))}
+        >
+          Check Step 1
+        </Button>
+        <Button
+          variant="outlined"
+          onClick={() => dispatch(runCheckStep1({ showAnswers: true }))}
+        >
+          Show Step 1 Solution
+        </Button>
+      </Stack>
     </>
   );
 }
