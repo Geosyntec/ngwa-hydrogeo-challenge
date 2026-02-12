@@ -3,6 +3,7 @@ import {
   computeYLengthFeet,
   computeGradientValue,
 } from "../services/drawingMath";
+import { RootState } from "@reduxjs/toolkit/query";
 
 export interface AnswerField {
   input: string;
@@ -127,6 +128,9 @@ export const gradientSlice = createSlice({
     },
   },
 });
-export const { setField, checkStep1, checkStep2, resetGradient } =
+export const { setField, checkStep1Applied, checkStep2Applied, resetGradient } =
   gradientSlice.actions;
+
+export const selectGradient = (s:any)=>s.gradient
+  
 export default gradientSlice.reducer;

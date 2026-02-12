@@ -145,6 +145,8 @@ export const velocitySlice = createSlice({
     },
   },
 });
-export const { setField, checkStep1, checkStep2, resetVelocity } =
+export const { setField, checkStep1Applied, checkStep2Applied, resetVelocity } =
   velocitySlice.actions;
+
+export const selectVelocity = (s:any)=>s.velocity  
 export default velocitySlice.reducer;

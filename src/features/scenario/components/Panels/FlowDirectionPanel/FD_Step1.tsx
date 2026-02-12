@@ -1,7 +1,7 @@
 import { Grid, TextField, Typography,Stack,Button } from "@mui/material";
 import { useAppDispatch, useAppSelector } from "../../../../../app/hooks";
 import { setField } from "../../../flowDirection/flowSlice";
-import { selectFlow } from "../../../flowDirection/flowSelectors";
+import { selectFlow,runCheckStep1 } from "../../../flowDirection/flowSelectors";
 
 export default function FDStep1() {
   const flow = useAppSelector(selectFlow);
