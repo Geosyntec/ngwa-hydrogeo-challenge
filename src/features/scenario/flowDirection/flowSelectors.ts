@@ -43,6 +43,12 @@ export const selectFlowStep3Complete = (s: RootState) => {
   return _filled(f.SelectedDirection)
 }
 
+/** True when all three Flow Direction steps have answers (filled or solution shown). */
+export const selectFlowAllStepsComplete = (s: RootState) =>
+  selectFlowStep1Complete(s) &&
+  selectFlowStep2Complete(s) &&
+  selectFlowStep3Complete(s)
+
 export const runCheckStep1 = (options: StepCheckOptions = {}) =>
   (dispatch: any, getState: () => RootState) => {
     const s = getState()

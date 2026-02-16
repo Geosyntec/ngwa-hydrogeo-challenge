@@ -130,7 +130,6 @@ export default function Scenario() {
     dispatch(setIsTest(false));
     dispatch(setScenarios([demo] as any));
     dispatch(selectScenarioByIndex(0));
-    dispatch(setSelectedPanel("flow"));
   }, [dispatch]);
 
   const currentScenario = scenarios[scenarioIndex];

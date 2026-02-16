@@ -34,10 +34,17 @@ export default function FlowDirectionPanel() {
   const [rcOpen, setRcOpen] = useState(false);
 
   useEffect(() => {
+    if (ready && selectedPanel !== "gradient" && selectedPanel !== "velocity") {
+      dispatch(setSelectedPanel("flow"));
+    }
+  }, [ready, selectedPanel, dispatch]);
+
+  useEffect(() => {
     if (flowDone) {
       dispatch(setSelectedPanel("gradient"));
     }
   }, [flowDone, dispatch]);
+
   const onToggle = useCallback(
     (_e: any, expanded: boolean) => {
       dispatch(setSelectedPanel(expanded ? "flow" : null));

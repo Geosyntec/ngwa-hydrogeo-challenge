@@ -19,7 +19,7 @@ import {
 } from "../../../gradient/gradientSelectors";
 import { setField } from "../../../gradient/gradientSlice";
 import { selectSortedByElevation } from "../../../flowDirection/flowSlice";
-import { selectFlowStep3Complete } from "../../../flowDirection/flowSelectors";
+import { selectFlowAllStepsComplete } from "../../../flowDirection/flowSelectors";
 import { selectScenarioState, setSelectedPanel } from "../../../ScenarioSlice";
 import RealityCheck from "../../RealityCheck/RealityCheck";
 import { useCallback, useEffect, useState } from "react";
@@ -29,11 +29,17 @@ export default function GradientPanel() {
   const g = useAppSelector(selectGradient);
   const sorted = useAppSelector(selectSortedByElevation);
   const ready = sorted.length === 3;
-  const flowReady = useAppSelector(selectFlowStep3Complete);
+  const flowReady = useAppSelector(selectFlowAllStepsComplete);
   const gradDone = useAppSelector(selectGradientStep2Complete);
   const { selectedPanel } = useAppSelector(selectScenarioState);
   const hi = ready ? sorted[2].Elevation : 0;
   const mid = ready ? sorted[1].Elevation : 0;
+  useEffect(() => {
+    if (flowReady && selectedPanel !== "velocity") {
+      dispatch(setSelectedPanel("gradient"));
+    }
+  }, [flowReady, selectedPanel, dispatch]);
+
   useEffect(() => {
     if (gradDone) {
       dispatch(setSelectedPanel("velocity"));
@@ -67,7 +73,6 @@ export default function GradientPanel() {
 
   return (
     <Accordion
-      defaultExpanded
       disabled={!flowReady}
       expanded={selectedPanel === "gradient"}
       onChange={onToggle}
@@ -79,7 +84,7 @@ export default function GradientPanel() {
         <Box sx={{ position: "relative", overflow: "visible" }}>
           {!flowReady && (
             <Typography variant="body2" color="text.secondary">
-              Complete <strong>Flow Direction – Step 3</strong> to unlock
+              Complete all <strong>Flow Direction</strong> steps (1–3) to unlock
               Gradient.
             </Typography>
           )}

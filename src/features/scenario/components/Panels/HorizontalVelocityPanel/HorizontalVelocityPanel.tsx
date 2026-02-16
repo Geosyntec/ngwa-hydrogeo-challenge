@@ -58,7 +58,6 @@ export default function HorizontalVelocityPanel() {
   const [rcOpen, setRcOpen] = useState(false);
   return (
     <Accordion
-      defaultExpanded
       disabled={!gradReady}
       expanded={selectedPanel === "velocity"}
       onChange={onToggle}
