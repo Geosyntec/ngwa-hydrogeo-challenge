@@ -6,6 +6,9 @@ export const ROUTES = {
   reference: '/reference',
   about: '/about',
   grading: '/grading',
+  gradingClasses: '/grading/classes',
+  gradingGrades: '/grading/grades',
+  gradingCreateTest: '/grading/create-test',
 } as const
 
 export const NAV_ITEMS = [

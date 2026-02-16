@@ -7,6 +7,9 @@ import ScenarioPage from './pages/ScenarioPage'
 import ReferencePage from './pages/ReferencePage'
 import AboutPage from './pages/AboutPage'
 import TeacherGradingPage from './pages/TeacherGradingPage'
+import ManageClassesPage from './pages/teacher/ManageClassesPage'
+import ViewGradesPage from './pages/teacher/ViewGradesPage'
+import CreateTestPage from './pages/teacher/CreateTestPage'
 import { ROUTES } from './app/routes'
 
 const theme = createTheme()
@@ -25,6 +28,9 @@ export default function App() {
             <Route path={ROUTES.reference} element={<ReferencePage />} />
             <Route path={ROUTES.about} element={<AboutPage />} />
             <Route path={ROUTES.grading} element={<TeacherGradingPage />} />
+            <Route path={ROUTES.gradingClasses} element={<ManageClassesPage />} />
+            <Route path={ROUTES.gradingGrades} element={<ViewGradesPage />} />
+            <Route path={ROUTES.gradingCreateTest} element={<CreateTestPage />} />
             <Route path="*" element={<Navigate to={ROUTES.home} replace />} />
           </Route>
         </Routes>
