@@ -1,44 +1,11 @@
-import { useState } from 'react'
-import { NavLink, useLocation } from 'react-router-dom'
-import {
-  AppBar,
-  Toolbar,
-  Typography,
-  Button,
-  Menu,
-  MenuItem,
-  Box,
-  useTheme,
-} from '@mui/material'
-import { useAppSelector, useAppDispatch } from '../../app/hooks'
-import {
-  selectScenarioState,
-  selectScenarioByIndex,
-} from '../../features/scenario/ScenarioSlice'
+import { NavLink } from 'react-router-dom'
+import { AppBar, Toolbar, Typography, Box, useTheme } from '@mui/material'
 import { ROUTES, NAV_ITEMS } from '../../app/routes'
 
 const brandColor = '#6CB5F4'
 
 export default function TopBar() {
   const theme = useTheme()
-  const location = useLocation()
-  const dispatch = useAppDispatch()
-  const { title, scenarios, scenarioIndex } = useAppSelector(selectScenarioState)
-  const onChallengePage =
-    location.pathname === ROUTES.scenario ||
-    location.pathname.startsWith(ROUTES.scenario + '/')
-
-  const [scenarioAnchor, setScenarioAnchor] = useState<null | HTMLElement>(null)
-
-  const openScenarioMenu = (e: React.MouseEvent<HTMLElement>) => {
-    e.preventDefault()
-    setScenarioAnchor(e.currentTarget)
-  }
-  const closeScenarioMenu = () => setScenarioAnchor(null)
-  const selectScenario = (index: number) => {
-    dispatch(selectScenarioByIndex(index))
-    closeScenarioMenu()
-  }
 
   return (
     <AppBar
@@ -57,8 +24,8 @@ export default function TopBar() {
           gap: 2,
         }}
       >
-        {/* Left: brand + scenario dropdown when on challenge */}
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flex: 1 }}>
+        {/* Left: brand */}
+        <Box sx={{ display: 'flex', alignItems: 'center', flex: 1 }}>
           <Typography
             component="span"
             variant="h6"
@@ -70,41 +37,6 @@ export default function TopBar() {
           >
             Hydrogeology
           </Typography>
-          {onChallengePage && scenarios.length > 0 && (
-            <Button
-              size="small"
-              onClick={openScenarioMenu}
-              sx={{
-                color: '#fff',
-                textTransform: 'none',
-                border: '1px solid rgba(255,255,255,0.3)',
-                '&:hover': { borderColor: brandColor, backgroundColor: 'rgba(255,255,255,0.05)' },
-              }}
-            >
-              <Typography variant="body2" component="span" sx={{ lineHeight: 1.2, textAlign: 'left' }}>
-                {title || 'Select scenario'}
-              </Typography>
-              <Typography component="span" sx={{ ml: 0.5 }}>▾</Typography>
-            </Button>
-          )}
-          <Menu
-            anchorEl={scenarioAnchor}
-            open={Boolean(scenarioAnchor)}
-            onClose={closeScenarioMenu}
-            anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
-            transformOrigin={{ vertical: 'top', horizontal: 'left' }}
-            PaperProps={{ sx: { mt: 1.5, minWidth: 220 } }}
-          >
-            {scenarios.map((s, i) => (
-              <MenuItem
-                key={s.id}
-                selected={scenarioIndex === i}
-                onClick={() => selectScenario(i)}
-              >
-                {s.name}
-              </MenuItem>
-            ))}
-          </Menu>
         </Box>
 
         {/* Right: nav pills with vertical rules (legacy-style) */}

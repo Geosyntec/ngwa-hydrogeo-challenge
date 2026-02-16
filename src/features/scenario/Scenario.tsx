@@ -1,5 +1,13 @@
 import { useEffect } from "react";
-import { Box, Container, Grid, Typography } from "@mui/material";
+import {
+  Box,
+  Container,
+  FormControl,
+  Grid,
+  MenuItem,
+  Select,
+  Typography,
+} from "@mui/material";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import {
   setIsTest,
@@ -17,7 +25,7 @@ import HorizontalVelocityPanel from "./components/Panels/HorizontalVelocityPanel
 
 export default function Scenario() {
   const dispatch = useAppDispatch();
-  const { title } = useAppSelector(selectScenarioState);
+  const { scenarios, scenarioIndex } = useAppSelector(selectScenarioState);
 
   useEffect(() => {
     //TODO: Pull scenario from API 
@@ -125,11 +133,32 @@ export default function Scenario() {
     dispatch(setSelectedPanel("flow"));
   }, [dispatch]);
 
+  const currentScenario = scenarios[scenarioIndex];
+  const scenarioValue = scenarioIndex >= 0 ? scenarioIndex : "";
+
   return (
     <Container maxWidth="xl" sx={{ py: 2 }}>
-      <Typography variant="h5" sx={{ mb: 2 }}>
-        {title || "Scenario"}
-      </Typography>
+      <Box sx={{ mb: 2 }}>
+        <FormControl size="small" sx={{ minWidth: 240 }}>
+          <Select
+            value={scenarioValue}
+            onChange={(e) => dispatch(selectScenarioByIndex(Number(e.target.value)))}
+            displayEmpty
+            renderValue={() =>
+              currentScenario ? currentScenario.name : "Select a scenario"
+            }
+          >
+            {scenarios.map((s, i) => (
+              <MenuItem key={s.id} value={i}>
+                {s.name}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+        <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+          Selecting a new scenario will reset the challenge and all progress will be lost.
+        </Typography>
+      </Box>
 
       <Grid container spacing={2}>
         <Grid item xs={12} md={6}>
