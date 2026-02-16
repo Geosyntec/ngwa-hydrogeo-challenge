@@ -1,4 +1,21 @@
-import { Box, Checkbox, Stack, Table, TableBody, TableCell, TableHead, TableRow, Typography } from '@mui/material'
+import { useState } from 'react'
+import {
+  Box,
+  Checkbox,
+  IconButton,
+  Stack,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+  Typography,
+} from '@mui/material'
+import UnfoldMore from '@mui/icons-material/UnfoldMore'
+import UnfoldLess from '@mui/icons-material/UnfoldLess'
+
+/** Where to anchor the card relative to the well marker (legacy: optimal visibility when 3 wells selected). */
+export type WellInfoCardPlacement = 'above' | 'below' | 'left' | 'right'
 
 export type WellInfoCardProps = {
   well: {
@@ -16,14 +33,28 @@ export type WellInfoCardProps = {
   left: number
   /** Whether the card should be visible */
   open: boolean
+  /** Where to anchor the card relative to the marker (default: above). Set by MapView when 3 wells selected. */
+  placement?: WellInfoCardPlacement
   /** Optional: toggle pump */
   onTogglePumping?: (on: boolean) => void
 }
 
 /**
  * A non-modal hover card that anchors near a well marker.
- * This component is purely presentational—no focus trapping, no portal.
+ * G/S/P and pumping are always visible; Geology & Hydrology is hidden by default
+ * and toggled with an icon (legacy expand/collapse behavior). Card has a max width
+ * with horizontal/vertical scroll when content overflows.
  */
+const PLACEMENT_STYLES: Record<
+  WellInfoCardPlacement,
+  { transform: string; transformOrigin?: string }
+> = {
+  above: { transform: 'translate(8px, -100%)' },
+  below: { transform: 'translate(8px, 24px)' },
+  left: { transform: 'translate(calc(-100% - 8px), -50%)', transformOrigin: 'top center' },
+  right: { transform: 'translate(8px, -50%)', transformOrigin: 'top center' },
+}
+
 export default function WellInfoCard({
   well,
   allowPumping,
@@ -31,11 +62,15 @@ export default function WellInfoCard({
   top,
   left,
   open,
+  placement = 'above',
   onTogglePumping,
 }: WellInfoCardProps) {
-  // Offset the card slightly so it doesn’t cover the marker
-  const OFFSET_X = 14; // px to the right of the marker
-  const OFFSET_Y = -8; // px above the marker center
+  const [geologyExpanded, setGeologyExpanded] = useState(false)
+
+  const OFFSET_X = 14
+  const OFFSET_Y = placement === 'above' || placement === 'below' ? -8 : 0
+
+  const placementStyle = PLACEMENT_STYLES[placement]
 
   return (
     <Box
@@ -44,25 +79,41 @@ export default function WellInfoCard({
         position: 'absolute',
         top: top + OFFSET_Y,
         left: left + OFFSET_X,
-        transform: 'translate(8px, -100%)', // to the top-right of marker
+        ...placementStyle,
         zIndex: 2,
         display: open ? 'block' : 'none',
-        minWidth: 280,
-        maxWidth: 360,
+        maxWidth: 380,
+        maxHeight: '70vh',
+        overflowX: 'auto',
+        overflowY: 'auto',
         bgcolor: 'background.paper',
         border: (t) => `1px solid ${t.palette.divider}`,
         boxShadow: 3,
         borderRadius: 1.5,
         p: 1.25,
-        pointerEvents: 'auto', // allow hover inside if needed
+        pointerEvents: 'auto',
       }}
     >
-      <Stack direction="row" spacing={2}>
-        <Box>
-          <Stack spacing={0.5}>
-            <Row label="G" value={`${well.GroundElevationFt}`} />
-            <Row label="S" value={`${well.StaticElevationFt}`} />
-            <Row label="P" value={`${well.PumpingElevationFt}`} />
+      <Stack direction="row" spacing={1} sx={{ minWidth: 'min-content' }}>
+        <Box sx={{ flexShrink: 0 }}>
+          <Stack direction="row" alignItems="flex-start" spacing={0.5}>
+            <IconButton
+              size="small"
+              onClick={() => setGeologyExpanded((e) => !e)}
+              aria-label={geologyExpanded ? 'Hide Geology & Hydrology' : 'Show Geology & Hydrology'}
+              sx={{ mt: -0.5, mr: 0.25 }}
+            >
+              {geologyExpanded ? (
+                <UnfoldLess fontSize="small" />
+              ) : (
+                <UnfoldMore fontSize="small" />
+              )}
+            </IconButton>
+            <Stack spacing={0.5}>
+              <Row label="G" value={`${well.GroundElevationFt}`} />
+              <Row label="S" value={`${well.StaticElevationFt}`} />
+              <Row label="P" value={`${well.PumpingElevationFt}`} />
+            </Stack>
           </Stack>
 
           {allowPumping && (
@@ -83,31 +134,34 @@ export default function WellInfoCard({
           </Box>
         </Box>
 
-        <Box sx={{ borderLeft: (t) => `1px solid ${t.palette.divider}`, mx: 1 }} />
-
-        <Box>
-          <Typography variant="subtitle2" sx={{ mb: 0.5 }}>Geology & Hydrology</Typography>
-          <Table size="small" sx={{ width: 300 }}>
-            <TableHead>
-              <TableRow>
-                <TableCell>Depth (ft)</TableCell>
-                <TableCell>Lithology</TableCell>
-                <TableCell>K</TableCell>
-                <TableCell>Porosity (%)</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {(well.GeologyNew ?? []).map((r, i) => (
-                <TableRow key={i}>
-                  <TableCell>{r.depthFt}</TableCell>
-                  <TableCell>{r.lithology}</TableCell>
-                  <TableCell>{r.conductivityK ?? ''}</TableCell>
-                  <TableCell>{r.porosityPct ?? ''}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </Box>
+        {geologyExpanded && (
+          <>
+            <Box sx={{ borderLeft: (t) => `1px solid ${t.palette.divider}`, alignSelf: 'stretch', flexShrink: 0 }} />
+            <Box sx={{ flexShrink: 0 }}>
+              <Typography variant="subtitle2" sx={{ mb: 0.5 }}>Geology & Hydrology</Typography>
+              <Table size="small" sx={{ width: 300 }}>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Depth (ft)</TableCell>
+                    <TableCell>Lithology</TableCell>
+                    <TableCell>K</TableCell>
+                    <TableCell>Porosity (%)</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {(well.GeologyNew ?? []).map((r, i) => (
+                    <TableRow key={i}>
+                      <TableCell>{r.depthFt}</TableCell>
+                      <TableCell>{r.lithology}</TableCell>
+                      <TableCell>{r.conductivityK ?? ''}</TableCell>
+                      <TableCell>{r.porosityPct ?? ''}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </Box>
+          </>
+        )}
       </Stack>
     </Box>
   )

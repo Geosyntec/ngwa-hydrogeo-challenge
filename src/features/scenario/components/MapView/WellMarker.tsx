@@ -9,10 +9,15 @@ import {
   selectWell,
   setWellPumping,
 } from "../../ScenarioSlice";
-import WellInfoCard from "./WellInfoCard";
+import WellInfoCard, { type WellInfoCardPlacement } from "./WellInfoCard";
 
-export default memo(function WellMarker({ wellId }: { wellId: string }) {
-  console.log("rendering well popover: ",wellId)
+export default memo(function WellMarker({
+  wellId,
+  cardPlacement,
+}: {
+  wellId: string;
+  cardPlacement?: WellInfoCardPlacement;
+}) {
   const dispatch = useAppDispatch();
   const well = useAppSelector(selectWellById(wellId));
   const allSelected = useAppSelector(selectAllWellsSelected);
@@ -68,27 +73,25 @@ export default memo(function WellMarker({ wellId }: { wellId: string }) {
           </Box>
 
           {/* Non-modal, anchored info card (rendered for selected wells) */}
-          {(
-            <WellInfoCard
-              well={{
-                Name: well.Name,
-                GroundElevationFt: well.GroundElevationFt,
-                StaticElevationFt: well.StaticElevationFt,
-                PumpingElevationFt: well.PumpingElevationFt,
-                IsPumpingOn: well.IsPumpingOn,
-                GeologyNew: (well as any).GeologyNew ?? [],
-              }}
-              allowPumping={allowPumping}
-              isTest={isTest}
-              // anchor near marker's position (use same top/left base in this container)
-              top={0} // local (relative to this wrapper)
-              left={0} // local (relative to this wrapper)
-              open={showCard}
-              onTogglePumping={(on) =>
-                dispatch(setWellPumping({ id: well.id, on }))
-              }
-            />
-          )}
+          <WellInfoCard
+            well={{
+              Name: well.Name,
+              GroundElevationFt: well.GroundElevationFt,
+              StaticElevationFt: well.StaticElevationFt,
+              PumpingElevationFt: well.PumpingElevationFt,
+              IsPumpingOn: well.IsPumpingOn,
+              GeologyNew: (well as any).GeologyNew ?? [],
+            }}
+            allowPumping={allowPumping}
+            isTest={isTest}
+            top={0}
+            left={0}
+            open={showCard}
+            placement={cardPlacement}
+            onTogglePumping={(on) =>
+              dispatch(setWellPumping({ id: well.id, on }))
+            }
+          />
         </Box>
       )}
     </>
