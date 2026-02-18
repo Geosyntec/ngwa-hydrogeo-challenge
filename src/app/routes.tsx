@@ -5,6 +5,7 @@ export const ROUTES = {
   scenarioTest: '/scenario/test/:testId',
   reference: '/reference',
   about: '/about',
+  login: '/login',
   grading: '/grading',
   gradingClasses: '/grading/classes',
   gradingGrades: '/grading/grades',

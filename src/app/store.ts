@@ -3,7 +3,7 @@ import scenarioReducer from '../features/scenario/ScenarioSlice'
 import flowDirectionReducer from '../features/scenario/flowDirection/flowSlice'
 import gradientReducer from '../features/scenario/gradient/gradientSlice'
 import velocityReducer from '../features/scenario/velocity/velocitySlice'
-
+import authReducer from '../features/auth/authSlice'
 
 export const store = configureStore({
   reducer: {
@@ -11,7 +11,7 @@ export const store = configureStore({
     flowDirection: flowDirectionReducer,
     gradient: gradientReducer,
     velocity: velocityReducer,
-
+    auth: authReducer,
   },
 })
 
