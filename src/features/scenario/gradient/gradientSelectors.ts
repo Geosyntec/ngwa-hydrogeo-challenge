@@ -21,6 +21,15 @@ export const selectGradientStep2Complete = (s: RootState) => {
          _filled(g.Gradient)
 }
 
+const GRADIENT_ANSWER_KEYS = ['WhatIsDistanceYValue', 'HighestWaterTableValue', 'RemainingWellValue', 'WhatIsDistanceYValue2', 'Gradient'] as const
+
+export const GRADIENT_TOTAL_QUESTIONS = GRADIENT_ANSWER_KEYS.length
+
+export const selectGradientRightCount = (s: RootState) => {
+  const g: any = selectGradient(s)
+  return GRADIENT_ANSWER_KEYS.filter((key) => g[key]?.isCorrect).length
+}
+
 export const checkStep1 = (opts: { check?: boolean; show?: boolean } = {}) =>
   (dispatch: any, getState: () => RootState) => {
     const s = getState()

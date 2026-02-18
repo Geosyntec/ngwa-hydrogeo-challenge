@@ -7,7 +7,7 @@ import {
   Stack,
   TextField,
   Typography,
-  Box
+  Box,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { useAppDispatch, useAppSelector } from "../../../../../app/hooks";
@@ -15,20 +15,50 @@ import {
   selectVelocity,
   checkStep1,
   checkStep2,
+  selectVelocityStep2Complete,
+  selectVelocityRightCount,
+  VELOCITY_TOTAL_QUESTIONS,
 } from "../../../velocity/velocitySelectors";
-import{setField} from "../../../velocity/velocitySlice";
+import { setField } from "../../../velocity/velocitySlice";
 import { selectSortedByElevation } from "../../../flowDirection/flowSlice";
-import { selectGradientStep2Complete } from "../../../gradient/gradientSelectors";
-import { selectScenarioState, setSelectedPanel } from "../../../ScenarioSlice";
+import {
+  selectFlowAllStepsComplete,
+  selectFlowRightCount,
+  FLOW_TOTAL_QUESTIONS,
+} from "../../../flowDirection/flowSelectors";
+import {
+  selectGradientStep2Complete,
+  selectGradientRightCount,
+  GRADIENT_TOTAL_QUESTIONS,
+} from "../../../gradient/gradientSelectors";
+import {
+  selectScenarioState,
+  setSelectedPanel,
+  clearWell,
+} from "../../../ScenarioSlice";
+import { reset as resetFlow } from "../../../flowDirection/flowSlice";
+import { resetGradient } from "../../../gradient/gradientSlice";
+import { resetVelocity } from "../../../velocity/velocitySlice";
 import { useCallback, useState } from "react";
-import RealityCheck from '../../RealityCheck/RealityCheck'
+import { useNavigate } from "react-router-dom";
+import RealityCheck from "../../RealityCheck/RealityCheck";
+import SubmitResultsModal from "../SubmitResultsModal";
+import { ROUTES } from "../../../../../app/routes";
 
 
 export default function HorizontalVelocityPanel() {
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   const v = useAppSelector(selectVelocity);
   const sorted = useAppSelector(selectSortedByElevation);
   const gradReady = useAppSelector(selectGradientStep2Complete);
+  const flowComplete = useAppSelector(selectFlowAllStepsComplete);
+  const velocityComplete = useAppSelector(selectVelocityStep2Complete);
+  const allPanelsComplete = flowComplete && gradReady && velocityComplete;
+  const flowRight = useAppSelector(selectFlowRightCount);
+  const gradientRight = useAppSelector(selectGradientRightCount);
+  const velocityRight = useAppSelector(selectVelocityRightCount);
+  const [submitModalOpen, setSubmitModalOpen] = useState(false);
   const { selectedPanel } = useAppSelector(selectScenarioState);
   const ready = sorted.length === 3;
   const onToggle = useCallback(
@@ -169,8 +199,45 @@ export default function HorizontalVelocityPanel() {
                   </Button>
                 </Stack>
               </div>
+
+              <Button
+                variant="contained"
+                color="primary"
+                size="large"
+                fullWidth
+                disabled={!allPanelsComplete}
+                onClick={() => setSubmitModalOpen(true)}
+                sx={{ mt: 3 }}
+              >
+                Submit Answers
+              </Button>
             </Stack>
           )}
+
+          <SubmitResultsModal
+            open={submitModalOpen}
+            onClose={() => setSubmitModalOpen(false)}
+            flowRight={flowRight}
+            flowTotal={FLOW_TOTAL_QUESTIONS}
+            gradientRight={gradientRight}
+            gradientTotal={GRADIENT_TOTAL_QUESTIONS}
+            velocityRight={velocityRight}
+            velocityTotal={VELOCITY_TOTAL_QUESTIONS}
+            onResetChallenge={() => {
+              dispatch(clearWell(1));
+              dispatch(clearWell(2));
+              dispatch(clearWell(3));
+              dispatch(resetFlow());
+              dispatch(resetGradient());
+              dispatch(resetVelocity());
+              dispatch(setSelectedPanel(null));
+              setSubmitModalOpen(false);
+            }}
+            onReturnHome={() => {
+              setSubmitModalOpen(false);
+              navigate(ROUTES.home);
+            }}
+          />
 
           <RealityCheck
             title="Reality Check: Horizontal Velocity"

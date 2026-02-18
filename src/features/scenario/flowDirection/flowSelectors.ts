@@ -49,6 +49,20 @@ export const selectFlowAllStepsComplete = (s: RootState) =>
   selectFlowStep2Complete(s) &&
   selectFlowStep3Complete(s)
 
+const FLOW_ANSWER_KEYS = [
+  'HighestWaterTableName', 'HighestWaterTableValue', 'LowestWaterTableName', 'LowestWaterTableValue',
+  'RemainingWellName', 'RemainingWellValue', 'DiffBtwnHighestLowest', 'DiffBtwnHighestMiddle',
+  'DiffBtwnHighestLowest2', 'DiffBtwnHighestMiddle2', 'ElevationRatio', 'DistanceHighestLowest',
+  'ElevResult_X_DistanceHighMid', 'SelectedDirection',
+] as const
+
+export const FLOW_TOTAL_QUESTIONS = FLOW_ANSWER_KEYS.length
+
+export const selectFlowRightCount = (s: RootState) => {
+  const f: any = selectFlow(s)
+  return FLOW_ANSWER_KEYS.filter((key) => f[key]?.isCorrect).length
+}
+
 export const runCheckStep1 = (options: StepCheckOptions = {}) =>
   (dispatch: any, getState: () => RootState) => {
     const s = getState()
