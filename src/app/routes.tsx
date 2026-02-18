@@ -18,5 +18,4 @@ export const NAV_ITEMS = [
   { path: ROUTES.scenario, label: 'The Challenge' },
   { path: ROUTES.reference, label: 'Reference' },
   { path: ROUTES.about, label: 'About' },
-  { path: ROUTES.grading, label: 'Teacher Grading' },
 ] as const
