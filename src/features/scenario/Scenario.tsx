@@ -23,9 +23,13 @@ import FlowDirectionPanel from "./components/Panels/FlowDirectionPanel/FlowDirec
 import GradientPanel from "./components/Panels/GradientPanel/GradientPanel";
 import HorizontalVelocityPanel from "./components/Panels/HorizontalVelocityPanel/HorizontalVelocityPanel";
 
-export default function Scenario() {
+export default function Scenario({ isTest = false }: { isTest?: boolean }) {
   const dispatch = useAppDispatch();
   const { scenarios, scenarioIndex } = useAppSelector(selectScenarioState);
+
+  useEffect(() => {
+    dispatch(setIsTest(!!isTest));
+  }, [isTest, dispatch]);
 
   useEffect(() => {
     //TODO: Pull scenario from API 
@@ -127,7 +131,6 @@ export default function Scenario() {
         },
       ],
     };
-    dispatch(setIsTest(false));
     dispatch(setScenarios([demo] as any));
     dispatch(selectScenarioByIndex(0));
   }, [dispatch]);

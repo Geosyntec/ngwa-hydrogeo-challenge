@@ -25,8 +25,8 @@ export default function App() {
           <Route element={<AppLayout />}>
             <Route path={ROUTES.home} element={<LandingPage />} />
             <Route path={ROUTES.gettingStarted} element={<GettingStartedPage />} />
-            <Route path={ROUTES.scenario} element={<ScenarioPage />} />
-            <Route path={ROUTES.scenarioTest} element={<ScenarioPage />} />
+            <Route path={ROUTES.scenario} element={<ScenarioPage isTest={false} />} />
+            <Route path={ROUTES.test} element={<ScenarioPage isTest />} />
             <Route path={ROUTES.reference} element={<ReferencePage />} />
             <Route path={ROUTES.about} element={<AboutPage />} />
             <Route path={ROUTES.login} element={<LoginPage />} />

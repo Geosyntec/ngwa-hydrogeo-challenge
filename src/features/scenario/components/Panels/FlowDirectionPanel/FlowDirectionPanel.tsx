@@ -30,7 +30,7 @@ export default function FlowDirectionPanel() {
   const ready = useAppSelector(selectAllWellsChosen);
   const flow = useAppSelector(selectFlow);
   const flowDone = useAppSelector(selectFlowStep3Complete);
-  const { selectedPanel } = useAppSelector(selectScenarioState);
+  const { selectedPanel, isTest } = useAppSelector(selectScenarioState);
   const [rcOpen, setRcOpen] = useState(false);
 
   useEffect(() => {
@@ -82,13 +82,15 @@ export default function FlowDirectionPanel() {
               <FDStep2 />
               <Divider />
               <FDStep3 />
-              <Typography variant="caption" color="text.secondary">
-                Right: {flow.rightAnswers} &nbsp; Wrong: {flow.wrongAnswers}
-              </Typography>
+              {!isTest && (
+                <Typography variant="caption" color="text.secondary">
+                  Right: {flow.rightAnswers} &nbsp; Wrong: {flow.wrongAnswers}
+                </Typography>
+              )}
             </Stack>
           )}
 
-          {/* Reality Check slide-out (visible when panel expanded) */}
+          {!isTest && (
           <RealityCheck
             title="Reality Check: Flow Direction"
             open={rcOpen}
@@ -110,6 +112,7 @@ export default function FlowDirectionPanel() {
               contour through the middle well.
             </Typography>
           </RealityCheck>
+          )}
         </Box>
       </AccordionDetails>
     </Accordion>

@@ -1,11 +1,14 @@
-import { Grid, TextField, Typography,Stack,Button } from "@mui/material";
+import { Grid, TextField, Typography, Stack, Button } from "@mui/material";
 import { useAppDispatch, useAppSelector } from "../../../../../app/hooks";
 import { setField } from "../../../flowDirection/flowSlice";
-import { selectFlow,selectFlowStep1Complete,runCheckStep2 } from "../../../flowDirection/flowSelectors";
+import { selectFlow, selectFlowStep1Complete, runCheckStep2 } from "../../../flowDirection/flowSelectors";
+import { selectScenarioState } from "../../../ScenarioSlice";
+
 export default function FDStep2() {
   const flow = useAppSelector(selectFlow);
   const dispatch = useAppDispatch();
   const stepReady = useAppSelector(selectFlowStep1Complete);
+  const isTest = useAppSelector(selectScenarioState).isTest;
   const bind = (key: any, label: string, helper?: string) => {
     const f = (flow as any)[key];
     return (
@@ -44,22 +47,24 @@ export default function FDStep2() {
           {bind("ElevResult_X_DistanceHighMid", "X * Distance High-Mid (ft)")}
         </Grid>
       </Grid>
-      <Stack direction="row" spacing={1}>
-        <Button
-          variant="outlined"
-          onClick={() => dispatch(runCheckStep2({ checkAnswers: true }))}
-          disabled={!stepReady}
-        >
-          Check Step 2
-        </Button>
-        <Button
-          variant="outlined"
-          onClick={() => dispatch(runCheckStep2({ showAnswers: true }))}
-          disabled={!stepReady}
-        >
-          Show Step 2 Solution
-        </Button>
-      </Stack>
+      {!isTest && (
+        <Stack direction="row" spacing={1}>
+          <Button
+            variant="outlined"
+            onClick={() => dispatch(runCheckStep2({ checkAnswers: true }))}
+            disabled={!stepReady}
+          >
+            Check Step 2
+          </Button>
+          <Button
+            variant="outlined"
+            onClick={() => dispatch(runCheckStep2({ showAnswers: true }))}
+            disabled={!stepReady}
+          >
+            Show Step 2 Solution
+          </Button>
+        </Stack>
+      )}
     </>
   );
 }

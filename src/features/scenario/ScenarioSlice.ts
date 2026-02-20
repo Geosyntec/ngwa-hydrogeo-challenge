@@ -38,6 +38,10 @@ export const scenarioSlice = createSlice({
   reducers: {
     setIsTest(s, a: PayloadAction<boolean>) {
       s.isTest = a.payload;
+      if (a.payload) {
+        s.showCheckAnswerButton = false;
+        s.showSolutionButton = false;
+      }
     },
     setScenarios(s, a: PayloadAction<ScenarioDefinition[]>) {
       s.scenarios = a.payload ?? [];

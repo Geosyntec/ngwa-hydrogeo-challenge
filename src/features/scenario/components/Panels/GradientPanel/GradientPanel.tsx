@@ -31,7 +31,7 @@ export default function GradientPanel() {
   const ready = sorted.length === 3;
   const flowReady = useAppSelector(selectFlowAllStepsComplete);
   const gradDone = useAppSelector(selectGradientStep2Complete);
-  const { selectedPanel } = useAppSelector(selectScenarioState);
+  const { selectedPanel, isTest } = useAppSelector(selectScenarioState);
   const hi = ready ? sorted[2].Elevation : 0;
   const mid = ready ? sorted[1].Elevation : 0;
   // useEffect(() => {
@@ -102,6 +102,7 @@ export default function GradientPanel() {
                     {bind("WhatIsDistanceYValue", "What is distance Y (ft)?")}
                   </Grid>
                 </Grid>
+                {!isTest && (
                 <Stack direction="row" spacing={1} sx={{ mt: 1 }}>
                   <Button
                     variant="outlined"
@@ -130,6 +131,7 @@ export default function GradientPanel() {
                     Show Step 1 Solution
                   </Button>
                 </Stack>
+                )}
               </div>
               <div>
                 <Typography variant="h6">Step 2</Typography>
@@ -151,6 +153,7 @@ export default function GradientPanel() {
                     {bind("Gradient", "Gradient (4 dp)")}
                   </Grid>
                 </Grid>
+                {!isTest && (
                 <Stack direction="row" spacing={1} sx={{ mt: 1 }}>
                   <Button
                     variant="outlined"
@@ -170,7 +173,7 @@ export default function GradientPanel() {
                     onClick={() =>
                       dispatch(
                         checkStep2({
-                          check:true,
+                          check: true,
                           show: true,
                         }),
                       )
@@ -179,10 +182,12 @@ export default function GradientPanel() {
                     Show Step 2 Solution
                   </Button>
                 </Stack>
+                )}
               </div>
             </Stack>
           )}
 
+          {!isTest && (
           <RealityCheck
             title="Reality Check: Gradient"
             open={rcOpen}
@@ -202,6 +207,7 @@ export default function GradientPanel() {
               contour through the middle well.
             </Typography>
           </RealityCheck>
+          )}
         </Box>
       </AccordionDetails>
     </Accordion>

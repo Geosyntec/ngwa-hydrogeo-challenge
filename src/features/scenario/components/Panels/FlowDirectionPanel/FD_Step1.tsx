@@ -1,11 +1,13 @@
-import { Grid, TextField, Typography,Stack,Button } from "@mui/material";
+import { Grid, TextField, Typography, Stack, Button } from "@mui/material";
 import { useAppDispatch, useAppSelector } from "../../../../../app/hooks";
 import { setField } from "../../../flowDirection/flowSlice";
-import { selectFlow,runCheckStep1 } from "../../../flowDirection/flowSelectors";
+import { selectFlow, runCheckStep1 } from "../../../flowDirection/flowSelectors";
+import { selectScenarioState } from "../../../ScenarioSlice";
 
 export default function FDStep1() {
   const flow = useAppSelector(selectFlow);
   const dispatch = useAppDispatch();
+  const isTest = useAppSelector(selectScenarioState).isTest;
   const bind = (
     key: any,
     label: string,
@@ -81,20 +83,22 @@ export default function FDStep1() {
           {bind("DiffBtwnHighestMiddle", "Δ Elev (High - Mid)")}
         </Grid>
       </Grid>
-      <Stack direction="row" spacing={1}>
-        <Button
-          variant="outlined"
-          onClick={() => dispatch(runCheckStep1({ checkAnswers: true }))}
-        >
-          Check Step 1
-        </Button>
-        <Button
-          variant="outlined"
-          onClick={() => dispatch(runCheckStep1({ showAnswers: true }))}
-        >
-          Show Step 1 Solution
-        </Button>
-      </Stack>
+      {!isTest && (
+        <Stack direction="row" spacing={1}>
+          <Button
+            variant="outlined"
+            onClick={() => dispatch(runCheckStep1({ checkAnswers: true }))}
+          >
+            Check Step 1
+          </Button>
+          <Button
+            variant="outlined"
+            onClick={() => dispatch(runCheckStep1({ showAnswers: true }))}
+          >
+            Show Step 1 Solution
+          </Button>
+        </Stack>
+      )}
     </>
   );
 }

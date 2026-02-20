@@ -59,7 +59,7 @@ export default function HorizontalVelocityPanel() {
   const gradientRight = useAppSelector(selectGradientRightCount);
   const velocityRight = useAppSelector(selectVelocityRightCount);
   const [submitModalOpen, setSubmitModalOpen] = useState(false);
-  const { selectedPanel } = useAppSelector(selectScenarioState);
+  const { selectedPanel, isTest } = useAppSelector(selectScenarioState);
   const ready = sorted.length === 3;
   useEffect(() => {
     if (gradReady && selectedPanel !== "gradient") {
@@ -127,13 +127,14 @@ export default function HorizontalVelocityPanel() {
                     {bind("Porosity", "Porosity (fraction)")}
                   </Grid>
                 </Grid>
+                {!isTest && (
                 <Stack direction="row" spacing={1} sx={{ mt: 1 }}>
                   <Button
                     variant="outlined"
                     onClick={() =>
                       dispatch(
                         checkStep1({
-                          show:false,
+                          show: false,
                           check: true,
                         }),
                       )
@@ -146,7 +147,7 @@ export default function HorizontalVelocityPanel() {
                     onClick={() =>
                       dispatch(
                         checkStep1({
-                          check:true,
+                          check: true,
                           show: true,
                         }),
                       )
@@ -155,6 +156,7 @@ export default function HorizontalVelocityPanel() {
                     Show Step 1 Solution
                   </Button>
                 </Stack>
+                )}
               </div>
               <div>
                 <Typography variant="h6">Step 2</Typography>
@@ -176,13 +178,14 @@ export default function HorizontalVelocityPanel() {
                     {bind("HorizontalVelocity", "Horizontal Velocity (2 dp)")}
                   </Grid>
                 </Grid>
+                {!isTest && (
                 <Stack direction="row" spacing={1} sx={{ mt: 1 }}>
                   <Button
                     variant="outlined"
                     onClick={() =>
                       dispatch(
                         checkStep2({
-                          show:false,
+                          show: false,
                           check: true,
                         }),
                       )
@@ -195,7 +198,7 @@ export default function HorizontalVelocityPanel() {
                     onClick={() =>
                       dispatch(
                         checkStep2({
-                          check:true,
+                          check: true,
                           show: true,
                         }),
                       )
@@ -204,6 +207,7 @@ export default function HorizontalVelocityPanel() {
                     Show Step 2 Solution
                   </Button>
                 </Stack>
+                )}
               </div>
 
               <Button
@@ -245,6 +249,7 @@ export default function HorizontalVelocityPanel() {
             }}
           />
 
+          {!isTest && (
           <RealityCheck
             title="Reality Check: Horizontal Velocity"
             open={rcOpen}
@@ -263,6 +268,7 @@ export default function HorizontalVelocityPanel() {
               is expressed as a fraction.
             </Typography>
           </RealityCheck>
+          )}
         </Box>
       </AccordionDetails>
     </Accordion>

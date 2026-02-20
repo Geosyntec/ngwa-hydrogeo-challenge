@@ -1,13 +1,15 @@
-import { Stack, TextField, Typography,Button } from "@mui/material";
+import { Stack, TextField, Typography, Button } from "@mui/material";
 import { useAppDispatch, useAppSelector } from "../../../../../app/hooks";
 import { setDirectionAngle, setField } from "../../../flowDirection/flowSlice";
-import { selectFlow,selectFlowStep2Complete,runCheckStep3 } from "../../../flowDirection/flowSelectors";
+import { selectFlow, selectFlowStep2Complete, runCheckStep3 } from "../../../flowDirection/flowSelectors";
+import { selectScenarioState } from "../../../ScenarioSlice";
 import CompassSelector from "./CompassSelector";
 
 export default function FDStep3() {
   const flow = useAppSelector(selectFlow);
   const dispatch = useAppDispatch();
-  const stepReady = useAppSelector(selectFlowStep2Complete)
+  const stepReady = useAppSelector(selectFlowStep2Complete);
+  const isTest = useAppSelector(selectScenarioState).isTest;
   return (
     <>
       <Typography variant="h6">Step 3</Typography>
@@ -63,22 +65,24 @@ export default function FDStep3() {
           </Typography>
         </Stack>
       </Stack>
-      <Stack direction="row" spacing={1}>
-        <Button
-          variant="outlined"
-          onClick={() => dispatch(runCheckStep3({ checkAnswers: true }))}
-          disabled={!stepReady}
-        >
-          Check Step 3
-        </Button>
-        <Button
-          variant="outlined"
-          onClick={() => dispatch(runCheckStep3({ showAnswers: true }))}
-          disabled={!stepReady}
-        >
-          Show Step 3 Solution
-        </Button>
-      </Stack>
+      {!isTest && (
+        <Stack direction="row" spacing={1}>
+          <Button
+            variant="outlined"
+            onClick={() => dispatch(runCheckStep3({ checkAnswers: true }))}
+            disabled={!stepReady}
+          >
+            Check Step 3
+          </Button>
+          <Button
+            variant="outlined"
+            onClick={() => dispatch(runCheckStep3({ showAnswers: true }))}
+            disabled={!stepReady}
+          >
+            Show Step 3 Solution
+          </Button>
+        </Stack>
+      )}
     </>
   );
 }

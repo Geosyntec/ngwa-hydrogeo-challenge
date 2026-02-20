@@ -3,6 +3,7 @@ export const ROUTES = {
   gettingStarted: '/getting-started',
   scenario: '/scenario',
   scenarioTest: '/scenario/test/:testId',
+  test: '/test',
   reference: '/reference',
   about: '/about',
   login: '/login',
@@ -15,7 +16,8 @@ export const ROUTES = {
 export const NAV_ITEMS = [
   { path: ROUTES.home, label: 'Home' },
   { path: ROUTES.gettingStarted, label: 'Getting Started' },
-  { path: ROUTES.scenario, label: 'The Challenge' },
+  { path: ROUTES.scenario, label: 'Practice' },
+  { path: ROUTES.test, label: 'Take the Test' },
   { path: ROUTES.reference, label: 'Reference' },
   { path: ROUTES.about, label: 'About' },
 ] as const
