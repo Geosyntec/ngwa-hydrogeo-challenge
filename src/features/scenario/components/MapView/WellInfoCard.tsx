@@ -11,8 +11,8 @@ import {
   TableRow,
   Typography,
 } from '@mui/material'
-import UnfoldMore from '@mui/icons-material/UnfoldMore'
-import UnfoldLess from '@mui/icons-material/UnfoldLess'
+import OpenInFullIcon from '@mui/icons-material/OpenInFull';
+import CloseFullscreenIcon from '@mui/icons-material/CloseFullscreen';
 
 /** Where to anchor the card relative to the well marker (legacy: optimal visibility when 3 wells selected). */
 export type WellInfoCardPlacement = 'above' | 'below' | 'left' | 'right'
@@ -82,7 +82,7 @@ export default function WellInfoCard({
         ...placementStyle,
         zIndex: 2,
         display: open ? 'block' : 'none',
-        maxWidth: 380,
+        width: 175, //box was not auto stretching to display children for some reason
         maxHeight: '70vh',
         overflowX: 'auto',
         overflowY: 'auto',
@@ -97,6 +97,11 @@ export default function WellInfoCard({
       <Stack direction="row" spacing={1} sx={{ minWidth: 'min-content' }}>
         <Box sx={{ flexShrink: 0 }}>
           <Stack direction="row" alignItems="flex-start" spacing={0.5}>
+            <Stack spacing={0.5}>
+              <Row label="G" value={`${well.GroundElevationFt}`} />
+              <Row label="S" value={`${well.StaticElevationFt}`} />
+              <Row label="P" value={`${well.PumpingElevationFt}`} />
+            </Stack>
             <IconButton
               size="small"
               onClick={() => setGeologyExpanded((e) => !e)}
@@ -104,16 +109,11 @@ export default function WellInfoCard({
               sx={{ mt: -0.5, mr: 0.25 }}
             >
               {geologyExpanded ? (
-                <UnfoldLess fontSize="small" />
+                <CloseFullscreenIcon fontSize="small" />
               ) : (
-                <UnfoldMore fontSize="small" />
+                <OpenInFullIcon fontSize="small" />
               )}
             </IconButton>
-            <Stack spacing={0.5}>
-              <Row label="G" value={`${well.GroundElevationFt}`} />
-              <Row label="S" value={`${well.StaticElevationFt}`} />
-              <Row label="P" value={`${well.PumpingElevationFt}`} />
-            </Stack>
           </Stack>
 
           {allowPumping && (
@@ -129,9 +129,9 @@ export default function WellInfoCard({
               </Typography>
             </Stack>
           )}
-          <Box sx={{ mt: 1, opacity: 0.6 }}>
+          {/* <Box sx={{ mt: 1, opacity: 0.6 }}>
             <Typography variant="caption" sx={{ fontWeight: 700 }}>{well.Name}</Typography>
-          </Box>
+          </Box> */}
         </Box>
 
         {geologyExpanded && (

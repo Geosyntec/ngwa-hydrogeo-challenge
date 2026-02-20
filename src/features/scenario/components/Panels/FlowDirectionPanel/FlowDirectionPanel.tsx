@@ -40,6 +40,7 @@ export default function FlowDirectionPanel() {
   }, [ready, selectedPanel, dispatch]);
 
   useEffect(() => {
+    console.log("flow done?:",flowDone)
     if (flowDone) {
       dispatch(setSelectedPanel("gradient"));
     }
