@@ -15,6 +15,8 @@ import {
   selectSelectedWellIds,
   selectWells,
 } from "../../ScenarioSlice";
+import { reset } from "../../flowDirection/flowSlice"
+import { selectFlow } from "../../flowDirection/flowSelectors";
 
 export default function ChooseWellsPanel() {
   const dispatch = useAppDispatch();
@@ -30,7 +32,12 @@ export default function ChooseWellsPanel() {
       <Chip
         label={label}
         color={color as any}
-        onDelete={id ? () => dispatch(clearWell(n)) : undefined}
+        onDelete={() => {
+          if (id) {
+            dispatch(clearWell(n))
+            dispatch(reset())
+          }
+        }}
         deleteIcon={id ? <BackspaceIcon /> : undefined}
         sx={{ fontWeight: id ? 700 : 400 }}
       />

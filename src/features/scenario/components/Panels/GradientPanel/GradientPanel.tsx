@@ -17,7 +17,7 @@ import {
   checkStep2,
   selectGradientStep2Complete,
 } from "../../../gradient/gradientSelectors";
-import { setField } from "../../../gradient/gradientSlice";
+import { GradientState, setField } from "../../../gradient/gradientSlice";
 import { selectSortedByElevation } from "../../../flowDirection/flowSlice";
 import { selectFlowAllStepsComplete } from "../../../flowDirection/flowSelectors";
 import { selectScenarioState, setSelectedPanel } from "../../../ScenarioSlice";
@@ -34,11 +34,13 @@ export default function GradientPanel() {
   const { selectedPanel } = useAppSelector(selectScenarioState);
   const hi = ready ? sorted[2].Elevation : 0;
   const mid = ready ? sorted[1].Elevation : 0;
-  useEffect(() => {
-    if (flowReady && selectedPanel !== "velocity") {
-      dispatch(setSelectedPanel("gradient"));
-    }
-  }, [flowReady, selectedPanel, dispatch]);
+  // useEffect(() => {
+  //   console.log("flow ready?: ",flowReady)
+  //   console.log("current panel?: ",selectedPanel)
+  //   if (flowReady && selectedPanel == "flow") {
+  //     dispatch(setSelectedPanel("gradient"));
+  //   }
+  // }, [flowReady, dispatch]);
 
   useEffect(() => {
     if (gradDone) {
@@ -52,7 +54,7 @@ export default function GradientPanel() {
     [dispatch],
   );
   const bind = (
-    key: keyof ReturnType<typeof selectGradient>,
+    key: keyof GradientState,
     label: string,
     helper?: string,
   ) => {
@@ -106,7 +108,7 @@ export default function GradientPanel() {
                     onClick={() =>
                       dispatch(
                         checkStep1({
-                          s: (window as any).store?.getState?.() ?? ({} as any),
+                          show: false,
                           check: true,
                         }),
                       )
@@ -119,7 +121,7 @@ export default function GradientPanel() {
                     onClick={() =>
                       dispatch(
                         checkStep1({
-                          s: (window as any).store?.getState?.() ?? ({} as any),
+                          check: true,
                           show: true,
                         }),
                       )
@@ -155,9 +157,7 @@ export default function GradientPanel() {
                     onClick={() =>
                       dispatch(
                         checkStep2({
-                          s: (window as any).store?.getState?.() ?? ({} as any),
-                          hi,
-                          mid,
+                          show: false,
                           check: true,
                         }),
                       )
@@ -170,9 +170,7 @@ export default function GradientPanel() {
                     onClick={() =>
                       dispatch(
                         checkStep2({
-                          s: (window as any).store?.getState?.() ?? ({} as any),
-                          hi,
-                          mid,
+                          check:true,
                           show: true,
                         }),
                       )

@@ -19,7 +19,7 @@ import {
   selectVelocityRightCount,
   VELOCITY_TOTAL_QUESTIONS,
 } from "../../../velocity/velocitySelectors";
-import { setField } from "../../../velocity/velocitySlice";
+import { setField, VelocityState } from "../../../velocity/velocitySlice";
 import { selectSortedByElevation } from "../../../flowDirection/flowSlice";
 import {
   selectFlowAllStepsComplete,
@@ -39,7 +39,7 @@ import {
 import { reset as resetFlow } from "../../../flowDirection/flowSlice";
 import { resetGradient } from "../../../gradient/gradientSlice";
 import { resetVelocity } from "../../../velocity/velocitySlice";
-import { useCallback, useState } from "react";
+import { useCallback, useState,useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import RealityCheck from "../../RealityCheck/RealityCheck";
 import SubmitResultsModal from "../SubmitResultsModal";
@@ -61,6 +61,12 @@ export default function HorizontalVelocityPanel() {
   const [submitModalOpen, setSubmitModalOpen] = useState(false);
   const { selectedPanel } = useAppSelector(selectScenarioState);
   const ready = sorted.length === 3;
+  useEffect(() => {
+    if (gradReady && selectedPanel !== "gradient") {
+      dispatch(setSelectedPanel("gradient"));
+    }
+  }, [gradReady, dispatch]);
+
   const onToggle = useCallback(
     (_e: any, expanded: boolean) => {
       dispatch(setSelectedPanel(expanded ? "velocity" : null));
@@ -68,7 +74,7 @@ export default function HorizontalVelocityPanel() {
     [dispatch],
   );
   const bind = (
-    key: keyof ReturnType<typeof selectVelocity>,
+    key: keyof VelocityState,
     label: string,
     helper?: string,
   ) => {
@@ -127,7 +133,7 @@ export default function HorizontalVelocityPanel() {
                     onClick={() =>
                       dispatch(
                         checkStep1({
-                          s: (window as any).store?.getState?.() ?? ({} as any),
+                          show:false,
                           check: true,
                         }),
                       )
@@ -140,7 +146,7 @@ export default function HorizontalVelocityPanel() {
                     onClick={() =>
                       dispatch(
                         checkStep1({
-                          s: (window as any).store?.getState?.() ?? ({} as any),
+                          check:true,
                           show: true,
                         }),
                       )
@@ -176,7 +182,7 @@ export default function HorizontalVelocityPanel() {
                     onClick={() =>
                       dispatch(
                         checkStep2({
-                          s: (window as any).store?.getState?.() ?? ({} as any),
+                          show:false,
                           check: true,
                         }),
                       )
@@ -189,7 +195,7 @@ export default function HorizontalVelocityPanel() {
                     onClick={() =>
                       dispatch(
                         checkStep2({
-                          s: (window as any).store?.getState?.() ?? ({} as any),
+                          check:true,
                           show: true,
                         }),
                       )
