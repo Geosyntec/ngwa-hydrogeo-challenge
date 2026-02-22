@@ -46,7 +46,6 @@ const defaultGrades: GetGradesResponse = {
     ElevResult_X_DistanceHighMid: 320,
     SelectedDirection: 'NW',
     WhatIsDistanceYValue: 320,
-    RemainingWellValue: 105,
     WhatIsDistanceYValue2: 320,
     Gradient: '0.0219',
     Gradient2: '0.0219',
