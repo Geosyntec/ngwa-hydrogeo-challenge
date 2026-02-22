@@ -4,7 +4,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "concurrently \"npm run dev:client\" \"npm run dev:server\"",
+    "dev:client": "vite",
+    "dev:server": "python -m uvicorn backend.main:app --reload --port 8000",
     "build": "tsc -p tsconfig.prod.json && vite build",
     "build:dev": "tsc -p tsconfig.dev.json && vite build --mode development",
     "preview": "vite preview"
@@ -21,6 +23,7 @@
     "react-router-dom": "^7.13.0"
   },
   "devDependencies": {
+    "concurrently": "^8.2.2",
     "@types/react": "^18.2.37",
     "@types/react-dom": "^18.2.15",
     "@vitejs/plugin-react": "^4.2.1",

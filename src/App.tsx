@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { CssBaseline, ThemeProvider, createTheme } from '@mui/material'
 import AppLayout from './components/Layout/AppLayout'
+import ErrorBoundary from './components/ErrorBoundary'
 import AuthGuard from './components/AuthGuard'
 import LandingPage from './pages/LandingPage'
 import GettingStartedPage from './pages/GettingStartedPage'
@@ -21,8 +22,9 @@ export default function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <BrowserRouter>
-        <Routes>
+      <ErrorBoundary>
+        <BrowserRouter>
+          <Routes>
           <Route element={<AppLayout />}>
             <Route path={ROUTES.home} element={<LandingPage />} />
             <Route path={ROUTES.gettingStarted} element={<GettingStartedPage />} />
@@ -42,6 +44,7 @@ export default function App() {
           </Route>
         </Routes>
       </BrowserRouter>
+      </ErrorBoundary>
     </ThemeProvider>
   )
 }
