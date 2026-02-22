@@ -4,6 +4,7 @@ import {
   Box,
   Button,
   Container,
+  Link,
   TextField,
   Typography,
 } from '@mui/material'
@@ -11,6 +12,10 @@ import { useAppDispatch } from '../app/hooks'
 import { login } from '../features/auth/authSlice'
 import { ROUTES } from '../app/routes'
 import { login as loginApi } from '../api/mockLoginApi'
+import Register from './Register'
+import RecoverPassword from './RecoverPassword'
+
+type View = 'login' | 'register' | 'recover'
 
 export default function LoginPage() {
   const dispatch = useAppDispatch()
@@ -18,6 +23,7 @@ export default function LoginPage() {
   const location = useLocation()
   const from = (location.state as { from?: { pathname: string } })?.from?.pathname ?? ROUTES.grading
 
+  const [view, setView] = useState<View>('login')
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -36,6 +42,39 @@ export default function LoginPage() {
     } finally {
       setLoading(false)
     }
+  }
+
+  if (view === 'register') {
+    return (
+      <Container maxWidth="xs">
+        <Box sx={{ marginTop: 8, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <Typography component="h1" variant="h5">
+            Register
+          </Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+            Create an account to access the Teacher Portal.
+          </Typography>
+          <Box sx={{ mt: 3, width: '100%' }}>
+            <Register onBack={() => setView('login')} />
+          </Box>
+        </Box>
+      </Container>
+    )
+  }
+
+  if (view === 'recover') {
+    return (
+      <Container maxWidth="xs">
+        <Box sx={{ marginTop: 8, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <Typography component="h1" variant="h5">
+            Recover password
+          </Typography>
+          <Box sx={{ mt: 3, width: '100%' }}>
+            <RecoverPassword onBack={() => setView('login')} />
+          </Box>
+        </Box>
+      </Container>
+    )
   }
 
   return (
@@ -88,10 +127,24 @@ export default function LoginPage() {
             fullWidth
             variant="contained"
             disabled={loading}
-            sx={{ mt: 3, mb: 2 }}
+            sx={{ mt: 3, mb: 1 }}
           >
             {loading ? 'Signing in…' : 'Sign in'}
           </Button>
+          <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 0.5 }}>
+            <Link
+              component="button"
+              type="button"
+              variant="body2"
+              onClick={() => setView('recover')}
+              sx={{ cursor: 'pointer' }}
+            >
+              Lost your password?
+            </Link>
+            <Button fullWidth variant="text" onClick={() => setView('register')} sx={{ mt: 0.5 }}>
+              Register
+            </Button>
+          </Box>
         </Box>
       </Box>
     </Container>
