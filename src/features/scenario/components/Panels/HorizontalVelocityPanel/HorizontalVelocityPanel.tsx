@@ -3,6 +3,10 @@ import {
   AccordionDetails,
   AccordionSummary,
   Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   Grid,
   Stack,
   TextField,
@@ -39,11 +43,14 @@ import {
 import { reset as resetFlow } from "../../../flowDirection/flowSlice";
 import { resetGradient } from "../../../gradient/gradientSlice";
 import { resetVelocity } from "../../../velocity/velocitySlice";
-import { useCallback, useState,useEffect } from "react";
+import { useCallback, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import RealityCheck from "../../RealityCheck/RealityCheck";
 import SubmitResultsModal from "../SubmitResultsModal";
 import { ROUTES } from "../../../../../app/routes";
+import { store } from "../../../../../app/store";
+import { buildSubmitGradesPayload } from "../../../submitGradesPayload";
+import { submitGrades } from "../../../../../api/mockSubmitGradesApi";
 
 
 export default function HorizontalVelocityPanel() {
@@ -92,6 +99,20 @@ export default function HorizontalVelocityPanel() {
     );
   };
   const [rcOpen, setRcOpen] = useState(false);
+  const [testSubmitting, setTestSubmitting] = useState(false);
+  const [testSubmitSuccessOpen, setTestSubmitSuccessOpen] = useState(false);
+  const handleTestSubmit = useCallback(async () => {
+    const payload = buildSubmitGradesPayload(store.getState());
+    if (!payload) return;
+    setTestSubmitting(true);
+    try {
+      await submitGrades(payload);
+      setTestSubmitSuccessOpen(true);
+    } finally {
+      setTestSubmitting(false);
+    }
+  }, []);
+
   return (
     <Accordion
       disabled={!gradReady}
@@ -210,6 +231,7 @@ export default function HorizontalVelocityPanel() {
                 )}
               </div>
 
+              {!isTest && (
               <Button
                 variant="contained"
                 color="primary"
@@ -221,8 +243,33 @@ export default function HorizontalVelocityPanel() {
               >
                 Submit Answers
               </Button>
+              )}
+              {isTest && (
+              <Button
+                variant="contained"
+                color="primary"
+                size="large"
+                fullWidth
+                disabled={!allPanelsComplete || testSubmitting}
+                onClick={handleTestSubmit}
+                sx={{ mt: 3 }}
+              >
+                {testSubmitting ? "Submitting…" : "Submit test"}
+              </Button>
+              )}
             </Stack>
           )}
+
+          <Dialog open={testSubmitSuccessOpen} onClose={() => setTestSubmitSuccessOpen(false)}>
+            <DialogTitle>Test submitted</DialogTitle>
+            <DialogContent>
+              <Typography>Your answers have been submitted for grading.</Typography>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={() => navigate(ROUTES.home)}>Return home</Button>
+              <Button variant="contained" onClick={() => setTestSubmitSuccessOpen(false)}>Close</Button>
+            </DialogActions>
+          </Dialog>
 
           <SubmitResultsModal
             open={submitModalOpen}
