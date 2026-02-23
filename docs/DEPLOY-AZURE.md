@@ -12,6 +12,10 @@ The app only runs if the **Startup Command** is set. The workflow sets it automa
 
 Optionally set **Application settings** → `WEBSITES_PORT` = `8000` if your stack uses it.
 
+## Oryx build disabled (pre-built venv)
+
+The workflow **does not use Oryx** to build the app. It creates a Python virtual environment (`antenv`) on the Linux runner, installs dependencies into it, and includes it in the deployment zip. The app setting `SCM_DO_BUILD_DURING_DEPLOYMENT=false` is set so Azure skips the Oryx build step. This avoids Oryx venv creation failures on the App Service side. The platform still finds and uses the `antenv` folder automatically at runtime.
+
 ## Prerequisites
 
 1. **Azure Web App**  

@@ -47,15 +47,18 @@ jobs:
           cache: 'pip'
           cache-dependency-path: backend/requirements.txt
 
-      - name: Install backend dependencies
+      - name: Create venv and install backend dependencies
         run: |
-          python -m pip install --upgrade pip
-          pip install -r backend/requirements.txt
+          cp backend/requirements.txt requirements.txt
+          python -m venv antenv
+          . antenv/bin/activate
+          pip install --upgrade pip
+          pip install -r requirements.txt
 
       - name: Create deployment package
         run: |
-          cp backend/requirements.txt requirements.txt
-          zip -r deploy.zip backend startup.sh requirements.txt -x "backend/__pycache__/*" "*.pyc"
+          zip -r deploy.zip backend startup.sh requirements.txt antenv \
+            -x "backend/__pycache__/*" "*.pyc" "antenv/__pycache__/*" "antenv/*/__pycache__/*" "antenv/*/*/__pycache__/*"
           ls -la deploy.zip
 
       - name: Upload deployment package
@@ -88,6 +91,10 @@ jobs:
       - name: Set startup command
         run: |
           az webapp config set --name ngwa-hydrogeo-challenge --resource-group ngwa-hydrogeo-challenge --startup-file "bash startup.sh"
+
+      - name: Disable Oryx build (use pre-built venv)
+        run: |
+          az webapp config appsettings set --name ngwa-hydrogeo-challenge --resource-group ngwa-hydrogeo-challenge --settings SCM_DO_BUILD_DURING_DEPLOYMENT=false --output none
 
       - name: 'Deploy to Azure Web App'
         uses: azure/webapps-deploy@v3
