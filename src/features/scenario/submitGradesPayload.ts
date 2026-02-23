@@ -85,9 +85,9 @@ export function buildSubmitGradesPayload(state: RootState): SubmitGradesPayload 
     selectedWells.three,
   ].filter((id): id is string => !!id);
 
-  const flowState = selectFlow(state) as Record<string, { input?: string }>;
-  const gradientState = selectGradient(state) as Record<string, { input?: string }>;
-  const velocityState = selectVelocity(state) as Record<string, { input?: string }>;
+  const flowState = selectFlow(state) as unknown as Record<string, { input?: string }>;
+  const gradientState = selectGradient(state) as unknown as Record<string, { input?: string }>;
+  const velocityState = selectVelocity(state) as unknown as Record<string, { input?: string }>;
 
   const answers: SubmitGradesAnswers = {
     ...getAnswersFromFields(flowState, FLOW_ANSWER_KEYS),
