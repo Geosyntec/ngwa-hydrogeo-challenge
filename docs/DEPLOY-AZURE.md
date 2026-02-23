@@ -2,6 +2,16 @@
 
 This workflow builds the frontend, copies it into `backend/static`, and deploys the app to Azure App Service (Linux, Python).
 
+## If you see the default Azure placeholder page
+
+The app only runs if the **Startup Command** is set. The workflow sets it automatically via Azure CLI. If you still see the default page:
+
+1. In **Azure Portal** → your Web App → **Configuration** → **General settings**.
+2. Set **Startup Command** to: `bash startup.sh`
+3. Save and restart the app (Overview → **Restart**).
+
+Optionally set **Application settings** → `WEBSITES_PORT` = `8000` if your stack uses it.
+
 ## Prerequisites
 
 1. **Azure Web App**  

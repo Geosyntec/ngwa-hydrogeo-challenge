@@ -85,6 +85,11 @@ jobs:
           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_859DCC6F59E34FD09812974535F5FB51 }}
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_275CA878716D4E6E867EC470AE81C659 }}
 
+      - name: Set startup command
+        run: |
+          rg=$(az webapp show --name ngwa-hydrogeo-challenge --query resourceGroup -o tsv)
+          az webapp config set --name ngwa-hydrogeo-challenge --resource-group "$rg" --startup-file "bash startup.sh"
+
       - name: 'Deploy to Azure Web App'
         uses: azure/webapps-deploy@v3
         id: deploy-to-webapp
