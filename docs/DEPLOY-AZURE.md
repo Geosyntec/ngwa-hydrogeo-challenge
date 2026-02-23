@@ -14,12 +14,14 @@ Optionally set **Application settings** → `WEBSITES_PORT` = `8000` if your sta
 
 ## Oryx build disabled (pre-built venv)
 
-The workflow **does not use Oryx** to build the app. It creates a Python virtual environment (`antenv`) on the Linux runner, installs dependencies into it, and includes it in the deployment zip. The app setting `SCM_DO_BUILD_DURING_DEPLOYMENT=false` is set so Azure skips the Oryx build step. This avoids Oryx venv creation failures on the App Service side. The platform still finds and uses the `antenv` folder automatically at runtime.
+The workflow **does not use Oryx** to build the app. It creates a Python virtual environment (`antenv`) on the Linux runner, installs dependencies into it, and includes it in the deployment zip. The app setting `SCM_DO_BUILD_DURING_DEPLOYMENT=false` is set so Azure skips the Oryx build step. This avoids Oryx venv creation failures on the App Service side.
+
+At runtime, **the container’s own Python** is used (not the venv’s `bin/python`), with `PYTHONPATH` set to `antenv/lib/pythonX.Y/site-packages`. That avoids GLIBC mismatches: the venv’s Python binary was built on the runner’s newer glibc; the container’s Python matches the App Service image. The App Service runtime must be **Python 3.11** to match the version used in the workflow and the deployed site-packages.
 
 ## Prerequisites
 
 1. **Azure Web App**  
-   Create a Linux App Service with runtime **Python 3.11** (or 3.10).
+   Create a Linux App Service with runtime **Python 3.11** (must match the workflow so `antenv/lib/python3.11/site-packages` exists).
 
 2. **Secrets** (GitHub repo → Settings → Secrets and variables → Actions):
    - `AZURE_WEBAPP_PUBLISH_PROFILE`: contents of the Web App’s **Download publish profile** (from Azure Portal → your Web App → Overview → Get publish profile).
