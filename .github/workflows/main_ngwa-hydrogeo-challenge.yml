@@ -87,8 +87,7 @@ jobs:
 
       - name: Set startup command
         run: |
-          rg=$(az webapp show --name ngwa-hydrogeo-challenge --query resourceGroup -o tsv)
-          az webapp config set --name ngwa-hydrogeo-challenge --resource-group "$rg" --startup-file "bash startup.sh"
+          az webapp config set --name ngwa-hydrogeo-challenge --resource-group ngwa-hydrogeo-challenge --startup-file "bash startup.sh"
 
       - name: 'Deploy to Azure Web App'
         uses: azure/webapps-deploy@v3
