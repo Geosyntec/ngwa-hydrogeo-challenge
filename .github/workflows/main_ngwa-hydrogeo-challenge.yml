@@ -57,7 +57,13 @@ jobs:
           cp backend/requirements.txt requirements.txt
           zip -r deploy.zip backend startup.sh requirements.txt -x "backend/__pycache__/*" "*.pyc"
           ls -la deploy.zip
-      
+
+      - name: Upload deployment package
+        uses: actions/upload-artifact@v4
+        with:
+          name: deploy-package
+          path: deploy.zip
+          retention-days: 1
 
   deploy:
     runs-on: ubuntu-latest
@@ -67,7 +73,11 @@ jobs:
       contents: read #This is required for actions/checkout
 
     steps:
-      
+      - name: Download deployment package
+        uses: actions/download-artifact@v4
+        with:
+          name: deploy-package
+
       - name: Login to Azure
         uses: azure/login@v2
         with:
@@ -81,4 +91,4 @@ jobs:
         with:
           app-name: 'ngwa-hydrogeo-challenge'
           slot-name: 'Production'
-          
+          package: deploy.zip
