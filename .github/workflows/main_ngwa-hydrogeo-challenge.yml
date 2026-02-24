@@ -103,3 +103,21 @@ jobs:
           app-name: 'ngwa-hydrogeo-challenge'
           slot-name: 'Production'
           package: deploy.zip
+
+      - name: Checkout (for bootstrap script)
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install backend dependencies
+        run: |
+          pip install -r backend/requirements.txt
+
+      - name: Bootstrap database (tables only)
+        if: ${{ secrets.DATABASE_URL != '' }}
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: python -m backend.scripts.bootstrap_db

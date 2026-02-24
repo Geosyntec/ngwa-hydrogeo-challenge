@@ -25,6 +25,7 @@ At runtime, **the container’s own Python** is used (not the venv’s `bin/pyth
 
 2. **Secrets** (GitHub repo → Settings → Secrets and variables → Actions):
    - `AZURE_WEBAPP_PUBLISH_PROFILE`: contents of the Web App’s **Download publish profile** (from Azure Portal → your Web App → Overview → Get publish profile).
+   - **`DATABASE_URL`** (optional): production PostgreSQL connection string (e.g. `postgresql://user:pass@host:5432/db?sslmode=require`). If set, the workflow runs the database bootstrap script after each deploy (creates/updates tables, no seed). Use the same value as in App Service Application settings so the app can connect at runtime.
 
 3. **Variable:**
    - `AZURE_WEBAPP_NAME`: your Web App name (e.g. `my-hydro-app`).
@@ -37,6 +38,9 @@ At runtime, **the container’s own Python** is used (not the venv’s `bin/pyth
 
 - **General Settings:**  
   If your platform uses a default port, set **Application Settings** → `WEBSITES_PORT` = `8000` (or leave unset if `PORT` is provided).
+
+- **Database:**  
+  Configure PostgreSQL via **Application settings** (e.g. `DATABASE_URL` or `POSTGRES_*`). See [DATABASE-AZURE.md](DATABASE-AZURE.md) for Azure PostgreSQL setup and dev machine access.
 
 ## Local deploy prep
 
