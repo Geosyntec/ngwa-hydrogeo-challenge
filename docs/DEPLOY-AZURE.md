@@ -25,16 +25,15 @@ At runtime, **the container’s own Python** is used (not the venv’s `bin/pyth
 
 2. **Secrets** (GitHub repo → Settings → Secrets and variables → Actions):
    - `AZURE_WEBAPP_PUBLISH_PROFILE`: contents of the Web App’s **Download publish profile** (from Azure Portal → your Web App → Overview → Get publish profile).
-   - **`DATABASE_URL`** (optional): production PostgreSQL connection string (e.g. `postgresql://user:pass@host:5432/db?sslmode=require`). If set, the workflow runs the database bootstrap script after each deploy (creates/updates tables, no seed). Use the same value as in App Service Application settings so the app can connect at runtime.
 
-3. **Variable:**
+3. **Variable** (if your workflow uses it):
    - `AZURE_WEBAPP_NAME`: your Web App name (e.g. `my-hydro-app`).
 
 ## App Service configuration
 
 - **Startup Command:**  
   `bash startup.sh`  
-  (The script is at the repo root and runs `uvicorn backend.main:app --host 0.0.0.0 --port $PORT`. Azure sets `PORT`.)
+  (At each app start, the script runs the database bootstrap (tables only, no seed) when `DATABASE_URL` is set, then starts `uvicorn backend.main:app --host 0.0.0.0 --port $PORT`. Azure sets `PORT`.)
 
 - **General Settings:**  
   If your platform uses a default port, set **Application Settings** → `WEBSITES_PORT` = `8000` (or leave unset if `PORT` is provided).

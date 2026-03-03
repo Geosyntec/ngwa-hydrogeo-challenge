@@ -27,7 +27,9 @@ If the host contains `.postgres.database.azure.com`, the app forces `sslmode=req
 
 ## Bootstrap tables
 
-After the database exists, create the schema (and optionally seed demo data) from the repo root:
+On **Azure App Service**, the startup script (`startup.sh`) runs the bootstrap (tables only, no seed) automatically when `DATABASE_URL` is set, so tables are created or updated on each app start. No workflow or runner access to the DB is required.
+
+For **local or one-off** setup, from the repo root:
 
 ```bash
 # Create tables only
