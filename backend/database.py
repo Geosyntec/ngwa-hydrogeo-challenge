@@ -59,8 +59,10 @@ Pool = asyncpg.Pool
 async def create_pool() -> Pool | None:
     """Create an asyncpg connection pool from environment. Returns None if not configured."""
     url = get_database_url()
+    print(f"Database URL: {url}")
     if not url:
         return None
+    
     return await asyncpg.create_pool(
         url,
         min_size=1,
