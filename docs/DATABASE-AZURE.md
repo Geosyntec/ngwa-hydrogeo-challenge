@@ -45,7 +45,7 @@ Tables created:
 |-------|--------|
 | `users` | Teachers/admins; login (username, password_hash). |
 | `classes` | Classes belonging to a teacher (teacher_id, name). |
-| `class_students` | Roster; row `id` is the student ID used in get-grades / submit-grades. |
+| `students` | Roster (first_name, last_name); row `id` is the student ID used in get-grades / submit-grades. |
 | `grade_submissions` | One row per submit; stores scenario_id, selected_wells, answers (JSONB), grade counts, percentage. |
 
 `--seed` inserts the same demo users and class rosters as the mock (e.g. Hydrogeology 101, Groundwater Lab, Advanced Aquifer Analysis with sample student names). Passwords are plaintext for demo only; use proper hashing in production.

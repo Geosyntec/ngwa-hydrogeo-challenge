@@ -28,6 +28,7 @@ import { ROUTES } from '../../app/routes'
 import {
   fetchClasses,
   updateClass,
+  studentDisplayName,
   type ClassesResponse,
   type StudentWithId,
   type UpdateClassPayload,
@@ -46,7 +47,7 @@ function getAuthToken(): string {
   }
 }
 
-type EditStudentRow = { id: string; name: string; isNew?: boolean }
+type EditStudentRow = { id: string; first_name: string; last_name: string; isNew?: boolean }
 
 export default function ManageClassesPage() {
   const navigate = useNavigate()
@@ -97,7 +98,7 @@ export default function ManageClassesPage() {
   const openEditModal = (className: string, classId: string, students: StudentWithId[]) => {
     setEditingClass({ className, classId, students })
     setEditStudents(
-      students.map((s) => ({ id: s.id, name: s.name }))
+      students.map((s) => ({ id: s.id, first_name: s.first_name, last_name: s.last_name }))
     )
     setEditError(null)
     setEditModalOpen(true)
@@ -110,9 +111,14 @@ export default function ManageClassesPage() {
     setEditError(null)
   }
 
-  const setStudentName = (index: number, name: string) => {
+  const setStudentFirst = (index: number, first_name: string) => {
     setEditStudents((prev) =>
-      prev.map((s, i) => (i === index ? { ...s, name } : s))
+      prev.map((s, i) => (i === index ? { ...s, first_name } : s))
+    )
+  }
+  const setStudentLast = (index: number, last_name: string) => {
+    setEditStudents((prev) =>
+      prev.map((s, i) => (i === index ? { ...s, last_name } : s))
     )
   }
 
@@ -120,7 +126,7 @@ export default function ManageClassesPage() {
     nextNewIdRef.current += 1
     setEditStudents((prev) => [
       ...prev,
-      { id: `new-${nextNewIdRef.current}`, name: '', isNew: true },
+      { id: `new-${nextNewIdRef.current}`, first_name: '', last_name: '', isNew: true },
     ])
   }
 
@@ -130,9 +136,11 @@ export default function ManageClassesPage() {
 
   const handleEditSubmit = async () => {
     if (!editingClass) return
-    const names = editStudents.map((s) => s.name.trim()).filter(Boolean)
-    if (names.length !== editStudents.length) {
-      setEditError('All students must have a name.')
+    const allHaveName = editStudents.every(
+      (s) => s.first_name.trim() !== '' || s.last_name.trim() !== ''
+    )
+    if (!allHaveName) {
+      setEditError('All students must have a first or last name.')
       return
     }
     setEditSubmitting(true)
@@ -141,7 +149,9 @@ export default function ManageClassesPage() {
       classId: editingClass.classId,
       teacherId,
       students: editStudents.map((s) =>
-        s.isNew ? { name: s.name.trim() } : { id: s.id, name: s.name.trim() }
+        s.isNew
+          ? { first_name: s.first_name.trim(), last_name: s.last_name.trim() }
+          : { id: s.id, first_name: s.first_name.trim(), last_name: s.last_name.trim() }
       ),
       authToken: getAuthToken(),
     }
@@ -258,7 +268,7 @@ export default function ManageClassesPage() {
                               {students.map((s) => (
                                 <li key={s.id}>
                                   <Typography component="span" variant="body2">
-                                    {s.name}
+                                    {studentDisplayName(s)}
                                   </Typography>
                                 </li>
                               ))}
@@ -281,22 +291,30 @@ export default function ManageClassesPage() {
         </DialogTitle>
         <DialogContent>
           <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-            Update student names or add new students. New students will receive an
-            ID when you submit.
+            Update student first and last names or add new students. New students
+            will receive an ID when you submit.
           </Typography>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
             {editStudents.map((student, index) => (
               <Box
                 key={student.isNew ? student.id : student.id}
-                sx={{ display: 'flex', alignItems: 'center', gap: 1 }}
+                sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}
               >
                 <TextField
                   size="small"
-                  fullWidth
-                  label="Student name"
-                  value={student.name}
-                  onChange={(e) => setStudentName(index, e.target.value)}
-                  placeholder="Name"
+                  label="First name"
+                  value={student.first_name}
+                  onChange={(e) => setStudentFirst(index, e.target.value)}
+                  placeholder="First"
+                  sx={{ minWidth: 120 }}
+                />
+                <TextField
+                  size="small"
+                  label="Last name"
+                  value={student.last_name}
+                  onChange={(e) => setStudentLast(index, e.target.value)}
+                  placeholder="Last"
+                  sx={{ minWidth: 120 }}
                 />
                 <IconButton
                   aria-label="Remove student"

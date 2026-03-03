@@ -37,10 +37,11 @@ export async function verifyStudent(
   if (!classData) {
     return { ok: false, message: 'That student cannot be verified.' }
   }
-  const normalized = studentName.toLowerCase()
-  const student = classData.students.find(
-    (s) => s.name.trim().toLowerCase() === normalized
-  )
+  const normalized = studentName.trim().toLowerCase()
+  const student = classData.students.find((s) => {
+    const full = [s.first_name, s.last_name].filter(Boolean).join(' ').trim().toLowerCase()
+    return full === normalized
+  })
   if (!student) {
     return { ok: false, message: 'That student cannot be verified.' }
   }

@@ -15,7 +15,7 @@ import {
 import ArrowBack from '@mui/icons-material/ArrowBack'
 import Visibility from '@mui/icons-material/Visibility'
 import { ROUTES } from '../../app/routes'
-import { fetchClasses, type ClassesResponse, type StudentWithId } from '../../api/mockClassesApi'
+import { fetchClasses, studentDisplayName, type ClassesResponse, type StudentWithId } from '../../api/mockClassesApi'
 import { getGrades, type GetGradesResponse } from '../../api/mockGetGradesApi'
 import GradesModal from './GradesModal'
 
@@ -34,7 +34,7 @@ export default function ViewGradesPage() {
   const [gradesData, setGradesData] = useState<GetGradesResponse | null>(null)
   const [selectedStudent, setSelectedStudent] = useState<{
     id: string
-    name: string
+    displayName: string
   } | null>(null)
 
   const loadClasses = useCallback(() => {
@@ -58,7 +58,7 @@ export default function ViewGradesPage() {
   )
 
   const openGrades = (student: StudentWithId) => {
-    setSelectedStudent({ id: student.id, name: student.name })
+    setSelectedStudent({ id: student.id, displayName: studentDisplayName(student) })
     setGradesData(null)
     setModalOpen(true)
     setGradesLoading(true)
@@ -123,7 +123,7 @@ export default function ViewGradesPage() {
                 classData.students.map((student) => (
                   <TableRow key={student.id} hover>
                     <TableCell>{className}</TableCell>
-                    <TableCell>{student.name}</TableCell>
+                    <TableCell>{studentDisplayName(student)}</TableCell>
                     <TableCell align="right">
                       <Button
                         size="small"
@@ -144,7 +144,7 @@ export default function ViewGradesPage() {
       <GradesModal
         open={modalOpen}
         onClose={closeModal}
-        studentName={selectedStudent?.name ?? null}
+        studentName={selectedStudent?.displayName ?? null}
         data={gradesData}
         loading={gradesLoading}
       />

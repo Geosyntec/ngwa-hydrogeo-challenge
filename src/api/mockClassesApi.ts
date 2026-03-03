@@ -8,7 +8,13 @@
 /** Student with backend-assigned read-only global ID (UUID). */
 export type StudentWithId = {
   id: string
-  name: string
+  first_name: string
+  last_name: string
+}
+
+/** Display name for a student (first + last). */
+export function studentDisplayName(s: StudentWithId): string {
+  return [s.first_name, s.last_name].filter(Boolean).join(' ').trim() || '(no name)'
 }
 
 /** Class data: class id plus list of students with ids. */
@@ -26,8 +32,18 @@ function generateId(): string {
     : `mock-${Math.random().toString(36).slice(2, 15)}`
 }
 
-function studentsWithIds(names: string[]): StudentWithId[] {
-  return names.map((name) => ({ id: generateId(), name }))
+function parseFullName(full: string): { first_name: string; last_name: string } {
+  const parts = full.trim().split(/\s+/)
+  if (parts.length === 0) return { first_name: '', last_name: '' }
+  if (parts.length === 1) return { first_name: parts[0], last_name: '' }
+  return { first_name: parts[0], last_name: parts.slice(1).join(' ') }
+}
+
+function studentsWithIds(fullNames: string[]): StudentWithId[] {
+  return fullNames.map((full) => {
+    const { first_name, last_name } = parseFullName(full)
+    return { id: generateId(), first_name, last_name }
+  })
 }
 
 const MOCK_DELAY_MS = 600
@@ -64,7 +80,11 @@ function buildMockData(): Record<string, ClassesResponse> {
         name,
         {
           classId: generateId(),
-          students: data.students.map((s) => ({ id: generateId(), name: s.name })),
+          students: data.students.map((s) => ({
+            id: generateId(),
+            first_name: s.first_name,
+            last_name: s.last_name,
+          })),
         },
       ])
     )
@@ -105,7 +125,7 @@ export async function fetchClasses(teacherName: string): Promise<ClassesResponse
 export type UpdateClassPayload = {
   classId: string
   teacherId: string
-  students: Array<{ id?: string; name: string }>
+  students: Array<{ id?: string; first_name: string; last_name: string }>
   authToken: string
 }
 
@@ -141,8 +161,8 @@ export async function updateClass(
   const [, classData] = entry
   classData.students = payload.students.map((s) =>
     s.id
-      ? { id: s.id, name: s.name.trim() }
-      : { id: generateId(), name: s.name.trim() }
+      ? { id: s.id, first_name: s.first_name.trim(), last_name: s.last_name.trim() }
+      : { id: generateId(), first_name: s.first_name.trim(), last_name: s.last_name.trim() }
   )
   // eslint-disable-next-line no-console
   console.log('[mock] POST /update-class', payload)
