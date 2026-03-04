@@ -10,7 +10,7 @@ Schema is derived from the mock APIs:
 Run from repo root with DATABASE_URL or POSTGRES_* set:
   python -m backend.scripts.bootstrap_db
 
-Optional: --seed to insert demo users and classes (passwords match current mock).
+Optional: --seed to drop all tables, recreate them, and insert demo users and classes (passwords match current mock).
 """
 
 from __future__ import annotations
@@ -195,14 +195,25 @@ async def run() -> None:
     print("Connecting to database...")
     conn = await asyncpg.connect(url)
     try:
-        # One-time migration: replace class_students (name) with students (first_name, last_name)
-        has_old = await conn.fetchval(
-            """SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'class_students'"""
-        )
-        if has_old:
-            print("Migrating from class_students to students...")
+        if args.seed:
+            print("Dropping existing tables (--seed: reset before seed)...")
             await conn.execute("DROP TABLE IF EXISTS grade_submissions")
-            await conn.execute("DROP TABLE IF EXISTS class_students")
+            await conn.execute("DROP TABLE IF EXISTS students")
+            await conn.execute("DROP TABLE IF EXISTS classes")
+            await conn.execute("DROP TABLE IF EXISTS email_verification_tokens")
+            await conn.execute("DROP TABLE IF EXISTS users")
+            print("Tables dropped.")
+
+        if not args.seed:
+            # One-time migration: replace class_students (name) with students (first_name, last_name)
+            has_old = await conn.fetchval(
+                """SELECT 1 FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'class_students'"""
+            )
+            if has_old:
+                print("Migrating from class_students to students...")
+                await conn.execute("DROP TABLE IF EXISTS grade_submissions")
+                await conn.execute("DROP TABLE IF EXISTS class_students")
+
         print("Creating tables...")
         await conn.execute(SCHEMA_SQL)
         print("Tables created (or already exist).")
