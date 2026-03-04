@@ -15,7 +15,8 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
 
-from backend.database import create_pool, close_pool, get_connection, get_database_url, Pool
+from backend.database import create_pool, close_pool, get_connection, Pool
+from backend.auth import verify_password
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -45,31 +46,40 @@ app.add_middleware(
 )
 
 
-# --- Login ---
+# --- Login (DB-backed, hashed passwords) ---
 class LoginBody(BaseModel):
     username: str
-    password: str | None = None
+    password: str
 
 
 class LoginResponse(BaseModel):
-    user: dict  # {"name": str}
-
-
-# Same validation as former mock: known users require correct password; unknown users accepted.
-MOCK_USERS = {"teacher": "demo", "teacher1": "demo", "admin": "admin"}
+    user: dict  # {"name": str}  # name is the username as stored for display
 
 
 @app.post("/api/login", response_model=LoginResponse)
-def login(body: LoginBody):
+async def login(body: LoginBody, conn=Depends(get_db)):
+    if conn is None:
+        raise HTTPException(
+            status_code=503,
+            detail="Login is unavailable (database not configured).",
+        )
     username = (body.username or "").strip()
     if not username:
         raise HTTPException(status_code=400, detail="Username is required.")
-    key = username.lower()
-    expected_password = MOCK_USERS.get(key)
     password = (body.password or "").strip()
-    if expected_password is not None and password != expected_password:
+    if not password:
+        raise HTTPException(status_code=400, detail="Password is required.")
+
+    row = await conn.fetchrow(
+        "SELECT id, username, password_hash FROM users WHERE LOWER(username) = LOWER($1)",
+        username,
+    )
+    if not row or not row["password_hash"]:
         raise HTTPException(status_code=401, detail="Invalid username or password.")
-    return LoginResponse(user={"name": username})
+    if not verify_password(password, row["password_hash"]):
+        raise HTTPException(status_code=401, detail="Invalid username or password.")
+
+    return LoginResponse(user={"name": row["username"]})
 
 
 @app.get("/api/ping")

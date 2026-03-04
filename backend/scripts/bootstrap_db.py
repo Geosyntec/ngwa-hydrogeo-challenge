@@ -108,15 +108,23 @@ def get_database_url() -> str | None:
     return f"postgresql://{user}:{password}@{host}:{port}/{dbname}?sslmode={ssl_mode}"
 
 
-# Demo data matching mock: teacher/demo, teacher1/demo, admin/admin; one teacher has classes with students
-SEED_SQL = """
--- Seed users (passwords: demo / admin; in production use proper hashes)
+# Demo users: passwords are hashed with bcrypt (teacher/demo, teacher1/demo, admin/admin)
+def _seed_users_sql() -> str:
+    from passlib.context import CryptContext
+    pwd = CryptContext(schemes=["bcrypt"], deprecated="auto", bcrypt__rounds=12)
+    h_demo = pwd.hash("demo").replace("'", "''")  # escape for SQL
+    h_admin = pwd.hash("admin").replace("'", "''")
+    return f"""
 INSERT INTO users (id, username, password_hash) VALUES
-  ('11111111-1111-1111-1111-111111111101', 'teacher', 'demo'),
-  ('11111111-1111-1111-1111-111111111102', 'teacher1', 'demo'),
-  ('11111111-1111-1111-1111-111111111103', 'admin', 'admin')
+  ('11111111-1111-1111-1111-111111111101', 'teacher', '{h_demo}'),
+  ('11111111-1111-1111-1111-111111111102', 'teacher1', '{h_demo}'),
+  ('11111111-1111-1111-1111-111111111103', 'admin', '{h_admin}')
 ON CONFLICT (username) DO NOTHING;
+"""
 
+
+# Seed classes and students (SQL only)
+SEED_CLASSES_AND_STUDENTS_SQL = """
 -- Seed classes for teacher (id 11111111-1111-1111-1111-111111111101)
 INSERT INTO classes (id, teacher_id, name) VALUES
   ('22222222-2222-2222-2222-222222222201', '11111111-1111-1111-1111-111111111101', 'Hydrogeology 101'),
@@ -177,7 +185,8 @@ async def run() -> None:
 
         if args.seed:
             print("Seeding demo data...")
-            await conn.execute(SEED_SQL)
+            await conn.execute(_seed_users_sql())
+            await conn.execute(SEED_CLASSES_AND_STUDENTS_SQL)
             print("Seed complete.")
     finally:
         await conn.close()

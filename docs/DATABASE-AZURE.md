@@ -48,7 +48,7 @@ Tables created:
 | `students` | Roster (first_name, last_name); row `id` is the student ID used in get-grades / submit-grades. |
 | `grade_submissions` | One row per submit; stores scenario_id, selected_wells, answers (JSONB), grade counts, percentage. |
 
-`--seed` inserts the same demo users and class rosters as the mock (e.g. Hydrogeology 101, Groundwater Lab, Advanced Aquifer Analysis with sample student names). Passwords are plaintext for demo only; use proper hashing in production.
+`--seed` inserts demo users (teacher/demo, teacher1/demo, admin/admin) with **bcrypt-hashed** passwords, plus class rosters. Login is DB-backed; use the same credentials to sign in after seeding.
 
 ## Creating Azure PostgreSQL (Flexible Server)
 

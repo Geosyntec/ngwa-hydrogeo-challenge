@@ -11,7 +11,7 @@ import {
 import { useAppDispatch } from '../app/hooks'
 import { login } from '../features/auth/authSlice'
 import { ROUTES } from '../app/routes'
-import { login as loginApi } from '../api/mockLoginApi'
+import { login as loginApi } from '../api/loginApi'
 import Register from './Register'
 import RecoverPassword from './RecoverPassword'
 

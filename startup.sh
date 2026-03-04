@@ -9,8 +9,8 @@ cd "$APP_ROOT"
 PYVER=$(python -c "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}')")
 export PYTHONPATH="$APP_ROOT/antenv/lib/python$PYVER/site-packages"
 # Ensure DB tables exist (no seed). Skip if DATABASE_URL not set; do not fail startup on bootstrap error.
-if [ -n "${DATABASE_URL}" ]; then
-  python -m backend.scripts.bootstrap_db || true
-fi
+#if [ -n "${DATABASE_URL}" ]; then
+python -m backend.scripts.bootstrap_db || true
+#fi
 PORT=${PORT:-8000}
 exec python -m uvicorn backend.main:app --host 0.0.0.0 --port "$PORT"
