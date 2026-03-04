@@ -6,7 +6,7 @@ import {
   Typography,
 } from '@mui/material'
 import { validatePassword } from '../utils/passwordValidation'
-import { register as registerApi } from '../api/mockRegisterApi'
+import { register as registerApi } from '../api/registerApi'
 
 export type RegisterProps = {
   onBack: () => void

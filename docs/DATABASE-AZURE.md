@@ -43,7 +43,8 @@ Tables created:
 
 | Table | Purpose |
 |-------|--------|
-| `users` | Teachers/admins; login (username, password_hash). |
+| `users` | Users sign in with email; stores email, password_hash, verified (boolean). |
+| `email_verification_tokens` | One-time tokens for verification links; expires in 1 hour. |
 | `classes` | Classes belonging to a teacher (teacher_id, name). |
 | `students` | Roster (first_name, last_name); row `id` is the student ID used in get-grades / submit-grades. |
 | `grade_submissions` | One row per submit; stores scenario_id, selected_wells, answers (JSONB), grade counts, percentage. |

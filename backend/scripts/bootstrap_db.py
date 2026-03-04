@@ -33,17 +33,41 @@ import asyncpg
 
 
 # ---------------------------------------------------------------------------
-# Schema (matches mock: users, classes, students, grade_submissions)
+# Schema (users with email + verified, email_verification_tokens, classes, students, grade_submissions)
 # ---------------------------------------------------------------------------
 
 SCHEMA_SQL = """
--- Teachers (and admins); login uses username + password_hash
+-- Users: email as identifier, verified flag for email verification
 CREATE TABLE IF NOT EXISTS users (
+  id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  email        TEXT UNIQUE NOT NULL,
+  password_hash TEXT NOT NULL,
+  verified     BOOLEAN NOT NULL DEFAULT false,
+  created_at   TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+-- One-time migration: if old username column exists, add email/verified and migrate
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = 'public' AND table_name = 'users' AND column_name = 'username') THEN
+    ALTER TABLE users ADD COLUMN IF NOT EXISTS email TEXT;
+    ALTER TABLE users ADD COLUMN IF NOT EXISTS verified BOOLEAN NOT NULL DEFAULT false;
+    UPDATE users SET email = username WHERE email IS NULL;
+    ALTER TABLE users DROP COLUMN IF EXISTS username;
+    CREATE UNIQUE INDEX IF NOT EXISTS users_email_key ON users(email);
+  END IF;
+END $$;
+
+-- Tokens for email verification links (expire in 1 hour)
+CREATE TABLE IF NOT EXISTS email_verification_tokens (
   id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  username   TEXT UNIQUE NOT NULL,
-  password_hash TEXT,
+  user_id    UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  token      TEXT NOT NULL UNIQUE,
+  expires_at TIMESTAMPTZ NOT NULL,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+CREATE INDEX IF NOT EXISTS idx_email_verification_tokens_token ON email_verification_tokens(token);
+CREATE INDEX IF NOT EXISTS idx_email_verification_tokens_expires_at ON email_verification_tokens(expires_at);
 
 -- Classes belong to a teacher; name is display name (e.g. "Hydrogeology 101")
 CREATE TABLE IF NOT EXISTS classes (
@@ -108,18 +132,18 @@ def get_database_url() -> str | None:
     return f"postgresql://{user}:{password}@{host}:{port}/{dbname}?sslmode={ssl_mode}"
 
 
-# Demo users: passwords are hashed with bcrypt (teacher/demo, teacher1/demo, admin/admin)
+# Demo users: email + bcrypt password (teacher@example.com/demo, etc.), pre-verified for convenience
 def _seed_users_sql() -> str:
     from passlib.context import CryptContext
     pwd = CryptContext(schemes=["bcrypt"], deprecated="auto", bcrypt__rounds=12)
-    h_demo = pwd.hash("demo").replace("'", "''")  # escape for SQL
+    h_demo = pwd.hash("demo").replace("'", "''")
     h_admin = pwd.hash("admin").replace("'", "''")
     return f"""
-INSERT INTO users (id, username, password_hash) VALUES
-  ('11111111-1111-1111-1111-111111111101', 'teacher', '{h_demo}'),
-  ('11111111-1111-1111-1111-111111111102', 'teacher1', '{h_demo}'),
-  ('11111111-1111-1111-1111-111111111103', 'admin', '{h_admin}')
-ON CONFLICT (username) DO NOTHING;
+INSERT INTO users (id, email, password_hash, verified) VALUES
+  ('11111111-1111-1111-1111-111111111101', 'teacher@example.com', '{h_demo}', true),
+  ('11111111-1111-1111-1111-111111111102', 'teacher1@example.com', '{h_demo}', true),
+  ('11111111-1111-1111-1111-111111111103', 'admin@example.com', '{h_admin}', true)
+ON CONFLICT (email) DO NOTHING;
 """
 
 

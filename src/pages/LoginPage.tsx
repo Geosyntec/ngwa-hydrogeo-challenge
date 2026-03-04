@@ -99,9 +99,10 @@ export default function LoginPage() {
             required
             fullWidth
             id="username"
-            label="Username"
+            label="Email"
             name="username"
-            autoComplete="username"
+            type="email"
+            autoComplete="email"
             autoFocus
             value={username}
             onChange={(e) => setUsername(e.target.value)}

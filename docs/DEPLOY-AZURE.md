@@ -41,6 +41,9 @@ At runtime, **the container’s own Python** is used (not the venv’s `bin/pyth
 - **Database:**  
   Configure PostgreSQL via **Application settings** (e.g. `DATABASE_URL` or `POSTGRES_*`). See [DATABASE-AZURE.md](DATABASE-AZURE.md) for Azure PostgreSQL setup and dev machine access.
 
+- **Email verification (Mailjet):**  
+  For registration verification emails, set **MAILJET_API_KEY**, **MAILJET_SECRET_KEY**, **MAILJET_FROM_EMAIL**, and optionally **MAILJET_FROM_NAME**. Set **VERIFICATION_BASE_URL** to the public URL of your app (e.g. `https://your-app.azurewebsites.net`) so verification links point to your frontend.
+
 ## Local deploy prep
 
 From the repo root:

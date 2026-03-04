@@ -9,6 +9,7 @@ import ScenarioPage from './pages/ScenarioPage'
 import ReferencePage from './pages/ReferencePage'
 import AboutPage from './pages/AboutPage'
 import LoginPage from './pages/LoginPage'
+import VerifyEmailPage from './pages/VerifyEmailPage'
 import ResetPasswordPage from './pages/ResetPasswordPage'
 import TeacherGradingPage from './pages/TeacherGradingPage'
 import ManageClassesPage from './pages/teacher/ManageClassesPage'
@@ -33,6 +34,7 @@ export default function App() {
             <Route path={ROUTES.reference} element={<ReferencePage />} />
             <Route path={ROUTES.about} element={<AboutPage />} />
             <Route path={ROUTES.login} element={<LoginPage />} />
+            <Route path={ROUTES.verifyEmail} element={<VerifyEmailPage />} />
             <Route path={ROUTES.resetPassword} element={<ResetPasswordPage />} />
             <Route element={<AuthGuard />}>
               <Route path={ROUTES.grading} element={<TeacherGradingPage />} />

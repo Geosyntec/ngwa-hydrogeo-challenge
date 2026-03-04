@@ -3,7 +3,11 @@ FastAPI backend for the Hydrogeology Challenge app.
 Run with: uvicorn backend.main:app --reload --port 8000
 In production (e.g. Azure App Service), serves the built React app from backend/static.
 """
+import os
+import re
+import secrets
 from contextlib import asynccontextmanager
+from datetime import datetime, timezone, timedelta
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -16,7 +20,8 @@ from fastapi.responses import FileResponse
 from pydantic import BaseModel
 
 from backend.database import create_pool, close_pool, get_connection, Pool
-from backend.auth import verify_password
+from backend.auth import verify_password, hash_password
+from backend.email_sender import send_verification_email
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -71,15 +76,143 @@ async def login(body: LoginBody, conn=Depends(get_db)):
         raise HTTPException(status_code=400, detail="Password is required.")
 
     row = await conn.fetchrow(
-        "SELECT id, username, password_hash FROM users WHERE LOWER(username) = LOWER($1)",
+        "SELECT id, email, password_hash, verified FROM users WHERE LOWER(email) = LOWER($1)",
         username,
     )
     if not row or not row["password_hash"]:
         raise HTTPException(status_code=401, detail="Invalid username or password.")
     if not verify_password(password, row["password_hash"]):
         raise HTTPException(status_code=401, detail="Invalid username or password.")
+    if not row["verified"]:
+        raise HTTPException(
+            status_code=403,
+            detail="Please verify your email before signing in. Check your inbox for the verification link.",
+        )
 
-    return LoginResponse(user={"name": row["username"]})
+    return LoginResponse(user={"name": row["email"]})
+
+
+# --- Register & email verification ---
+def _verification_base_url() -> str:
+    base = (os.environ.get("VERIFICATION_BASE_URL") or "").strip().rstrip("/")
+    if base:
+        return base
+    return "http://localhost:5173"  # dev default
+
+EMAIL_RE = re.compile(r"^[^@]+@[^@]+\.[^@]+$")
+
+
+class RegisterBody(BaseModel):
+    email: str
+    password: str
+
+
+class RegisterResponse(BaseModel):
+    ok: bool
+    message: str
+
+
+@app.post("/api/register", response_model=RegisterResponse)
+async def register(body: RegisterBody, conn=Depends(get_db)):
+    if conn is None:
+        raise HTTPException(status_code=503, detail="Registration is unavailable (database not configured).")
+    email = (body.email or "").strip().lower()
+    if not email:
+        raise HTTPException(status_code=400, detail="Email is required.")
+    if not EMAIL_RE.match(email):
+        raise HTTPException(status_code=400, detail="Invalid email format.")
+    password = (body.password or "").strip()
+    if not password:
+        raise HTTPException(status_code=400, detail="Password is required.")
+
+    existing = await conn.fetchrow("SELECT id FROM users WHERE email = $1", email)
+    if existing:
+        raise HTTPException(status_code=400, detail="An account with this email already exists.")
+
+    password_hash = hash_password(password)
+    user_id = await conn.fetchval(
+        "INSERT INTO users (email, password_hash, verified) VALUES ($1, $2, false) RETURNING id",
+        email,
+        password_hash,
+    )
+    token = secrets.token_urlsafe(32)
+    expires_at = datetime.now(timezone.utc) + timedelta(hours=1)
+    await conn.execute(
+        "INSERT INTO email_verification_tokens (user_id, token, expires_at) VALUES ($1, $2, $3)",
+        user_id,
+        token,
+        expires_at,
+    )
+    base = _verification_base_url()
+    link = f"{base}/verify-email?token={token}"
+    send_verification_email(email, link)
+
+    return RegisterResponse(ok=True, message="Verification email has been sent. Please check your inbox.")
+
+
+class VerifyEmailBody(BaseModel):
+    token: str
+
+
+class VerifyEmailResponse(BaseModel):
+    ok: bool
+    message: str
+
+
+@app.post("/api/verify-email", response_model=VerifyEmailResponse)
+async def verify_email(body: VerifyEmailBody, conn=Depends(get_db)):
+    if conn is None:
+        raise HTTPException(status_code=503, detail="Verification is unavailable (database not configured).")
+    token = (body.token or "").strip()
+    if not token:
+        raise HTTPException(status_code=400, detail="Token is required.")
+
+    row = await conn.fetchrow(
+        "SELECT id, user_id, expires_at FROM email_verification_tokens WHERE token = $1",
+        token,
+    )
+    now = datetime.now(timezone.utc)
+    if not row or row["expires_at"] <= now:
+        raise HTTPException(status_code=400, detail="expired")
+
+    await conn.execute("UPDATE users SET verified = true WHERE id = $1", row["user_id"])
+    await conn.execute("DELETE FROM email_verification_tokens WHERE id = $1", row["id"])
+
+    return VerifyEmailResponse(ok=True, message="Your email is verified. You can sign in now.")
+
+
+class ResendVerificationBody(BaseModel):
+    email: str
+
+
+@app.post("/api/resend-verification", response_model=RegisterResponse)
+async def resend_verification(body: ResendVerificationBody, conn=Depends(get_db)):
+    if conn is None:
+        raise HTTPException(status_code=503, detail="Resend is unavailable (database not configured).")
+    email = (body.email or "").strip().lower()
+    if not email:
+        raise HTTPException(status_code=400, detail="Email is required.")
+
+    user = await conn.fetchrow("SELECT id, verified FROM users WHERE email = $1", email)
+    if not user:
+        return RegisterResponse(ok=True, message="If an account exists, a new verification email has been sent.")
+    if user["verified"]:
+        return RegisterResponse(ok=True, message="This account is already verified. You can sign in.")
+
+    await conn.execute("DELETE FROM email_verification_tokens WHERE user_id = $1", user["id"])
+    token = secrets.token_urlsafe(32)
+    expires_at = datetime.now(timezone.utc) + timedelta(hours=1)
+    await conn.execute(
+        "INSERT INTO email_verification_tokens (user_id, token, expires_at) VALUES ($1, $2, $3)",
+        user["id"],
+        token,
+        expires_at,
+    )
+    base = _verification_base_url()
+    link = f"{base}/verify-email?token={token}"
+    send_verification_email(email, link)
+
+    return RegisterResponse(ok=True, message="A new verification email has been sent.")
 
 
 @app.get("/api/ping")

@@ -7,6 +7,8 @@ export const ROUTES = {
   reference: '/reference',
   about: '/about',
   login: '/login',
+  register: '/register',
+  verifyEmail: '/verify-email',
   resetPassword: '/reset-password',
   grading: '/grading',
   gradingClasses: '/grading/classes',
