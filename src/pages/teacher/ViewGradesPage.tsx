@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useAppSelector } from '../../app/hooks'
+import { selectAuthUser } from '../../features/auth/authSlice'
 import {
   Box,
   IconButton,
@@ -15,15 +17,14 @@ import {
 import ArrowBack from '@mui/icons-material/ArrowBack'
 import Visibility from '@mui/icons-material/Visibility'
 import { ROUTES } from '../../app/routes'
-import { fetchClasses, studentDisplayName, type ClassesResponse, type StudentWithId } from '../../api/mockClassesApi'
+import { fetchClasses, studentDisplayName, type ClassesResponse, type StudentWithId } from '../../api/classesApi'
 import { getGrades, type GetGradesResponse } from '../../api/mockGetGradesApi'
 import GradesModal from './GradesModal'
 
-const TEACHER_NAME = 'default'
-
 export default function ViewGradesPage() {
   const navigate = useNavigate()
-  const teacherName = useMemo(() => TEACHER_NAME, [])
+  const authUser = useAppSelector(selectAuthUser)
+  const teacherEmail = (authUser?.name ?? '').trim()
 
   const [classesData, setClassesData] = useState<ClassesResponse | null>(null)
   const [loading, setLoading] = useState(true)
@@ -38,15 +39,20 @@ export default function ViewGradesPage() {
   } | null>(null)
 
   const loadClasses = useCallback(() => {
+    if (!teacherEmail) {
+      setClassesData(null)
+      setLoading(false)
+      return
+    }
     setLoading(true)
     setError(null)
-    fetchClasses(teacherName)
+    fetchClasses(teacherEmail)
       .then(setClassesData)
       .catch((err) => {
         setError(err instanceof Error ? err.message : 'Failed to load classes')
       })
       .finally(() => setLoading(false))
-  }, [teacherName])
+  }, [teacherEmail])
 
   useEffect(() => {
     loadClasses()

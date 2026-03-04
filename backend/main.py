@@ -6,6 +6,7 @@ In production (e.g. Azure App Service), serves the built React app from backend/
 import os
 import re
 import secrets
+import uuid as uuid_mod
 from contextlib import asynccontextmanager
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
@@ -213,6 +214,165 @@ async def resend_verification(body: ResendVerificationBody, conn=Depends(get_db)
     send_verification_email(email, link)
 
     return RegisterResponse(ok=True, message="A new verification email has been sent.")
+
+
+# --- Classes (DB-backed) ---
+@app.get("/api/classes")
+async def get_classes(teacher: str, conn=Depends(get_db)):
+    """Return classes keyed by class name; teacher is the user's email."""
+    if conn is None:
+        raise HTTPException(status_code=503, detail="Database not configured.")
+    teacher_email = (teacher or "").strip().lower()
+    if not teacher_email:
+        return {}
+    user = await conn.fetchrow(
+        "SELECT id FROM users WHERE LOWER(email) = $1", teacher_email
+    )
+    if not user:
+        return {}
+    rows = await conn.fetch(
+        "SELECT id, name FROM classes WHERE teacher_id = $1 ORDER BY name",
+        user["id"],
+    )
+    result = {}
+    for row in rows:
+        class_id = str(row["id"])
+        class_name = row["name"]
+        students = await conn.fetch(
+            "SELECT id, first_name, last_name FROM students WHERE class_id = $1 ORDER BY created_at",
+            row["id"],
+        )
+        result[class_name] = {
+            "classId": class_id,
+            "students": [
+                {
+                    "id": str(s["id"]),
+                    "first_name": s["first_name"] or "",
+                    "last_name": s["last_name"] or "",
+                }
+                for s in students
+            ],
+        }
+    return result
+
+
+class UpdateClassStudent(BaseModel):
+    id: str | None = None
+    first_name: str
+    last_name: str
+
+
+class UpdateClassBody(BaseModel):
+    classId: str
+    teacherId: str  # teacher email
+    students: list[UpdateClassStudent]
+    authToken: str | None = None
+
+
+class UpdateClassResponse(BaseModel):
+    ok: bool
+    message: str | None = None
+
+
+@app.post("/api/update-class", response_model=UpdateClassResponse)
+async def update_class(body: UpdateClassBody, conn=Depends(get_db)):
+    if conn is None:
+        raise HTTPException(status_code=503, detail="Database not configured.")
+    teacher_email = (body.teacherId or "").strip().lower()
+    if not teacher_email:
+        raise HTTPException(status_code=400, detail="Teacher is required.")
+    user = await conn.fetchrow(
+        "SELECT id FROM users WHERE LOWER(email) = $1", teacher_email
+    )
+    if not user:
+        raise HTTPException(status_code=404, detail="Teacher not found.")
+    class_row = await conn.fetchrow(
+        "SELECT id FROM classes WHERE id = $1 AND teacher_id = $2",
+        body.classId,
+        user["id"],
+    )
+    if not class_row:
+        raise HTTPException(status_code=404, detail="Class not found.")
+    class_id = class_row["id"]
+
+    keep_ids = []
+    for s in body.students:
+        first = (s.first_name or "").strip()
+        last = (s.last_name or "").strip()
+        if not first and not last:
+            continue
+        if s.id and not s.id.startswith("new-"):
+            try:
+                keep_ids.append(uuid_mod.UUID(s.id))
+            except ValueError:
+                pass
+
+    # Delete students in this class that are not in the payload's keep list
+    if keep_ids:
+        await conn.execute(
+            "DELETE FROM students WHERE class_id = $1 AND NOT (id = ANY($2))",
+            class_id,
+            keep_ids,
+        )
+    else:
+        await conn.execute("DELETE FROM students WHERE class_id = $1", class_id)
+
+    # Update existing or insert new
+    for s in body.students:
+        first = (s.first_name or "").strip()
+        last = (s.last_name or "").strip()
+        if not first and not last:
+            continue
+        if s.id and not s.id.startswith("new-"):
+            try:
+                sid = uuid_mod.UUID(s.id)
+                if sid in keep_ids:
+                    await conn.execute(
+                        "UPDATE students SET first_name = $1, last_name = $2 WHERE id = $3 AND class_id = $4",
+                        first,
+                        last,
+                        sid,
+                        class_id,
+                    )
+            except ValueError:
+                await conn.execute(
+                    "INSERT INTO students (class_id, first_name, last_name) VALUES ($1, $2, $3)",
+                    class_id,
+                    first,
+                    last,
+                )
+        else:
+            await conn.execute(
+                "INSERT INTO students (class_id, first_name, last_name) VALUES ($1, $2, $3)",
+                class_id,
+                first,
+                last,
+            )
+
+    return UpdateClassResponse(ok=True, message="Class updated.")
+
+
+@app.delete("/api/classes")
+async def delete_class(classId: str, teacher: str, conn=Depends(get_db)):
+    """Delete a class; teacher is the user's email (must own the class)."""
+    if conn is None:
+        raise HTTPException(status_code=503, detail="Database not configured.")
+    teacher_email = (teacher or "").strip().lower()
+    if not teacher_email:
+        raise HTTPException(status_code=400, detail="Teacher is required.")
+    user = await conn.fetchrow(
+        "SELECT id FROM users WHERE LOWER(email) = $1", teacher_email
+    )
+    if not user:
+        raise HTTPException(status_code=404, detail="Teacher not found.")
+    result = await conn.execute(
+        "DELETE FROM classes WHERE id = $1 AND teacher_id = $2",
+        classId,
+        user["id"],
+    )
+    if result == "DELETE 0":
+        raise HTTPException(status_code=404, detail="Class not found.")
+    return {"ok": True, "message": "Class deleted."}
 
 
 @app.get("/api/ping")

@@ -24,19 +24,20 @@ import ArrowBack from '@mui/icons-material/ArrowBack'
 import Edit from '@mui/icons-material/Edit'
 import PersonAdd from '@mui/icons-material/PersonAdd'
 import DeleteOutline from '@mui/icons-material/DeleteOutline'
+import Delete from '@mui/icons-material/Delete'
 import { ROUTES } from '../../app/routes'
 import {
   fetchClasses,
   updateClass,
+  deleteClass,
   studentDisplayName,
   type ClassesResponse,
   type StudentWithId,
   type UpdateClassPayload,
-} from '../../api/mockClassesApi'
+} from '../../api/classesApi'
 import { useAppSelector } from '../../app/hooks'
 import { selectAuthUser } from '../../features/auth/authSlice'
 
-const TEACHER_NAME = 'default'
 const AUTH_TOKEN_KEY = 'ngwa-auth-token'
 
 function getAuthToken(): string {
@@ -52,8 +53,7 @@ type EditStudentRow = { id: string; first_name: string; last_name: string; isNew
 export default function ManageClassesPage() {
   const navigate = useNavigate()
   const authUser = useAppSelector(selectAuthUser)
-  const teacherName = useMemo(() => TEACHER_NAME, [])
-  const teacherId = authUser?.name ?? teacherName
+  const teacherEmail = (authUser?.name ?? '').trim()
 
   const [classesData, setClassesData] = useState<ClassesResponse | null>(null)
   const [loading, setLoading] = useState(true)
@@ -69,18 +69,25 @@ export default function ManageClassesPage() {
   const [editStudents, setEditStudents] = useState<EditStudentRow[]>([])
   const [editSubmitting, setEditSubmitting] = useState(false)
   const [editError, setEditError] = useState<string | null>(null)
+  const [deleteConfirm, setDeleteConfirm] = useState<{ className: string; classId: string } | null>(null)
+  const [deleteSubmitting, setDeleteSubmitting] = useState(false)
   const nextNewIdRef = useRef(0)
 
   const loadClasses = useCallback(() => {
+    if (!teacherEmail) {
+      setClassesData(null)
+      setLoading(false)
+      return
+    }
     setLoading(true)
     setError(null)
-    fetchClasses(teacherName)
+    fetchClasses(teacherEmail)
       .then(setClassesData)
       .catch((err) => {
         setError(err instanceof Error ? err.message : 'Failed to load classes')
       })
       .finally(() => setLoading(false))
-  }, [teacherName])
+  }, [teacherEmail])
 
   useEffect(() => {
     loadClasses()
@@ -134,6 +141,20 @@ export default function ManageClassesPage() {
     setEditStudents((prev) => prev.filter((_, i) => i !== index))
   }
 
+  const handleDeleteClass = async () => {
+    if (!deleteConfirm || !teacherEmail) return
+    setDeleteSubmitting(true)
+    try {
+      await deleteClass(deleteConfirm.classId, teacherEmail)
+      setDeleteConfirm(null)
+      loadClasses()
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to delete class.')
+    } finally {
+      setDeleteSubmitting(false)
+    }
+  }
+
   const handleEditSubmit = async () => {
     if (!editingClass) return
     const allHaveName = editStudents.every(
@@ -147,7 +168,7 @@ export default function ManageClassesPage() {
     setEditError(null)
     const payload: UpdateClassPayload = {
       classId: editingClass.classId,
-      teacherId,
+      teacherId: teacherEmail,
       students: editStudents.map((s) =>
         s.isNew
           ? { first_name: s.first_name.trim(), last_name: s.last_name.trim() }
@@ -156,7 +177,7 @@ export default function ManageClassesPage() {
       authToken: getAuthToken(),
     }
     try {
-      const res = await updateClass(payload, teacherName)
+      const res = await updateClass(payload, teacherEmail)
       if (res.ok) {
         closeEditModal()
         loadClasses()
@@ -204,6 +225,7 @@ export default function ManageClassesPage() {
                 <TableCell>Class name</TableCell>
                 <TableCell align="right">Students</TableCell>
                 <TableCell padding="checkbox" sx={{ width: 48 }} />
+                <TableCell padding="checkbox" sx={{ width: 48 }} />
               </TableRow>
             </TableHead>
             <TableBody>
@@ -241,10 +263,20 @@ export default function ManageClassesPage() {
                           <Edit />
                         </IconButton>
                       </TableCell>
+                      <TableCell padding="checkbox">
+                        <IconButton
+                          aria-label="Delete class"
+                          size="small"
+                          onClick={() => setDeleteConfirm({ className, classId: classData.classId })}
+                          color="error"
+                        >
+                          <Delete />
+                        </IconButton>
+                      </TableCell>
                     </TableRow>
                     <TableRow>
                       <TableCell
-                        colSpan={4}
+                        colSpan={5}
                         sx={{ py: 0, borderBottom: isExpanded ? undefined : 0 }}
                       >
                         <Collapse in={isExpanded} timeout="auto" unmountOnExit>
@@ -348,6 +380,24 @@ export default function ManageClassesPage() {
             disabled={editSubmitting || editStudents.length === 0}
           >
             {editSubmitting ? 'Saving…' : 'Save changes'}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog open={!!deleteConfirm} onClose={() => !deleteSubmitting && setDeleteConfirm(null)}>
+        <DialogTitle>Delete class</DialogTitle>
+        <DialogContent>
+          <Typography>
+            Delete class &quot;{deleteConfirm?.className}&quot;? This will remove the class and all
+            its students. This cannot be undone.
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDeleteConfirm(null)} disabled={deleteSubmitting}>
+            Cancel
+          </Button>
+          <Button color="error" variant="contained" onClick={handleDeleteClass} disabled={deleteSubmitting}>
+            {deleteSubmitting ? 'Deleting…' : 'Delete'}
           </Button>
         </DialogActions>
       </Dialog>
