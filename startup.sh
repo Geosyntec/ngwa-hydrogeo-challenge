@@ -8,9 +8,13 @@ cd "$APP_ROOT"
 # Match site-packages to container Python version (e.g. 3.11)
 PYVER=$(python -c "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}')")
 export PYTHONPATH="$APP_ROOT/antenv/lib/python$PYVER/site-packages"
-# Ensure DB tables exist (no seed). Skip if DATABASE_URL not set; do not fail startup on bootstrap error.
-#if [ -n "${DATABASE_URL}" ]; then
-python -m backend.scripts.bootstrap_db --seed || true
-#fi
+# Run DB bootstrap only on-demand: set RUN_DB_BOOTSTRAP=1 (tables only) or RUN_DB_BOOTSTRAP=seed (tables + demo data) in Application settings, then restart. Unset to skip on normal deploys.
+if [ -n "${RUN_DB_BOOTSTRAP}" ]; then
+  if [ "$RUN_DB_BOOTSTRAP" = "seed" ]; then
+    python -m backend.scripts.bootstrap_db --seed || true
+  else
+    python -m backend.scripts.bootstrap_db || true
+  fi
+fi
 PORT=${PORT:-8000}
 exec python -m uvicorn backend.main:app --host 0.0.0.0 --port "$PORT"

@@ -62,7 +62,7 @@ def send_verification_email(to_email: str, verification_link: str) -> bool:
     if not from_email:
         logger.warning("MAILJET_FROM_EMAIL not set. Skipping send.")
         return False
-
+    logger.info("Mailjet: about to send email to %s", to_email)
     body = {
         "Messages": [
             {

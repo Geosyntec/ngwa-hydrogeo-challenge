@@ -33,13 +33,16 @@ At runtime, **the container’s own Python** is used (not the venv’s `bin/pyth
 
 - **Startup Command:**  
   `bash startup.sh`  
-  (At each app start, the script runs the database bootstrap (tables only, no seed) when `DATABASE_URL` is set, then starts `uvicorn backend.main:app --host 0.0.0.0 --port $PORT`. Azure sets `PORT`.)
+  (Starts `uvicorn backend.main:app --host 0.0.0.0 --port $PORT`. Azure sets `PORT`. DB bootstrap runs only when requested; see below.)
 
 - **General Settings:**  
   If your platform uses a default port, set **Application Settings** → `WEBSITES_PORT` = `8000` (or leave unset if `PORT` is provided).
 
 - **Database:**  
   Configure PostgreSQL via **Application settings** (e.g. `DATABASE_URL` or `POSTGRES_*`). See [DATABASE-AZURE.md](DATABASE-AZURE.md) for Azure PostgreSQL setup and dev machine access.
+
+- **DB bootstrap (on-demand):**  
+  Bootstrap does **not** run on every deploy. To run it: in **Application settings** set **RUN_DB_BOOTSTRAP** = `1` (tables only) or `seed` (tables + demo data), then **Restart** the app. After the run, remove **RUN_DB_BOOTSTRAP** or set it to empty so future restarts don’t run bootstrap again.
 
 - **Email verification (Mailjet):**  
   In **Configuration → Application settings**, add these names **exactly** (case-sensitive):
