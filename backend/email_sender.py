@@ -78,6 +78,8 @@ def send_verification_email(to_email: str, verification_link: str) -> bool:
         ]
     }
 
+    logger.info("Mailjet: sending verification email to %s (from %s)", to_email, from_email)
+
     req = urllib.request.Request(
         MAILJET_SEND_URL,
         data=json.dumps(body).encode(),
@@ -89,13 +91,41 @@ def send_verification_email(to_email: str, verification_link: str) -> bool:
     )
     try:
         with urllib.request.urlopen(req, timeout=15) as resp:
-            if 200 <= resp.status < 300:
+            status = getattr(resp, "status", getattr(resp, "code", None))
+            raw = resp.read()
+            try:
+                response_body = raw.decode("utf-8") if raw else ""
+            except Exception:
+                response_body = f"<{len(raw)} bytes>"
+            if 200 <= (status or 0) < 300:
+                logger.info(
+                    "Mailjet send succeeded: status=%s, response=%s",
+                    status,
+                    response_body[:500] if response_body else "(empty)",
+                )
                 return True
-            logger.warning("Mailjet send returned %s: %s", resp.status, resp.read())
+            logger.warning(
+                "Mailjet send non-2xx: status=%s, response=%s",
+                status,
+                response_body[:1000] if response_body else "(empty)",
+            )
             return False
     except urllib.error.HTTPError as e:
-        logger.warning("Mailjet send failed: %s %s", e.code, e.read())
+        body_bytes = e.read()
+        try:
+            body_str = body_bytes.decode("utf-8") if body_bytes else ""
+        except Exception:
+            body_str = f"<{len(body_bytes)} bytes>"
+        logger.warning(
+            "Mailjet send HTTP error: code=%s, reason=%s, response=%s",
+            e.code,
+            getattr(e, "reason", ""),
+            body_str[:1000] if body_str else "(empty)",
+        )
+        return False
+    except urllib.error.URLError as e:
+        logger.warning("Mailjet send URL error: %s", e.reason)
         return False
     except Exception as e:
-        logger.warning("Mailjet send error: %s", e)
+        logger.exception("Mailjet send failed: %s", e)
         return False
