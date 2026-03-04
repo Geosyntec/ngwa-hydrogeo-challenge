@@ -256,6 +256,66 @@ async def get_classes(teacher: str, conn=Depends(get_db)):
     return result
 
 
+class CreateClassStudent(BaseModel):
+    first_name: str
+    last_name: str
+
+
+class CreateClassBody(BaseModel):
+    teacherId: str
+    name: str
+    students: list[CreateClassStudent] = []
+
+
+class CreateClassResponse(BaseModel):
+    ok: bool
+    classId: str | None = None
+    message: str | None = None
+
+
+@app.post("/api/classes", response_model=CreateClassResponse)
+async def create_class(body: CreateClassBody, conn=Depends(get_db)):
+    """Create a new class for the teacher; optionally add students."""
+    if conn is None:
+        raise HTTPException(status_code=503, detail="Database not configured.")
+    teacher_email = (body.teacherId or "").strip().lower()
+    if not teacher_email:
+        raise HTTPException(status_code=400, detail="Teacher is required.")
+    name = (body.name or "").strip()
+    if not name:
+        raise HTTPException(status_code=400, detail="Class name is required.")
+    user = await conn.fetchrow(
+        "SELECT id FROM users WHERE LOWER(email) = $1", teacher_email
+    )
+    if not user:
+        raise HTTPException(status_code=404, detail="Teacher not found.")
+    # Unique per teacher: (teacher_id, name)
+    existing = await conn.fetchrow(
+        "SELECT id FROM classes WHERE teacher_id = $1 AND name = $2",
+        user["id"],
+        name,
+    )
+    if existing:
+        raise HTTPException(status_code=409, detail="A class with that name already exists.")
+    row = await conn.fetchrow(
+        "INSERT INTO classes (teacher_id, name) VALUES ($1, $2) RETURNING id",
+        user["id"],
+        name,
+    )
+    class_id = row["id"]
+    for s in body.students:
+        first = (s.first_name or "").strip()
+        last = (s.last_name or "").strip()
+        if first or last:
+            await conn.execute(
+                "INSERT INTO students (class_id, first_name, last_name) VALUES ($1, $2, $3)",
+                class_id,
+                first,
+                last,
+            )
+    return CreateClassResponse(ok=True, classId=str(class_id), message="Class created.")
+
+
 class UpdateClassStudent(BaseModel):
     id: str | None = None
     first_name: str

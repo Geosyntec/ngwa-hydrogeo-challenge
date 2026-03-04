@@ -34,6 +34,40 @@ export async function fetchClasses(teacherEmail: string): Promise<ClassesRespons
   return res.json()
 }
 
+export type CreateClassPayload = {
+  teacherId: string
+  name: string
+  students: Array<{ first_name: string; last_name: string }>
+}
+
+export type CreateClassResponse = {
+  ok: boolean
+  classId?: string
+  message?: string
+}
+
+export async function createClass(
+  teacherEmail: string,
+  name: string,
+  students: Array<{ first_name: string; last_name: string }>
+): Promise<CreateClassResponse> {
+  const base = getApiUrl()
+  const res = await fetch(`${base}/api/classes`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      teacherId: teacherEmail,
+      name: name.trim(),
+      students,
+    } as CreateClassPayload),
+    credentials: 'include',
+  })
+  const data = await res.json().catch(() => ({}))
+  const message = typeof data.detail === 'string' ? data.detail : data.message
+  if (!res.ok) throw new Error(message ?? 'Create class failed.')
+  return { ok: true, classId: data.classId, message: data.message }
+}
+
 export type UpdateClassPayload = {
   classId: string
   teacherId: string

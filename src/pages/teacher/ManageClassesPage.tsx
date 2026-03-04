@@ -21,6 +21,7 @@ import {
 import KeyboardArrowDown from '@mui/icons-material/KeyboardArrowDown'
 import KeyboardArrowUp from '@mui/icons-material/KeyboardArrowUp'
 import ArrowBack from '@mui/icons-material/ArrowBack'
+import Add from '@mui/icons-material/Add'
 import Edit from '@mui/icons-material/Edit'
 import PersonAdd from '@mui/icons-material/PersonAdd'
 import DeleteOutline from '@mui/icons-material/DeleteOutline'
@@ -28,6 +29,7 @@ import Delete from '@mui/icons-material/Delete'
 import { ROUTES } from '../../app/routes'
 import {
   fetchClasses,
+  createClass,
   updateClass,
   deleteClass,
   studentDisplayName,
@@ -102,8 +104,11 @@ export default function ManageClassesPage() {
     setExpandedClass((prev) => (prev === className ? null : className))
   }
 
+  const [editClassName, setEditClassName] = useState('')
+
   const openEditModal = (className: string, classId: string, students: StudentWithId[]) => {
     setEditingClass({ className, classId, students })
+    setEditClassName(className)
     setEditStudents(
       students.map((s) => ({ id: s.id, first_name: s.first_name, last_name: s.last_name }))
     )
@@ -111,9 +116,18 @@ export default function ManageClassesPage() {
     setEditModalOpen(true)
   }
 
+  const openAddModal = () => {
+    setEditingClass(null)
+    setEditClassName('')
+    setEditStudents([])
+    setEditError(null)
+    setEditModalOpen(true)
+  }
+
   const closeEditModal = () => {
     setEditModalOpen(false)
     setEditingClass(null)
+    setEditClassName('')
     setEditStudents([])
     setEditError(null)
   }
@@ -156,7 +170,6 @@ export default function ManageClassesPage() {
   }
 
   const handleEditSubmit = async () => {
-    if (!editingClass) return
     const allHaveName = editStudents.every(
       (s) => s.first_name.trim() !== '' || s.last_name.trim() !== ''
     )
@@ -166,26 +179,45 @@ export default function ManageClassesPage() {
     }
     setEditSubmitting(true)
     setEditError(null)
-    const payload: UpdateClassPayload = {
-      classId: editingClass.classId,
-      teacherId: teacherEmail,
-      students: editStudents.map((s) =>
-        s.isNew
-          ? { first_name: s.first_name.trim(), last_name: s.last_name.trim() }
-          : { id: s.id, first_name: s.first_name.trim(), last_name: s.last_name.trim() }
-      ),
-      authToken: getAuthToken(),
-    }
     try {
-      const res = await updateClass(payload, teacherEmail)
-      if (res.ok) {
+      if (editingClass) {
+        const payload: UpdateClassPayload = {
+          classId: editingClass.classId,
+          teacherId: teacherEmail,
+          students: editStudents.map((s) =>
+            s.isNew
+              ? { first_name: s.first_name.trim(), last_name: s.last_name.trim() }
+              : { id: s.id, first_name: s.first_name.trim(), last_name: s.last_name.trim() }
+          ),
+          authToken: getAuthToken(),
+        }
+        const res = await updateClass(payload, teacherEmail)
+        if (res.ok) {
+          closeEditModal()
+          loadClasses()
+        } else {
+          setEditError(res.message ?? 'Update failed.')
+        }
+      } else {
+        const name = editClassName.trim()
+        if (!name) {
+          setEditError('Class name is required.')
+          setEditSubmitting(false)
+          return
+        }
+        await createClass(
+          teacherEmail,
+          name,
+          editStudents.map((s) => ({
+            first_name: s.first_name.trim(),
+            last_name: s.last_name.trim(),
+          }))
+        )
         closeEditModal()
         loadClasses()
-      } else {
-        setEditError(res.message ?? 'Update failed.')
       }
     } catch (err) {
-      setEditError(err instanceof Error ? err.message : 'Update failed.')
+      setEditError(err instanceof Error ? err.message : 'Save failed.')
     } finally {
       setEditSubmitting(false)
     }
@@ -217,7 +249,17 @@ export default function ManageClassesPage() {
       )}
 
       {!loading && !error && classesData && (
-        <TableContainer sx={{ maxWidth: 720 }}>
+        <>
+          <Button
+            variant="contained"
+            startIcon={<Add />}
+            onClick={openAddModal}
+            disabled={!teacherEmail}
+            sx={{ mb: 2 }}
+          >
+            Add class
+          </Button>
+          <TableContainer sx={{ maxWidth: 720 }}>
           <Table size="small">
             <TableHead>
               <TableRow>
@@ -315,16 +357,29 @@ export default function ManageClassesPage() {
             </TableBody>
           </Table>
         </TableContainer>
+        </>
       )}
 
       <Dialog open={editModalOpen} onClose={closeEditModal} maxWidth="sm" fullWidth>
         <DialogTitle>
-          Edit class {editingClass?.className ?? ''}
+          {editingClass ? `Edit class ${editingClass.className}` : 'Add new class'}
         </DialogTitle>
         <DialogContent>
+          {!editingClass && (
+            <TextField
+              autoFocus
+              fullWidth
+              label="Class name"
+              value={editClassName}
+              onChange={(e) => setEditClassName(e.target.value)}
+              placeholder="e.g. Hydrogeology 101"
+              sx={{ mb: 2 }}
+            />
+          )}
           <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-            Update student first and last names or add new students. New students
-            will receive an ID when you submit.
+            {editingClass
+              ? 'Update student first and last names or add new students. New students will receive an ID when you submit.'
+              : 'Optionally add students now. You can add more later by editing the class.'}
           </Typography>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
             {editStudents.map((student, index) => (
@@ -377,9 +432,12 @@ export default function ManageClassesPage() {
           <Button
             variant="contained"
             onClick={handleEditSubmit}
-            disabled={editSubmitting || editStudents.length === 0}
+            disabled={
+              editSubmitting ||
+              (editingClass ? editStudents.length === 0 : !editClassName.trim())
+            }
           >
-            {editSubmitting ? 'Saving…' : 'Save changes'}
+            {editSubmitting ? 'Saving…' : editingClass ? 'Save changes' : 'Create class'}
           </Button>
         </DialogActions>
       </Dialog>
