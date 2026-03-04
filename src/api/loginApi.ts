@@ -16,6 +16,8 @@ export type LoginResponse = {
 
 export type LoginError = {
   message: string
+  /** True when backend returned 403 (email not verified). */
+  needVerification?: boolean
 }
 
 export async function login(credentials: LoginCredentials): Promise<LoginResponse> {
@@ -39,7 +41,7 @@ export async function login(credentials: LoginCredentials): Promise<LoginRespons
         : data.message ?? 'Sign in failed.'
 
   if (!res.ok) {
-    const err: LoginError = { message }
+    const err: LoginError = { message, needVerification: res.status === 403 }
     return Promise.reject(err)
   }
 

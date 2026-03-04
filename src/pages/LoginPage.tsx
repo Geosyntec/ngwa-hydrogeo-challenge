@@ -27,11 +27,13 @@ export default function LoginPage() {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
+  const [needVerification, setNeedVerification] = useState(false)
   const [loading, setLoading] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
+    setNeedVerification(false)
     setLoading(true)
     try {
       const res = await loginApi({ username: username.trim(), password })
@@ -39,6 +41,7 @@ export default function LoginPage() {
       navigate(from, { replace: true })
     } catch (err: any) {
       setError(err?.message ?? 'Sign in failed.')
+      setNeedVerification(!!err?.needVerification)
     } finally {
       setLoading(false)
     }
@@ -119,9 +122,22 @@ export default function LoginPage() {
             onChange={(e) => setPassword(e.target.value)}
           />
           {error && (
-            <Typography color="error" variant="body2" sx={{ mt: 1 }}>
-              {error}
-            </Typography>
+            <Box sx={{ mt: 1, width: '100%' }}>
+              <Typography color="error" variant="body2">
+                {error}
+              </Typography>
+              {needVerification && (
+                <Link
+                  component="button"
+                  type="button"
+                  variant="body2"
+                  onClick={() => navigate(ROUTES.verifyEmail)}
+                  sx={{ mt: 0.5, display: 'inline-block', cursor: 'pointer' }}
+                >
+                  Resend verification email
+                </Link>
+              )}
+            </Box>
           )}
           <Button
             type="submit"
