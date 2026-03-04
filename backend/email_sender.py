@@ -78,7 +78,7 @@ def send_verification_email(to_email: str, verification_link: str) -> bool:
         ]
     }
 
-    logger.info("Mailjet: sending verification email to %s (from %s)", to_email, from_email)
+    logger.warning("Mailjet: sending verification email to %s (from %s)", to_email, from_email)
 
     req = urllib.request.Request(
         MAILJET_SEND_URL,
@@ -97,6 +97,7 @@ def send_verification_email(to_email: str, verification_link: str) -> bool:
                 response_body = raw.decode("utf-8") if raw else ""
             except Exception:
                 response_body = f"<{len(raw)} bytes>"
+            logger.warning("Mailjet status: %s", status)
             if 200 <= (status or 0) < 300:
                 logger.info(
                     "Mailjet send succeeded: status=%s, response=%s",
