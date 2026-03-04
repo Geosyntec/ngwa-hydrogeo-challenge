@@ -1,7 +1,13 @@
 """
 Send emails via Mailjet Send API v3.1.
 
-Configure with env: MAILJET_API_KEY, MAILJET_SECRET_KEY, MAILJET_FROM_EMAIL, MAILJET_FROM_NAME (optional).
+Where to set secrets:
+- Azure: Web App → Configuration → Application settings. Add names exactly:
+  MAILJET_API_KEY, MAILJET_SECRET_KEY, MAILJET_FROM_EMAIL (MAILJET_FROM_NAME optional).
+  Then Save and Restart the app so the process sees the new variables.
+- Local: .env in project root (loaded by main.py via python-dotenv).
+
+Names are case-sensitive. We also check MJ_APIKEY_PUBLIC / MJ_APIKEY_PRIVATE as fallbacks.
 """
 
 from __future__ import annotations
@@ -19,8 +25,12 @@ MAILJET_SEND_URL = "https://api.mailjet.com/v3.1/send"
 
 
 def _get_auth_header() -> str | None:
-    api_key = (os.environ.get("MAILJET_API_KEY") or "").strip()
-    secret = (os.environ.get("MAILJET_SECRET_KEY") or "").strip()
+    api_key = (
+        (os.environ.get("MAILJET_API_KEY") or "").strip()
+    )
+    secret = (
+        (os.environ.get("MAILJET_SECRET_KEY") or "").strip()
+    )
     if not api_key or not secret:
         return None
     raw = f"{api_key}:{secret}"
@@ -33,7 +43,18 @@ def send_verification_email(to_email: str, verification_link: str) -> bool:
     """
     auth = _get_auth_header()
     if not auth:
-        logger.warning("Mailjet not configured (MAILJET_API_KEY / MAILJET_SECRET_KEY). Skipping send.")
+        has_key = bool(
+            (os.environ.get("MAILJET_API_KEY") or "").strip()
+        )
+        has_secret = bool(
+            (os.environ.get("MAILJET_SECRET_KEY") or "").strip()
+        )
+        logger.warning(
+            "Mailjet not configured: MAILJET_API_KEY set=%s, MAILJET_SECRET_KEY set=%s. "
+            "Set both in Azure Application settings (exact names), then Restart the app.",
+            has_key,
+            has_secret,
+        )
         return False
 
     from_email = (os.environ.get("MAILJET_FROM_EMAIL") or "").strip()

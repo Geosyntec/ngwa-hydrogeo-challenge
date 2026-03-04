@@ -42,7 +42,12 @@ At runtime, **the container’s own Python** is used (not the venv’s `bin/pyth
   Configure PostgreSQL via **Application settings** (e.g. `DATABASE_URL` or `POSTGRES_*`). See [DATABASE-AZURE.md](DATABASE-AZURE.md) for Azure PostgreSQL setup and dev machine access.
 
 - **Email verification (Mailjet):**  
-  For registration verification emails, set **MAILJET_API_KEY**, **MAILJET_SECRET_KEY**, **MAILJET_FROM_EMAIL**, and optionally **MAILJET_FROM_NAME**. Set **VERIFICATION_BASE_URL** to the public URL of your app (e.g. `https://your-app.azurewebsites.net`) so verification links point to your frontend.
+  In **Configuration → Application settings**, add these names **exactly** (case-sensitive):
+  - **MAILJET_API_KEY** – your Mailjet API key
+  - **MAILJET_SECRET_KEY** – your Mailjet Secret key
+  - **MAILJET_FROM_EMAIL** – sender address (must be allowed in Mailjet)
+  - **MAILJET_FROM_NAME** (optional) – sender display name  
+  Then **Save** and **Restart** the Web App so the process picks up the new variables. If emails are still skipped, check Log stream for a warning that shows which of the two (API key / Secret key) is not set.
 
 ## Local deploy prep
 
