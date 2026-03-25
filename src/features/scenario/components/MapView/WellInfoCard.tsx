@@ -1,4 +1,4 @@
-import { useLayoutEffect, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import {
   Box,
@@ -111,6 +111,14 @@ function portalPlacementStyle(
   }
 }
 
+/** Don't start a card drag from embedded controls or table (text selection). */
+function isWellCardDragTarget(target: EventTarget | null): boolean {
+  if (!(target instanceof Element)) return false
+  return !!target.closest(
+    'button, a, input, textarea, select, [role="checkbox"], .MuiIconButton-root, .MuiCheckbox-root, label, table, .MuiTableCell-root, .MuiTableRow-root, .MuiTableHead-root, .MuiTableBody-root',
+  )
+}
+
 export default function WellInfoCard({
   well,
   allowPumping,
@@ -125,6 +133,15 @@ export default function WellInfoCard({
 }: WellInfoCardProps) {
   const [geologyExpanded, setGeologyExpanded] = useState(false)
   const [portalBoxStyle, setPortalBoxStyle] = useState<React.CSSProperties | null>(null)
+  const [userPanOffset, setUserPanOffset] = useState({ x: 0, y: 0 })
+  const [isDragging, setIsDragging] = useState(false)
+  const dragSessionRef = useRef<{
+    pointerId: number
+    startClientX: number
+    startClientY: number
+    startOffX: number
+    startOffY: number
+  } | null>(null)
 
   const OFFSET_X = 14
   const OFFSET_Y = placement === 'above' || placement === 'below' ? -8 : 0
@@ -151,22 +168,34 @@ export default function WellInfoCard({
     }
   }, [open, placement, anchorRef])
 
-  const positionSx =
+  useEffect(() => {
+    if (!open) setUserPanOffset({ x: 0, y: 0 })
+  }, [open])
+
+  useEffect(() => {
+    setUserPanOffset({ x: 0, y: 0 })
+  }, [well.Name])
+
+  const basePositionSx: React.CSSProperties =
     anchorRef != null
       ? (portalBoxStyle ?? {
-          position: 'fixed' as const,
+          position: 'fixed',
           zIndex: 1300,
           left: 0,
           top: 0,
-          visibility: 'hidden' as const,
+          visibility: 'hidden',
         })
       : {
-          position: 'absolute' as const,
+          position: 'absolute',
           top: top + OFFSET_Y,
           left: left + OFFSET_X,
           ...placementStyle,
           zIndex: 2,
         }
+
+  const positionSx = { ...basePositionSx }
+  if (typeof positionSx.left === 'number') positionSx.left += userPanOffset.x
+  if (typeof positionSx.top === 'number') positionSx.top += userPanOffset.y
 
   const cardSx = {
     ...positionSx,
@@ -181,14 +210,63 @@ export default function WellInfoCard({
     borderRadius: 1.5,
     p: 1.25,
     pointerEvents: 'auto',
+    cursor: isDragging ? 'grabbing' : 'grab',
+    touchAction: isDragging ? ('none' as const) : ('auto' as const),
+    userSelect: isDragging ? ('none' as const) : ('auto' as const),
+  }
+
+  const onPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (e.button !== 0 || !open) return
+    if (isWellCardDragTarget(e.target)) return
+    e.preventDefault()
+    dragSessionRef.current = {
+      pointerId: e.pointerId,
+      startClientX: e.clientX,
+      startClientY: e.clientY,
+      startOffX: userPanOffset.x,
+      startOffY: userPanOffset.y,
+    }
+    setIsDragging(true)
+    e.currentTarget.setPointerCapture(e.pointerId)
+  }
+
+  const onPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    const session = dragSessionRef.current
+    if (!session || e.pointerId !== session.pointerId) return
+    e.preventDefault()
+    const dx = e.clientX - session.startClientX
+    const dy = e.clientY - session.startClientY
+    setUserPanOffset({
+      x: session.startOffX + dx,
+      y: session.startOffY + dy,
+    })
+  }
+
+  const endDrag = (e: React.PointerEvent<HTMLDivElement>) => {
+    const session = dragSessionRef.current
+    if (!session || e.pointerId !== session.pointerId) return
+    dragSessionRef.current = null
+    setIsDragging(false)
+    try {
+      e.currentTarget.releasePointerCapture(e.pointerId)
+    } catch {
+      /* already released */
+    }
   }
 
   const card = (
     <Box
       aria-hidden={!open}
       sx={cardSx}
+      onPointerDown={onPointerDown}
+      onPointerMove={onPointerMove}
+      onPointerUp={endDrag}
+      onPointerCancel={endDrag}
       onMouseEnter={portalPointerHandlers?.onMouseEnter}
-      onMouseLeave={portalPointerHandlers?.onMouseLeave}
+      onMouseLeave={() => {
+        if (isDragging) return
+        portalPointerHandlers?.onMouseLeave?.()
+      }}
     >
       <Stack direction="row" spacing={1} sx={{ minWidth: 'min-content' }}>
         <Box sx={{ flexShrink: 0 }}>
