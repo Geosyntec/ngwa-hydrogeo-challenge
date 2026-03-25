@@ -1,7 +1,10 @@
 import React, { memo, useMemo } from "react";
 import { useAppSelector } from "../../../../app/hooks";
 import { selectMap } from "../../ScenarioSlice";
-import { selectSortedByElevation } from "../../flowDirection/flowSlice";
+import {
+  selectSortedByElevation,
+  waterTableElevationFt,
+} from "../../flowDirection/flowSlice";
 import { selectFlow } from "../../flowDirection/flowSelectors";
 import { selectGradient } from "../../gradient/gradientSelectors";
 import {
@@ -37,8 +40,11 @@ export default memo(function MapOverlay() {
     const dML_Ft = Math.round(distPx(mid.Point, lo.Point) * ratioFtPerPx);
     const dLH_Ft = Math.round(distPx(lo.Point, hi.Point) * ratioFtPerPx);
 
-    const diffHighLow = Math.round((hi.Elevation - lo.Elevation) * 10) / 10;
-    const diffHighMid = Math.round((hi.Elevation - mid.Elevation) * 10) / 10;
+    const hiEl = waterTableElevationFt(hi);
+    const midEl = waterTableElevationFt(mid);
+    const loEl = waterTableElevationFt(lo);
+    const diffHighLow = Math.round((hiEl - loEl) * 10) / 10;
+    const diffHighMid = Math.round((hiEl - midEl) * 10) / 10;
     const elevRatio =
       diffHighLow === 0 ? 0 : Number((diffHighMid / diffHighLow).toFixed(2));
 

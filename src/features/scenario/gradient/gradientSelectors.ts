@@ -1,6 +1,9 @@
 import type { RootState } from '../../../app/store'
 import { selectGradient as _selectGradient, checkStep1Applied, checkStep2Applied } from './gradientSlice'
-import { selectSortedByElevation } from '../flowDirection/flowSlice'
+import {
+  selectSortedByElevation,
+  waterTableElevationFt,
+} from '../flowDirection/flowSlice'
 import { computeYLengthFeet, computeGradientValue } from '../services/drawingMath'
 
 export const selectGradient = (s: RootState) => _selectGradient(s)
@@ -42,8 +45,8 @@ export const checkStep2 = (opts: { check?: boolean; show?: boolean } = {}) =>
     const s = getState()
     const sorted = selectSortedByElevation(s)
     if (sorted.length < 3) return
-    const hi = sorted[2].Elevation
-    const mid = sorted[1].Elevation
+    const hi = waterTableElevationFt(sorted[2])
+    const mid = waterTableElevationFt(sorted[1])
     const Y = computeYLengthFeet(s) ?? undefined
     const gradient = computeGradientValue(s) ?? undefined
     dispatch(checkStep2Applied({ hi, mid, Y, gradient, check: opts.check, show: opts.show }))

@@ -1,6 +1,9 @@
 import type { RootState } from "../../../app/store";
 import { selectMap } from "../ScenarioSlice";
-import { selectSortedByElevation } from "../flowDirection/flowSlice";
+import {
+  selectSortedByElevation,
+  waterTableElevationFt,
+} from "../flowDirection/flowSlice";
 
 export type Pt = { x: number; y: number };
 export const distance = (a: Pt, b: Pt) => Math.hypot(b.x - a.x, b.y - a.y);
@@ -56,8 +59,11 @@ export function computeActualFlowDirectionAngle(s: RootState): number | null {
     mid = sorted[1],
     hi = sorted[2];
   const ratioFtPerPx = (map.physicalWidth * 5280) / map.width;
-  const diffHighLow = Math.round((hi.Elevation - lo.Elevation) * 10) / 10;
-  const diffHighMid = Math.round((hi.Elevation - mid.Elevation) * 10) / 10;
+  const hiEl = waterTableElevationFt(hi);
+  const midEl = waterTableElevationFt(mid);
+  const loEl = waterTableElevationFt(lo);
+  const diffHighLow = Math.round((hiEl - loEl) * 10) / 10;
+  const diffHighMid = Math.round((hiEl - midEl) * 10) / 10;
   if (diffHighLow === 0) return null;
   const elevationRatio = Number((diffHighMid / diffHighLow).toFixed(2));
   const dHighLowFt = Math.round(distance(hi.Point, lo.Point) * ratioFtPerPx);
@@ -79,8 +85,11 @@ export function computeYLengthFeet(s: RootState): number | null {
     mid = sorted[1],
     hi = sorted[2];
   const ratioFtPerPx = (map.physicalWidth * 5280) / map.width;
-  const diffHighLow = Math.round((hi.Elevation - lo.Elevation) * 10) / 10;
-  const diffHighMid = Math.round((hi.Elevation - mid.Elevation) * 10) / 10;
+  const hiEl = waterTableElevationFt(hi);
+  const midEl = waterTableElevationFt(mid);
+  const loEl = waterTableElevationFt(lo);
+  const diffHighLow = Math.round((hiEl - loEl) * 10) / 10;
+  const diffHighMid = Math.round((hiEl - midEl) * 10) / 10;
   if (diffHighLow === 0) return null;
   const elevationRatio = Number((diffHighMid / diffHighLow).toFixed(2));
   const dHighLowFt = Math.round(distance(hi.Point, lo.Point) * ratioFtPerPx);
@@ -97,7 +106,8 @@ export function computeGradientValue(s: RootState): number | null {
   if (!Y || Y === 0 || !sorted || sorted.length < 3) return null;
   const hi = sorted[2],
     mid = sorted[1];
-  const raw = (hi.Elevation - mid.Elevation) / Y;
+  const raw =
+    (waterTableElevationFt(hi) - waterTableElevationFt(mid)) / Y;
   return Math.round(raw * 1e4) / 1e4;
 }
 
@@ -143,7 +153,8 @@ export function pickHydraulicPropsForHighWell(s: RootState) {
   const sorted = (selectSortedByElevation as any)(s);
   if (!sorted || sorted.length < 3) return {};
   const hi = sorted[2];
-  const wellDepth = (hi.GroundElevationFt ?? 0) - (hi.StaticElevationFt ?? 0);
+  const wellDepth =
+    (hi.GroundElevationFt ?? 0) - waterTableElevationFt(hi);
   const any: any = hi;
   if (Array.isArray(any.Geology) && any.Geology.length) {
     const geology = any.Geology;

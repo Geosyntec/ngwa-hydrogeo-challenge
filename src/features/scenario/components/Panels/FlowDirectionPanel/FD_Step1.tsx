@@ -40,7 +40,9 @@ export default function FDStep1() {
     <>
       <Typography variant="h6">Step 1</Typography>
       <Typography variant="body2" color="text.secondary">
-        Identify the high, low, and remaining wells and compute differences.
+        Identify the high, low, and remaining wells and compute differences. For each
+        well, use the static water level (S) unless pumping is on—then use the pumping
+        level (P).
       </Typography>
       <Grid container spacing={1}>
         <Grid item xs={12} md={6}>

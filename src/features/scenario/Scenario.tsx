@@ -161,6 +161,14 @@ export default function Scenario({ isTest = false }: { isTest?: boolean }) {
       </Box>
 
       <Grid container spacing={2}>
+        
+        <Grid item xs={12} md={6}>
+          <ChooseWellsPanel />
+          <FlowDirectionPanel />
+          <GradientPanel />
+          <HorizontalVelocityPanel />
+        </Grid>
+
         <Grid item xs={12} md={6}>
           <Box
             sx={{
@@ -171,13 +179,6 @@ export default function Scenario({ isTest = false }: { isTest?: boolean }) {
           >
             <MapView />
           </Box>
-        </Grid>
-
-        <Grid item xs={12} md={6}>
-          <ChooseWellsPanel />
-          <FlowDirectionPanel />
-          <GradientPanel />
-          <HorizontalVelocityPanel />
         </Grid>
       </Grid>
     </Container>

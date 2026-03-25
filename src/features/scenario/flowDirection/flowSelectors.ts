@@ -1,6 +1,12 @@
 import type { RootState } from '../../../app/store'
 import { selectMap } from '../ScenarioSlice'
-import { selectSortedByElevation, _applyStep1Result, _applyStep2Result, _applyStep3Result } from './flowSlice'
+import {
+  selectSortedByElevation,
+  waterTableElevationFt,
+  _applyStep1Result,
+  _applyStep2Result,
+  _applyStep3Result,
+} from './flowSlice'
 import type { StepCheckOptions } from './flowTypes'
 
 const precise_round = (n: number, d: number) => {
@@ -69,12 +75,15 @@ export const runCheckStep1 = (options: StepCheckOptions = {}) =>
     const sorted = selectSortedByElevation(s)
     if (sorted.length < 3) return
     const lo = sorted[0], mid = sorted[1], hi = sorted[2]
-    const diffHighLow = precise_round(hi.Elevation - lo.Elevation, 1)
-    const diffHighMid = precise_round(hi.Elevation - mid.Elevation, 1)
+    const hiEl = waterTableElevationFt(hi)
+    const midEl = waterTableElevationFt(mid)
+    const loEl = waterTableElevationFt(lo)
+    const diffHighLow = precise_round(hiEl - loEl, 1)
+    const diffHighMid = precise_round(hiEl - midEl, 1)
     dispatch(_applyStep1Result({
-      hiName: hi.Name, hiVal: hi.Elevation,
-      loName: lo.Name, loVal: lo.Elevation,
-      midName: mid.Name, midVal: mid.Elevation,
+      hiName: hi.Name, hiVal: hiEl,
+      loName: lo.Name, loVal: loEl,
+      midName: mid.Name, midVal: midEl,
       diffHighLow, diffHighMid, options
     }))
   }
@@ -85,8 +94,11 @@ export const runCheckStep2 = (options: StepCheckOptions = {}) =>
     const sorted = selectSortedByElevation(s)
     if (sorted.length < 3) return
     const lo = sorted[0], mid = sorted[1], hi = sorted[2]
-    const diffHighLow = precise_round(hi.Elevation - lo.Elevation, 1)
-    const diffHighMid = precise_round(hi.Elevation - mid.Elevation, 1)
+    const hiEl = waterTableElevationFt(hi)
+    const midEl = waterTableElevationFt(mid)
+    const loEl = waterTableElevationFt(lo)
+    const diffHighLow = precise_round(hiEl - loEl, 1)
+    const diffHighMid = precise_round(hiEl - midEl, 1)
     const elevationRatio = precise_round(diffHighMid / diffHighLow, 2).toFixed(2)
     const map = selectMap(s)
     const ratio = map ? (map.physicalWidth * 5280) / map.width : 1

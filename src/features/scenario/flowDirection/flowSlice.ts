@@ -9,6 +9,7 @@ import {
   selectSelectedWellIds,
   selectWells,
 } from "../ScenarioSlice";
+import type { WellModel } from "../scenarioTypes";
 import { computeActualFlowDirectionAngle } from "../services/drawingMath";
 
 const precise_round = (n: number, d: number) => {
@@ -65,9 +66,18 @@ const selectSelectedWellTriplet = createSelector(
       .map((id) => wells.find((w) => w.id === id))
       .filter((w): w is NonNullable<typeof w> => !!w),
 );
+
+/** Water-table elevation for flow/gradient work: pumping level when on, else static. */
+export function waterTableElevationFt(w: WellModel): number {
+  return w.IsPumpingOn ? w.PumpingElevationFt : w.StaticElevationFt;
+}
+
 export const selectSortedByElevation = createSelector(
   selectSelectedWellTriplet,
-  (arr) => [...arr].sort((a, b) => a.StaticElevationFt - b.StaticElevationFt),
+  (arr) =>
+    [...arr].sort(
+      (a, b) => waterTableElevationFt(a) - waterTableElevationFt(b),
+    ),
 );
 export const selectAllWellsChosen = createSelector(
   selectSelectedWellTriplet,

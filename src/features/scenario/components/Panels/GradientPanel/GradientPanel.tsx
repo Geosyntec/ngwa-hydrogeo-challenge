@@ -18,7 +18,10 @@ import {
   selectGradientStep2Complete,
 } from "../../../gradient/gradientSelectors";
 import { GradientState, setField } from "../../../gradient/gradientSlice";
-import { selectSortedByElevation } from "../../../flowDirection/flowSlice";
+import {
+  selectSortedByElevation,
+  waterTableElevationFt,
+} from "../../../flowDirection/flowSlice";
 import { selectFlowAllStepsComplete } from "../../../flowDirection/flowSelectors";
 import { selectScenarioState, setSelectedPanel } from "../../../ScenarioSlice";
 import RealityCheck from "../../RealityCheck/RealityCheck";
@@ -32,8 +35,8 @@ export default function GradientPanel() {
   const flowReady = useAppSelector(selectFlowAllStepsComplete);
   const gradDone = useAppSelector(selectGradientStep2Complete);
   const { selectedPanel, isTest } = useAppSelector(selectScenarioState);
-  const hi = ready ? sorted[2].Elevation : 0;
-  const mid = ready ? sorted[1].Elevation : 0;
+  const hi = ready ? waterTableElevationFt(sorted[2]) : 0;
+  const mid = ready ? waterTableElevationFt(sorted[1]) : 0;
   // useEffect(() => {
   //   console.log("flow ready?: ",flowReady)
   //   console.log("current panel?: ",selectedPanel)
