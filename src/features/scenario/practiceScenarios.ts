@@ -29,9 +29,9 @@ export const practiceScenarios: ScenarioDefinition[] = [
         "IsSelected": false,
         "IsCollapsed": true,
         "Top": 82,
-        "Left": 666,
+        "Left": 166,
         "Point": {
-          "x": 666,
+          "x": 166,
           "y": 82
         },
         "GeologyNew": [
@@ -72,9 +72,9 @@ export const practiceScenarios: ScenarioDefinition[] = [
         "IsSelected": false,
         "IsCollapsed": true,
         "Top": 200,
-        "Left": 989,
+        "Left": 489,
         "Point": {
-          "x": 989,
+          "x": 489,
           "y": 200
         },
         "GeologyNew": [
@@ -121,9 +121,9 @@ export const practiceScenarios: ScenarioDefinition[] = [
         "IsSelected": false,
         "IsCollapsed": true,
         "Top": 290,
-        "Left": 869,
+        "Left": 369,
         "Point": {
-          "x": 869,
+          "x": 369,
           "y": 290
         },
         "GeologyNew": [
@@ -164,9 +164,9 @@ export const practiceScenarios: ScenarioDefinition[] = [
         "IsSelected": false,
         "IsCollapsed": true,
         "Top": 326,
-        "Left": 583,
+        "Left": 83,
         "Point": {
-          "x": 583,
+          "x": 83,
           "y": 326
         },
         "GeologyNew": [
@@ -219,9 +219,9 @@ export const practiceScenarios: ScenarioDefinition[] = [
         "IsSelected": false,
         "IsCollapsed": true,
         "Top": 491,
-        "Left": 814,
+        "Left": 314,
         "Point": {
-          "x": 814,
+          "x": 314,
           "y": 491
         },
         "GeologyNew": [
@@ -268,9 +268,9 @@ export const practiceScenarios: ScenarioDefinition[] = [
         "IsSelected": false,
         "IsCollapsed": true,
         "Top": 610,
-        "Left": 648,
+        "Left": 148,
         "Point": {
-          "x": 648,
+          "x": 148,
           "y": 610
         },
         "GeologyNew": [
@@ -311,9 +311,9 @@ export const practiceScenarios: ScenarioDefinition[] = [
         "IsSelected": false,
         "IsCollapsed": true,
         "Top": 644,
-        "Left": 967,
+        "Left": 467,
         "Point": {
-          "x": 967,
+          "x": 467,
           "y": 644
         },
         "GeologyNew": [
@@ -369,9 +369,9 @@ export const practiceScenarios: ScenarioDefinition[] = [
         "IsSelected": false,
         "IsCollapsed": true,
         "Top": 45,
-        "Left": 998,
+        "Left": 498,
         "Point": {
-          "x": 998,
+          "x": 498,
           "y": 45
         },
         "GeologyNew": [
@@ -430,9 +430,9 @@ export const practiceScenarios: ScenarioDefinition[] = [
         "IsSelected": false,
         "IsCollapsed": true,
         "Top": 198,
-        "Left": 614,
+        "Left": 114,
         "Point": {
-          "x": 614,
+          "x": 114,
           "y": 198
         },
         "GeologyNew": [
@@ -479,9 +479,9 @@ export const practiceScenarios: ScenarioDefinition[] = [
         "IsSelected": false,
         "IsCollapsed": true,
         "Top": 342,
-        "Left": 828,
+        "Left": 328,
         "Point": {
-          "x": 828,
+          "x": 328,
           "y": 342
         },
         "GeologyNew": [
@@ -552,9 +552,9 @@ export const practiceScenarios: ScenarioDefinition[] = [
         "IsSelected": false,
         "IsCollapsed": true,
         "Top": 639,
-        "Left": 743,
+        "Left": 243,
         "Point": {
-          "x": 743,
+          "x": 243,
           "y": 639
         },
         "GeologyNew": [
@@ -613,9 +613,9 @@ export const practiceScenarios: ScenarioDefinition[] = [
         "IsSelected": false,
         "IsCollapsed": true,
         "Top": 595,
-        "Left": 943,
+        "Left": 443,
         "Point": {
-          "x": 943,
+          "x": 443,
           "y": 595
         },
         "GeologyNew": [
@@ -695,9 +695,9 @@ export const practiceScenarios: ScenarioDefinition[] = [
         "IsSelected": false,
         "IsCollapsed": true,
         "Top": 149,
-        "Left": 785,
+        "Left": 285,
         "Point": {
-          "x": 785,
+          "x": 285,
           "y": 149
         },
         "GeologyNew": [
@@ -756,9 +756,9 @@ export const practiceScenarios: ScenarioDefinition[] = [
         "IsSelected": false,
         "IsCollapsed": true,
         "Top": 283,
-        "Left": 599,
+        "Left": 99,
         "Point": {
-          "x": 599,
+          "x": 99,
           "y": 283
         },
         "GeologyNew": [
@@ -817,9 +817,9 @@ export const practiceScenarios: ScenarioDefinition[] = [
         "IsSelected": false,
         "IsCollapsed": true,
         "Top": 273,
-        "Left": 990,
+        "Left": 490,
         "Point": {
-          "x": 990,
+          "x": 490,
           "y": 273
         },
         "GeologyNew": [
@@ -878,9 +878,9 @@ export const practiceScenarios: ScenarioDefinition[] = [
         "IsSelected": false,
         "IsCollapsed": true,
         "Top": 524,
-        "Left": 703,
+        "Left": 203,
         "Point": {
-          "x": 703,
+          "x": 203,
           "y": 524
         },
         "GeologyNew": [
@@ -927,9 +927,9 @@ export const practiceScenarios: ScenarioDefinition[] = [
         "IsSelected": false,
         "IsCollapsed": true,
         "Top": 606,
-        "Left": 924,
+        "Left": 424,
         "Point": {
-          "x": 924,
+          "x": 424,
           "y": 606
         },
         "GeologyNew": [
@@ -991,9 +991,9 @@ export const practiceScenarios: ScenarioDefinition[] = [
         "IsSelected": false,
         "IsCollapsed": true,
         "Top": 129,
-        "Left": 594,
+        "Left": 94,
         "Point": {
-          "x": 594,
+          "x": 94,
           "y": 129
         },
         "GeologyNew": [
@@ -1052,9 +1052,9 @@ export const practiceScenarios: ScenarioDefinition[] = [
         "IsSelected": false,
         "IsCollapsed": true,
         "Top": 69,
-        "Left": 898,
+        "Left": 398,
         "Point": {
-          "x": 898,
+          "x": 398,
           "y": 69
         },
         "GeologyNew": [
@@ -1119,9 +1119,9 @@ export const practiceScenarios: ScenarioDefinition[] = [
         "IsSelected": false,
         "IsCollapsed": true,
         "Top": 233,
-        "Left": 770,
+        "Left": 270,
         "Point": {
-          "x": 770,
+          "x": 270,
           "y": 233
         },
         "GeologyNew": [
@@ -1180,9 +1180,9 @@ export const practiceScenarios: ScenarioDefinition[] = [
         "IsSelected": false,
         "IsCollapsed": true,
         "Top": 310,
-        "Left": 592,
+        "Left": 92,
         "Point": {
-          "x": 592,
+          "x": 92,
           "y": 310
         },
         "GeologyNew": [
@@ -1241,9 +1241,9 @@ export const practiceScenarios: ScenarioDefinition[] = [
         "IsSelected": false,
         "IsCollapsed": true,
         "Top": 461,
-        "Left": 915,
+        "Left": 415,
         "Point": {
-          "x": 915,
+          "x": 415,
           "y": 461
         },
         "GeologyNew": [
@@ -1302,9 +1302,9 @@ export const practiceScenarios: ScenarioDefinition[] = [
         "IsSelected": false,
         "IsCollapsed": true,
         "Top": 572,
-        "Left": 702,
+        "Left": 202,
         "Point": {
-          "x": 702,
+          "x": 202,
           "y": 572
         },
         "GeologyNew": [
@@ -1375,9 +1375,9 @@ export const practiceScenarios: ScenarioDefinition[] = [
         "IsSelected": false,
         "IsCollapsed": true,
         "Top": 585,
-        "Left": 835,
+        "Left": 335,
         "Point": {
-          "x": 835,
+          "x": 335,
           "y": 585
         },
         "GeologyNew": [
@@ -1439,9 +1439,9 @@ export const practiceScenarios: ScenarioDefinition[] = [
         "IsSelected": false,
         "IsCollapsed": true,
         "Top": 69,
-        "Left": 928,
+        "Left": 428,
         "Point": {
-          "x": 928,
+          "x": 428,
           "y": 69
         },
         "GeologyNew": [
@@ -1482,9 +1482,9 @@ export const practiceScenarios: ScenarioDefinition[] = [
         "IsSelected": false,
         "IsCollapsed": true,
         "Top": 159,
-        "Left": 648,
+        "Left": 148,
         "Point": {
-          "x": 648,
+          "x": 148,
           "y": 159
         },
         "GeologyNew": [
@@ -1531,9 +1531,9 @@ export const practiceScenarios: ScenarioDefinition[] = [
         "IsSelected": false,
         "IsCollapsed": true,
         "Top": 295,
-        "Left": 829,
+        "Left": 329,
         "Point": {
-          "x": 829,
+          "x": 329,
           "y": 295
         },
         "GeologyNew": [
@@ -1574,9 +1574,9 @@ export const practiceScenarios: ScenarioDefinition[] = [
         "IsSelected": false,
         "IsCollapsed": true,
         "Top": 454,
-        "Left": 707,
+        "Left": 207,
         "Point": {
-          "x": 707,
+          "x": 207,
           "y": 454
         },
         "GeologyNew": [
@@ -1629,9 +1629,9 @@ export const practiceScenarios: ScenarioDefinition[] = [
         "IsSelected": false,
         "IsCollapsed": true,
         "Top": 550,
-        "Left": 900,
+        "Left": 400,
         "Point": {
-          "x": 900,
+          "x": 400,
           "y": 550
         },
         "GeologyNew": [
@@ -1678,9 +1678,9 @@ export const practiceScenarios: ScenarioDefinition[] = [
         "IsSelected": false,
         "IsCollapsed": true,
         "Top": 611,
-        "Left": 599,
+        "Left": 99,
         "Point": {
-          "x": 599,
+          "x": 99,
           "y": 611
         },
         "GeologyNew": [
@@ -1736,9 +1736,9 @@ export const practiceScenarios: ScenarioDefinition[] = [
         "IsSelected": false,
         "IsCollapsed": true,
         "Top": 215,
-        "Left": 586,
+        "Left": 86,
         "Point": {
-          "x": 586,
+          "x": 86,
           "y": 215
         },
         "GeologyNew": [
@@ -1785,9 +1785,9 @@ export const practiceScenarios: ScenarioDefinition[] = [
         "IsSelected": false,
         "IsCollapsed": true,
         "Top": 234,
-        "Left": 875,
+        "Left": 375,
         "Point": {
-          "x": 875,
+          "x": 375,
           "y": 234
         },
         "GeologyNew": [
@@ -1840,9 +1840,9 @@ export const practiceScenarios: ScenarioDefinition[] = [
         "IsSelected": false,
         "IsCollapsed": true,
         "Top": 361,
-        "Left": 762,
+        "Left": 262,
         "Point": {
-          "x": 762,
+          "x": 262,
           "y": 361
         },
         "GeologyNew": [
@@ -1895,9 +1895,9 @@ export const practiceScenarios: ScenarioDefinition[] = [
         "IsSelected": false,
         "IsCollapsed": true,
         "Top": 538,
-        "Left": 910,
+        "Left": 410,
         "Point": {
-          "x": 910,
+          "x": 410,
           "y": 538
         },
         "GeologyNew": [
@@ -1944,9 +1944,9 @@ export const practiceScenarios: ScenarioDefinition[] = [
         "IsSelected": false,
         "IsCollapsed": true,
         "Top": 611,
-        "Left": 686,
+        "Left": 186,
         "Point": {
-          "x": 686,
+          "x": 186,
           "y": 611
         },
         "GeologyNew": [
