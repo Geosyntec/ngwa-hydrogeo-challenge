@@ -64,7 +64,7 @@ export default function FlowDirectionPanel() {
       }}
     >
       <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-        <Typography variant="subtitle1">Flow Direction</Typography>
+        <Typography variant="h5">Flow Direction</Typography>
       </AccordionSummary>
 
       <AccordionDetails>
@@ -76,6 +76,10 @@ export default function FlowDirectionPanel() {
             </Typography>
           )}
           {ready && (
+            <Box>
+            <Typography variant="body2" color="text.secondary" sx={{marginBottom:"12px"}}>
+            To determine the flow direction of groundwater between three wells you will need to work through three basic steps.
+          </Typography>
             <Stack spacing={2}>
               <FDStep1 />
               <Divider />
@@ -87,7 +91,8 @@ export default function FlowDirectionPanel() {
                   Right: {flow.rightAnswers} &nbsp; Wrong: {flow.wrongAnswers}
                 </Typography>
               )}
-            </Stack>
+              </Stack>
+              </Box>
           )}
 
           {!isTest && (

@@ -1,7 +1,10 @@
 import { Grid, TextField, Typography, Stack, Button } from "@mui/material";
 import { useAppDispatch, useAppSelector } from "../../../../../app/hooks";
 import { setField } from "../../../flowDirection/flowSlice";
-import { selectFlow, runCheckStep1 } from "../../../flowDirection/flowSelectors";
+import {
+  selectFlow,
+  runCheckStep1,
+} from "../../../flowDirection/flowSelectors";
 import { selectScenarioState } from "../../../ScenarioSlice";
 
 export default function FDStep1() {
@@ -12,7 +15,8 @@ export default function FDStep1() {
     key: any,
     label: string,
     helper?: string,
-    maxLength?: number
+    maxLength?: number,
+    width?:number
   ) => {
     const f: any = (flow as any)[key];
     return (
@@ -32,7 +36,7 @@ export default function FDStep1() {
         }
         error={f.checked && !f.isCorrect}
         helperText={f.showAnswer ? `Answer: ${f.answer}` : helper}
-        sx={{ width: 220 }}
+        sx={{ width: width ?? 50 }}
       />
     );
   };
@@ -40,49 +44,79 @@ export default function FDStep1() {
     <>
       <Typography variant="h6">Step 1</Typography>
       <Typography variant="body2" color="text.secondary">
-        Identify the high, low, and remaining wells and compute differences. For each
-        well, use the static water level (S) unless pumping is on—then use the pumping
-        level (P).
+        What is the...
       </Typography>
-      <Grid container spacing={1}>
+      <Grid container columnSpacing={0} rowSpacing={1}>
+        {/* Highest Well Row */}
+        <Grid item xs={12} md={3}>
+          <Typography variant="body2" color="text.secondary">
+            Well with the highest <br /> water table elevation:
+          </Typography>
+        </Grid>
+        <Grid item xs={12} md={1}>
+          {bind("HighestWaterTableName", "", "", 1)}
+        </Grid>
+        <Grid item md={2}></Grid>
+        <Grid item xs={12} md={3}>
+          <Typography variant="body2" color="text.secondary">
+            Enter its elevation:
+          </Typography>
+        </Grid>
+        <Grid item xs={12} md={3}>
+          {bind("HighestWaterTableValue", "", "", undefined,100)}
+        </Grid>
+        {/* Lowest Well Row */}
+        <Grid item xs={12} md={3}>
+          <Typography variant="body2" color="text.secondary">
+            Well with the lowest <br /> water table elevation:
+          </Typography>
+        </Grid>
+        <Grid item xs={12} md={1}>
+          {bind("LowestWaterTableName", "", "", 1)}
+        </Grid>
+        <Grid item md={2}></Grid>
+        <Grid item xs={12} md={3}>
+          <Typography variant="body2" color="text.secondary">
+            Enter its elevation:
+          </Typography>
+        </Grid>
+        <Grid item xs={12} md={1}>
+          {bind("LowestWaterTableValue", "","",undefined,100)}
+        </Grid>
+        {/* Middle Well Row */}
+        <Grid item xs={12} md={3}>
+          <Typography variant="body2" color="text.secondary">
+            The remaining well:
+          </Typography>
+        </Grid>
+        <Grid item xs={12} md={1}>
+          {bind("RemainingWellName", "", "", 1)}
+        </Grid>
+        <Grid item md={2}></Grid>
+        <Grid item xs={12} md={3}>
+          <Typography variant="body2" color="text.secondary">
+            Enter its elevation:
+          </Typography>
+        </Grid>
+        <Grid item xs={12} md={1}>
+          {bind("RemainingWellValue", "","",undefined,100)}
+        </Grid>
+        {/* Difference Rows */}
         <Grid item xs={12} md={6}>
-          {bind(
-            "HighestWaterTableName",
-            "Highest well (letter)",
-            "Enter A/B/C…",
-            1
-          )}
+          <Typography variant="body2" color="text.secondary">
+          What is the difference in elevation between the <strong>highest</strong> and <strong>lowest</strong> wells:
+          </Typography>
         </Grid>
         <Grid item xs={12} md={6}>
-          {bind("HighestWaterTableValue", "Its elevation (ft)")}
+          {bind("DiffBtwnHighestLowest", "","",undefined,100)}
         </Grid>
         <Grid item xs={12} md={6}>
-          {bind(
-            "LowestWaterTableName",
-            "Lowest well (letter)",
-            "Enter A/B/C…",
-            1
-          )}
+          <Typography variant="body2" color="text.secondary">
+          What is the difference in elevation between the <strong>highest</strong> and <strong>middle</strong> wells:
+          </Typography>
         </Grid>
         <Grid item xs={12} md={6}>
-          {bind("LowestWaterTableValue", "Its elevation (ft)")}
-        </Grid>
-        <Grid item xs={12} md={6}>
-          {bind(
-            "RemainingWellName",
-            "Remaining well (letter)",
-            "Enter A/B/C…",
-            1
-          )}
-        </Grid>
-        <Grid item xs={12} md={6}>
-          {bind("RemainingWellValue", "Its elevation (ft)")}
-        </Grid>
-        <Grid item xs={12} md={6}>
-          {bind("DiffBtwnHighestLowest", "Δ Elev (High - Low)")}
-        </Grid>
-        <Grid item xs={12} md={6}>
-          {bind("DiffBtwnHighestMiddle", "Δ Elev (High - Mid)")}
+          {bind("DiffBtwnHighestMiddle", "","",undefined,100)}
         </Grid>
       </Grid>
       {!isTest && (
