@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useLayoutEffect, useState } from 'react'
+import { createPortal } from 'react-dom'
 import {
   Box,
   Checkbox,
@@ -11,6 +12,7 @@ import {
   TableRow,
   Typography,
 } from '@mui/material'
+import type { Theme } from '@mui/material/styles'
 import OpenInFullIcon from '@mui/icons-material/OpenInFull';
 import CloseFullscreenIcon from '@mui/icons-material/CloseFullscreen';
 
@@ -37,6 +39,17 @@ export type WellInfoCardProps = {
   placement?: WellInfoCardPlacement
   /** Optional: toggle pump */
   onTogglePumping?: (on: boolean) => void
+  /**
+   * When set, the card is rendered in a portal with position:fixed so it is not clipped
+   * by ancestors (e.g. map wrapper with overflow:hidden). Position follows this element
+   * on scroll and resize.
+   */
+  anchorRef?: React.RefObject<HTMLElement | null>
+  /** When using anchorRef (portal), wire these so hover can move from marker to card without closing. */
+  portalPointerHandlers?: {
+    onMouseEnter?: () => void
+    onMouseLeave?: () => void
+  }
 }
 
 /**
@@ -55,6 +68,49 @@ const PLACEMENT_STYLES: Record<
   right: { transform: 'translate(8px, -50%)', transformOrigin: 'top center' },
 }
 
+/** Fixed viewport position so the card clears overflow:hidden ancestors (portal mode). */
+function portalPlacementStyle(
+  placement: WellInfoCardPlacement,
+  rect: DOMRect,
+): React.CSSProperties {
+  const cx = rect.left + rect.width / 2
+  const cy = rect.top + rect.height / 2
+  const base: React.CSSProperties = {
+    position: 'fixed',
+    zIndex: 1300,
+  }
+  switch (placement) {
+    case 'above':
+      return {
+        ...base,
+        left: cx,
+        top: rect.top,
+        transform: 'translate(-50%, calc(-100% - 8px))',
+      }
+    case 'below':
+      return {
+        ...base,
+        left: cx,
+        top: rect.bottom,
+        transform: 'translate(-50%, 8px)',
+      }
+    case 'left':
+      return {
+        ...base,
+        left: rect.left,
+        top: cy,
+        transform: 'translate(calc(-100% - 8px), -50%)',
+      }
+    case 'right':
+      return {
+        ...base,
+        left: rect.right,
+        top: cy,
+        transform: 'translate(8px, -50%)',
+      }
+  }
+}
+
 export default function WellInfoCard({
   well,
   allowPumping,
@@ -64,35 +120,75 @@ export default function WellInfoCard({
   open,
   placement = 'above',
   onTogglePumping,
+  anchorRef,
+  portalPointerHandlers,
 }: WellInfoCardProps) {
   const [geologyExpanded, setGeologyExpanded] = useState(false)
+  const [portalBoxStyle, setPortalBoxStyle] = useState<React.CSSProperties | null>(null)
 
   const OFFSET_X = 14
   const OFFSET_Y = placement === 'above' || placement === 'below' ? -8 : 0
 
   const placementStyle = PLACEMENT_STYLES[placement]
 
-  return (
+  useLayoutEffect(() => {
+    if (!open || !anchorRef?.current) {
+      setPortalBoxStyle(null)
+      return
+    }
+    const update = () => {
+      if (!anchorRef?.current) return
+      setPortalBoxStyle(
+        portalPlacementStyle(placement, anchorRef.current.getBoundingClientRect()),
+      )
+    }
+    update()
+    window.addEventListener('scroll', update, true)
+    window.addEventListener('resize', update)
+    return () => {
+      window.removeEventListener('scroll', update, true)
+      window.removeEventListener('resize', update)
+    }
+  }, [open, placement, anchorRef])
+
+  const positionSx =
+    anchorRef != null
+      ? (portalBoxStyle ?? {
+          position: 'fixed' as const,
+          zIndex: 1300,
+          left: 0,
+          top: 0,
+          visibility: 'hidden' as const,
+        })
+      : {
+          position: 'absolute' as const,
+          top: top + OFFSET_Y,
+          left: left + OFFSET_X,
+          ...placementStyle,
+          zIndex: 2,
+        }
+
+  const cardSx = {
+    ...positionSx,
+    display: open ? 'block' : 'none',
+    width: 175, //box was not auto stretching to display children for some reason
+    maxHeight: '70vh',
+    overflowX: 'auto',
+    overflowY: 'auto',
+    bgcolor: 'background.paper',
+    border: (t: Theme) => `1px solid ${t.palette.divider}`,
+    boxShadow: 3,
+    borderRadius: 1.5,
+    p: 1.25,
+    pointerEvents: 'auto',
+  }
+
+  const card = (
     <Box
       aria-hidden={!open}
-      sx={{
-        position: 'absolute',
-        top: top + OFFSET_Y,
-        left: left + OFFSET_X,
-        ...placementStyle,
-        zIndex: 2,
-        display: open ? 'block' : 'none',
-        width: 175, //box was not auto stretching to display children for some reason
-        maxHeight: '70vh',
-        overflowX: 'auto',
-        overflowY: 'auto',
-        bgcolor: 'background.paper',
-        border: (t) => `1px solid ${t.palette.divider}`,
-        boxShadow: 3,
-        borderRadius: 1.5,
-        p: 1.25,
-        pointerEvents: 'auto',
-      }}
+      sx={cardSx}
+      onMouseEnter={portalPointerHandlers?.onMouseEnter}
+      onMouseLeave={portalPointerHandlers?.onMouseLeave}
     >
       <Stack direction="row" spacing={1} sx={{ minWidth: 'min-content' }}>
         <Box sx={{ flexShrink: 0 }}>
@@ -165,6 +261,12 @@ export default function WellInfoCard({
       </Stack>
     </Box>
   )
+
+  if (anchorRef != null) {
+    return open ? createPortal(card, document.body) : null
+  }
+
+  return card
 }
 
 function Row({ label, value }: { label: string; value: string }) {

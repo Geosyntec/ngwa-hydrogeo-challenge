@@ -54,7 +54,7 @@ export const practiceScenarios: ScenarioDefinition[] = [
         GroundElevationFt: 104,
         StaticElevationFt: 99,
         PumpingElevationFt: 94,
-        IsPumpingOn: true,
+        IsPumpingOn: false,
         IsSelected: false,
         IsCollapsed: true,
         Top: 420,

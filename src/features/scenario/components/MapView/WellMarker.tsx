@@ -1,4 +1,4 @@
-import { memo, useCallback, useRef, useState } from "react";
+import { memo, useCallback, useEffect, useRef, useState } from "react";
 import { Box, Button } from "@mui/material";
 import RoomIcon from "@mui/icons-material/Room";
 import { useAppDispatch, useAppSelector } from "../../../../app/hooks";
@@ -25,6 +25,35 @@ export default memo(function WellMarker({
   const [hover, setHover] = useState(false);
   const [focus, setFocus] = useState(false);
   const markerRef = useRef<HTMLButtonElement | null>(null);
+  const markerAnchorRef = useRef<HTMLDivElement | null>(null);
+  const hoverLeaveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const cancelHoverLeave = useCallback(() => {
+    if (hoverLeaveTimerRef.current != null) {
+      clearTimeout(hoverLeaveTimerRef.current);
+      hoverLeaveTimerRef.current = null;
+    }
+  }, []);
+
+  const scheduleHoverLeave = useCallback(() => {
+    cancelHoverLeave();
+    hoverLeaveTimerRef.current = setTimeout(() => {
+      setHover(false);
+      hoverLeaveTimerRef.current = null;
+    }, 200);
+  }, [cancelHoverLeave]);
+
+  const beginHover = useCallback(() => {
+    cancelHoverLeave();
+    setHover(true);
+  }, [cancelHoverLeave]);
+
+  useEffect(
+    () => () => {
+      if (hoverLeaveTimerRef.current != null) clearTimeout(hoverLeaveTimerRef.current);
+    },
+    [],
+  );
 
   if (!well) return null;
   const isVisible = !allSelected || (allSelected && well.IsSelected);
@@ -40,6 +69,7 @@ export default memo(function WellMarker({
     <>
       {isVisible && (
         <Box
+          ref={markerAnchorRef}
           sx={{
             position: "absolute",
             top: well.Top,
@@ -48,11 +78,10 @@ export default memo(function WellMarker({
             display: "flex",
             alignItems: "center",
             gap: 1,
-            // Ensure this container lets the card overlap outside
             overflow: "visible",
           }}
-          onMouseEnter={() => setHover(true)}
-          onMouseLeave={() => setHover(false)}
+          onMouseEnter={beginHover}
+          onMouseLeave={scheduleHoverLeave}
         >
           <Button
             ref={markerRef}
@@ -88,6 +117,11 @@ export default memo(function WellMarker({
             left={0}
             open={showCard}
             placement={cardPlacement}
+            anchorRef={markerAnchorRef}
+            portalPointerHandlers={{
+              onMouseEnter: beginHover,
+              onMouseLeave: scheduleHoverLeave,
+            }}
             onTogglePumping={(on) =>
               dispatch(setWellPumping({ id: well.id, on }))
             }
