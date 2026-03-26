@@ -5,6 +5,18 @@ import { setDirectionAngle } from "../../../flowDirection/flowSlice";
 import { selectFlow } from "../../../flowDirection/flowSelectors";
 import { unitVectorFromRaphaelAngle } from "../../../services/drawingMath";
 
+/**
+ * Redux / map overlay use atan2-style angles: 0° = East (+x), increasing clockwise
+ * in SVG (90° = South, 270° = North). Legacy compass UI uses 0° = North, 90° = East.
+ */
+function compassDegreesFromInternal(internalDeg: number): number {
+  return (internalDeg + 90 + 360) % 360;
+}
+
+function internalDegreesFromCompass(compassDeg: number): number {
+  return (compassDeg - 90 + 360) % 360;
+}
+
 export default function CompassSelector({ display = true }: { display?: boolean }) {
   const size = 150;
   const dispatch = useAppDispatch();
@@ -61,9 +73,11 @@ export default function CompassSelector({ display = true }: { display?: boolean 
       document.body.style.userSelect = prev;
     };
   }, [dragging]);
-  const majorTicks = Array.from({ length: 12 }, (_, i) => i * 30);
-  const toXY = (deg: number, r: number) => {
-    const v = unitVectorFromRaphaelAngle(deg);
+  /** Major ticks every 30° on the compass dial (0° = N, 90° = E, …). */
+  const majorTicksCompass = Array.from({ length: 12 }, (_, i) => i * 30);
+  const majorTicksInternal = majorTicksCompass.map(internalDegreesFromCompass);
+  const toXYInternal = (internalDeg: number, r: number) => {
+    const v = unitVectorFromRaphaelAngle(internalDeg);
     return { x: cx + v.x * r, y: cy + v.y * r };
   };
   if(!display) return null
@@ -76,7 +90,7 @@ export default function CompassSelector({ display = true }: { display?: boolean 
         role="slider"
         aria-valuemin={0}
         aria-valuemax={360}
-        aria-valuenow={Math.round(DirectionAngle)}
+        aria-valuenow={Math.round(compassDegreesFromInternal(DirectionAngle))}
         tabIndex={0}
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
@@ -91,12 +105,12 @@ export default function CompassSelector({ display = true }: { display?: boolean 
           strokeWidth={18}
           onPointerDown={onPointerDown}
         />
-        {majorTicks.map((deg) => {
-          const p1 = toXY(deg, ringR - 12),
-            p2 = toXY(deg, ringR + 12);
+        {majorTicksInternal.map((internalDeg, i) => {
+          const p1 = toXYInternal(internalDeg, ringR - 12),
+            p2 = toXYInternal(internalDeg, ringR + 12);
           return (
             <line
-              key={deg}
+              key={majorTicksCompass[i]}
               x1={p1.x}
               y1={p1.y}
               x2={p2.x}
@@ -107,8 +121,8 @@ export default function CompassSelector({ display = true }: { display?: boolean 
           );
         })}
         <text
-          x={toXY(0, ringR + 24).x}
-          y={toXY(0, ringR + 24).y}
+          x={toXYInternal(internalDegreesFromCompass(90), ringR + 24).x}
+          y={toXYInternal(internalDegreesFromCompass(90), ringR + 24).y}
           textAnchor="middle"
           fontSize={12}
           fill="#666"
@@ -117,8 +131,8 @@ export default function CompassSelector({ display = true }: { display?: boolean 
           E
         </text>
         <text
-          x={toXY(90, ringR + 24).x}
-          y={toXY(90, ringR + 24).y}
+          x={toXYInternal(internalDegreesFromCompass(180), ringR + 24).x}
+          y={toXYInternal(internalDegreesFromCompass(180), ringR + 24).y}
           textAnchor="middle"
           fontSize={12}
           fill="#666"
@@ -127,8 +141,8 @@ export default function CompassSelector({ display = true }: { display?: boolean 
           S
         </text>
         <text
-          x={toXY(180, ringR + 24).x}
-          y={toXY(180, ringR + 24).y}
+          x={toXYInternal(internalDegreesFromCompass(270), ringR + 24).x}
+          y={toXYInternal(internalDegreesFromCompass(270), ringR + 24).y}
           textAnchor="middle"
           fontSize={12}
           fill="#666"
@@ -137,8 +151,8 @@ export default function CompassSelector({ display = true }: { display?: boolean 
           W
         </text>
         <text
-          x={toXY(270, ringR + 24).x}
-          y={toXY(270, ringR + 24).y}
+          x={toXYInternal(internalDegreesFromCompass(0), ringR + 24).x}
+          y={toXYInternal(internalDegreesFromCompass(0), ringR + 24).y}
           textAnchor="middle"
           fontSize={12}
           fill="#666"
@@ -154,7 +168,7 @@ export default function CompassSelector({ display = true }: { display?: boolean 
           fontWeight={600}
           fill="#1976d2"
         >
-          {Math.round(DirectionAngle)}°
+          {Math.round(compassDegreesFromInternal(DirectionAngle))}°
         </text>
         <circle
           cx={handle.x}
@@ -174,7 +188,8 @@ export default function CompassSelector({ display = true }: { display?: boolean 
           mt: 1,
         }}
       >
-        Drag the blue dot (Alt/Option to snap 5°).
+        Degrees clockwise from North (legacy). Drag the blue dot (Alt/Option to
+        snap 5°).
       </Box>
     </Box>
   );
