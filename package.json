@@ -9,7 +9,7 @@
     "dev:server": "python -m uvicorn backend.main:app --reload --port 8000",
     "build": "tsc -p tsconfig.prod.json && vite build",
     "build:azure": "npm run build && node scripts/build-for-azure.cjs",
-    "build:dev": "tsc -p tsconfig.dev.json && vite build --mode development",
+    "build:dev": "tsc -p tsconfig.dev.json && vite build --mode staging",
     "preview": "vite preview"
   },
   "dependencies": {
