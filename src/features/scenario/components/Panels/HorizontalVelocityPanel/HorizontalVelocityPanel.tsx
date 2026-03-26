@@ -52,7 +52,6 @@ import { store } from "../../../../../app/store";
 import { buildSubmitGradesPayload } from "../../../submitGradesPayload";
 import { submitGrades } from "../../../../../api/mockSubmitGradesApi";
 
-
 export default function HorizontalVelocityPanel() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
@@ -68,23 +67,19 @@ export default function HorizontalVelocityPanel() {
   const [submitModalOpen, setSubmitModalOpen] = useState(false);
   const { selectedPanel, isTest } = useAppSelector(selectScenarioState);
   const ready = sorted.length === 3;
-  useEffect(() => {
-    if (gradReady && selectedPanel !== "gradient") {
-      dispatch(setSelectedPanel("gradient"));
-    }
-  }, [gradReady, dispatch]);
+  // useEffect(() => {
+  //   if (gradReady && selectedPanel !== "gradient") {
+  //     dispatch(setSelectedPanel("gradient"));
+  //   }
+  // }, [gradReady, dispatch]);
 
   const onToggle = useCallback(
     (_e: any, expanded: boolean) => {
       dispatch(setSelectedPanel(expanded ? "velocity" : null));
     },
-    [dispatch],
+    [dispatch]
   );
-  const bind = (
-    key: keyof VelocityState,
-    label: string,
-    helper?: string,
-  ) => {
+  const bind = (key: keyof VelocityState, label: string, helper?: string,width?:number) => {
     const f: any = (v as any)[key];
     return (
       <TextField
@@ -94,7 +89,7 @@ export default function HorizontalVelocityPanel() {
         onChange={(e) => dispatch(setField({ key, value: e.target.value }))}
         error={f.checked && !f.isCorrect}
         helperText={f.showAnswer ? `Answer: ${f.answer}` : helper}
-        sx={{ width: 280 }}
+        sx={{ width: width ?? 50 }}
       />
     );
   };
@@ -120,154 +115,223 @@ export default function HorizontalVelocityPanel() {
       onChange={onToggle}
     >
       <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-        <Typography variant="subtitle1">Horizontal Velocity</Typography>
+        <Typography variant="h5">Horizontal Velocity</Typography>
       </AccordionSummary>
       <AccordionDetails>
         <Box sx={{ position: "relative", overflow: "visible" }}>
-          {!gradReady && (
-            <Typography variant="body2" color="text.secondary">
-              Complete <strong>Gradient – Step 2</strong> to unlock Horizontal
-              Velocity.
-            </Typography>
-          )}
           {gradReady && ready && (
-            <Stack spacing={3}>
-              <div>
-                <Typography variant="h6">Step 1</Typography>
-                <Typography variant="body2" color="text.secondary">
-                  Determine Gradient, Conductivity, and Porosity (fraction).
-                </Typography>
-                <Grid container spacing={1} sx={{ mt: 1 }}>
-                  <Grid item xs={12} md={4}>
-                    {bind("Gradient", "Gradient (4 dp)")}
+            <>
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                sx={{ marginBottom: "12px" }}
+              >
+                Now that you have found the gradient you can calculate the
+                groundwater's horizontal velocity (v). You need to complete 2
+                steps to find this value.
+              </Typography>
+              <Stack spacing={3}>
+                <div>
+                  <Typography variant="h6">Step 1</Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Find these values:
+                  </Typography>
+                  <Grid container spacing={1} sx={{ mt: 1 }}>
+                    <Grid item lg={12} sx={{display:'flex',flexDirection:'row'}}>
+                      <Grid item lg={4} sx={{display:'flex',alignItems:'center'}}>
+                        <Typography variant="body2">i (gradient) = </Typography>
+                      </Grid>
+                      <Grid item lg={2}>
+                        {bind("Gradient", "","",100)}
+                      </Grid>
+                      <Grid item lg={6} sx={{display:'flex',alignItems:'center'}}>
+                        <Typography variant="body2">ft/ft (round to 4 Decimal Places)</Typography>
+                      </Grid>
+                    </Grid>
+                    <Grid item lg={12} sx={{display:'flex',flexDirection:'row'}}>
+                      <Grid item lg={4} sx={{display:'flex',alignItems:'center'}}>
+                        <Typography variant="body2">K (conductivity) = </Typography>
+                      </Grid>
+                      <Grid item lg={2}>
+                        {bind("Conductivity", "","",100)}
+                      </Grid>
+                      <Grid item lg={6} sx={{display:'flex',alignItems:'center'}}>
+                        <Typography variant="body2">ft/day</Typography>
+                      </Grid>
+                    </Grid>
+                    <Grid item lg={12} sx={{display:'flex',flexDirection:'row'}}>
+                      <Grid item lg={4} sx={{display:'flex',alignItems:'center'}}>
+                        <Typography variant="body2">n (porosity) = </Typography>
+                      </Grid>
+                      <Grid item lg={2}>
+                        {bind("Porosity", "","",100)}
+                      </Grid>
+                      <Grid item lg={6} sx={{display:'flex',alignItems:'center'}}>
+                        <Typography variant="body2">(Percentage expressed as a value from 0-1)</Typography>
+                      </Grid>
+                    </Grid>
                   </Grid>
-                  <Grid item xs={12} md={4}>
-                    {bind("Conductivity", "Conductivity k")}
+                  {!isTest && (
+                    <Stack direction="row" spacing={1} sx={{ mt: 1 }}>
+                      <Button
+                        variant="outlined"
+                        onClick={() =>
+                          dispatch(
+                            checkStep1({
+                              show: false,
+                              check: true,
+                            })
+                          )
+                        }
+                      >
+                        Check Step 1
+                      </Button>
+                      <Button
+                        variant="outlined"
+                        onClick={() =>
+                          dispatch(
+                            checkStep1({
+                              check: true,
+                              show: true,
+                            })
+                          )
+                        }
+                      >
+                        Show Step 1 Solution
+                      </Button>
+                    </Stack>
+                  )}
+                </div>
+                <div>
+                  <Typography variant="h6">Step 2</Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Use Darcy's Law to find the horizontal velocity of groundwater between the wells:
+                  </Typography>
+                  <Grid container spacing={1} sx={{ mt: 1 }}>
+                  <Grid
+                    item
+                    xl={6}
+                    columnSpacing={1}
+                    sx={{ display: "flex", flexDirection: "row" }}
+                  >
+                    <Grid item xl={4}>
+                      {bind(
+                        "Conductivity2",
+                        "k",
+                        "",
+                        100
+                      )}
+                    </Grid>
+                    <Grid item xl={4} sx={{display:'flex',paddingTop:'2%',justifyContent:'center'}}>
+                      <Typography variant="body2">x</Typography>
+                    </Grid>
+                    <Grid item xl={4}>
+                      {bind(
+                        "Gradient2",
+                        "i",
+                        "",
+                        100
+                      )}
+                    </Grid>
+                    <Grid item xl={12} sx={{display:'flex',justifyContent:'center',alignItems:'center'}}>
+                      {bind(
+                        "Porosity2",
+                        "n",
+                        "",
+                        100
+                      )}
+                    </Grid>
                   </Grid>
-                  <Grid item xs={12} md={4}>
-                    {bind("Porosity", "Porosity (fraction)")}
+                  <Grid item xl={6} sx={{display:'flex',flexDirection:'row'}}>
+                    <Grid item xl={2} sx={{display:'flex',paddingTop:'2%',justifyContent:'center'}}>
+                      <Typography variant="body2">=</Typography>
+                    </Grid>
+                    <Grid item xl={10}>
+                        {bind("HorizontalVelocity", "v", "", 100)}
+                        <Typography variant="body2" color="text.secondary">ft/day</Typography>
+                    </Grid>
                   </Grid>
                 </Grid>
-                {!isTest && (
-                <Stack direction="row" spacing={1} sx={{ mt: 1 }}>
-                  <Button
-                    variant="outlined"
-                    onClick={() =>
-                      dispatch(
-                        checkStep1({
-                          show: false,
-                          check: true,
-                        }),
-                      )
-                    }
-                  >
-                    Check Step 1
-                  </Button>
-                  <Button
-                    variant="outlined"
-                    onClick={() =>
-                      dispatch(
-                        checkStep1({
-                          check: true,
-                          show: true,
-                        }),
-                      )
-                    }
-                  >
-                    Show Step 1 Solution
-                  </Button>
-                </Stack>
-                )}
-              </div>
-              <div>
-                <Typography variant="h6">Step 2</Typography>
-                <Typography variant="body2" color="text.secondary">
-                  Compute <strong>Horizontal Velocity</strong> = (Gradient ×
-                  Conductivity) / Porosity, 2 dp.
-                </Typography>
-                <Grid container spacing={1} sx={{ mt: 1 }}>
-                  <Grid item xs={12} md={3}>
-                    {bind("Gradient2", "Gradient (4 dp)")}
-                  </Grid>
-                  <Grid item xs={12} md={3}>
-                    {bind("Conductivity2", "Conductivity k")}
-                  </Grid>
-                  <Grid item xs={12} md={3}>
-                    {bind("Porosity2", "Porosity (fraction)")}
-                  </Grid>
-                  <Grid item xs={12} md={3}>
-                    {bind("HorizontalVelocity", "Horizontal Velocity (2 dp)")}
-                  </Grid>
-                </Grid>
-                {!isTest && (
-                <Stack direction="row" spacing={1} sx={{ mt: 1 }}>
-                  <Button
-                    variant="outlined"
-                    onClick={() =>
-                      dispatch(
-                        checkStep2({
-                          show: false,
-                          check: true,
-                        }),
-                      )
-                    }
-                  >
-                    Check Step 2
-                  </Button>
-                  <Button
-                    variant="outlined"
-                    onClick={() =>
-                      dispatch(
-                        checkStep2({
-                          check: true,
-                          show: true,
-                        }),
-                      )
-                    }
-                  >
-                    Show Step 2 Solution
-                  </Button>
-                </Stack>
-                )}
-              </div>
+                  {!isTest && (
+                    <Stack direction="row" spacing={1} sx={{ mt: 1 }}>
+                      <Button
+                        variant="outlined"
+                        onClick={() =>
+                          dispatch(
+                            checkStep2({
+                              show: false,
+                              check: true,
+                            })
+                          )
+                        }
+                      >
+                        Check Step 2
+                      </Button>
+                      <Button
+                        variant="outlined"
+                        onClick={() =>
+                          dispatch(
+                            checkStep2({
+                              check: true,
+                              show: true,
+                            })
+                          )
+                        }
+                      >
+                        Show Step 2 Solution
+                      </Button>
+                    </Stack>
+                  )}
+                </div>
 
-              {!isTest && (
-              <Button
-                variant="contained"
-                color="primary"
-                size="large"
-                fullWidth
-                disabled={!allPanelsComplete}
-                onClick={() => setSubmitModalOpen(true)}
-                sx={{ mt: 3 }}
-              >
-                Submit Answers
-              </Button>
-              )}
-              {isTest && (
-              <Button
-                variant="contained"
-                color="primary"
-                size="large"
-                fullWidth
-                disabled={!allPanelsComplete || testSubmitting}
-                onClick={handleTestSubmit}
-                sx={{ mt: 3 }}
-              >
-                {testSubmitting ? "Submitting…" : "Submit test"}
-              </Button>
-              )}
-            </Stack>
+                {!isTest && (
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    size="large"
+                    fullWidth
+                    disabled={!allPanelsComplete}
+                    onClick={() => setSubmitModalOpen(true)}
+                    sx={{ mt: 3 }}
+                  >
+                    Submit Answers
+                  </Button>
+                )}
+                {isTest && (
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    size="large"
+                    fullWidth
+                    disabled={!allPanelsComplete || testSubmitting}
+                    onClick={handleTestSubmit}
+                    sx={{ mt: 3 }}
+                  >
+                    {testSubmitting ? "Submitting…" : "Submit test"}
+                  </Button>
+                )}
+              </Stack>
+            </>
           )}
 
-          <Dialog open={testSubmitSuccessOpen} onClose={() => setTestSubmitSuccessOpen(false)}>
+          <Dialog
+            open={testSubmitSuccessOpen}
+            onClose={() => setTestSubmitSuccessOpen(false)}
+          >
             <DialogTitle>Test submitted</DialogTitle>
             <DialogContent>
-              <Typography>Your answers have been submitted for grading.</Typography>
+              <Typography>
+                Your answers have been submitted for grading.
+              </Typography>
             </DialogContent>
             <DialogActions>
               <Button onClick={() => navigate(ROUTES.home)}>Return home</Button>
-              <Button variant="contained" onClick={() => setTestSubmitSuccessOpen(false)}>Close</Button>
+              <Button
+                variant="contained"
+                onClick={() => setTestSubmitSuccessOpen(false)}
+              >
+                Close
+              </Button>
             </DialogActions>
           </Dialog>
 
@@ -297,24 +361,24 @@ export default function HorizontalVelocityPanel() {
           />
 
           {!isTest && (
-          <RealityCheck
-            title="Reality Check: Horizontal Velocity"
-            open={rcOpen}
-            onToggle={() => setRcOpen((o) => !o)}
-            available={selectedPanel === "velocity"}
-          >
-            <Typography paragraph>
-              We use Darcy’s Law: V = (K · i) / n. K varies widely by material,
-              and real geology can mix layers—flow doesn’t only occur in the
-              “best” layer.{" "}
-              {/* mirrors the Horizontal Velocity reality‑check text from scenario.html */}{" "}
-              [1](https://geosyntec-my.sharepoint.com/personal/aang_geosyntec_com/Documents/Microsoft%20Copilot%20Chat%20Files/scenario.html)
-            </Typography>
-            <Typography variant="caption" color="text.secondary">
-              Units: if K is ft/day and i is unitless, V will be ft/day when n
-              is expressed as a fraction.
-            </Typography>
-          </RealityCheck>
+            <RealityCheck
+              title="Reality Check: Horizontal Velocity"
+              open={rcOpen}
+              onToggle={() => setRcOpen((o) => !o)}
+              available={selectedPanel === "velocity"}
+            >
+              <Typography paragraph>
+                We use Darcy’s Law: V = (K · i) / n. K varies widely by
+                material, and real geology can mix layers—flow doesn’t only
+                occur in the “best” layer.{" "}
+                {/* mirrors the Horizontal Velocity reality‑check text from scenario.html */}{" "}
+                [1](https://geosyntec-my.sharepoint.com/personal/aang_geosyntec_com/Documents/Microsoft%20Copilot%20Chat%20Files/scenario.html)
+              </Typography>
+              <Typography variant="caption" color="text.secondary">
+                Units: if K is ft/day and i is unitless, V will be ft/day when n
+                is expressed as a fraction.
+              </Typography>
+            </RealityCheck>
           )}
         </Box>
       </AccordionDetails>

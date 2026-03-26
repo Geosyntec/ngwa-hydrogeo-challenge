@@ -75,6 +75,7 @@ export default memo(function MapOverlay() {
       !!flow.DistanceHighestLowest.input ||
       !!flow.DistanceHighestLowest.answer;
 
+    console.log(flow.SelectedDirection.input)
     const step3Engaged =
       !!flow.SelectedDirection.input || !!flow.SelectedDirection.answer;
     const step1YEngaged =
@@ -300,7 +301,7 @@ export default memo(function MapOverlay() {
       )}
 
       {/* actual vs user direction (step 3) */}
-      {computed.step3Engaged && (
+      {/* {computed.step3Engaged && (
         <line
           x1={hi.Point.x}
           y1={hi.Point.y}
@@ -311,17 +312,17 @@ export default memo(function MapOverlay() {
           strokeDasharray="6 6"
           markerEnd="url(#arrowEndBlue)"
         />
-      )}
+      )} */}
       {computed.step3Engaged && computed.userLine && (
         <line
           x1={hi.Point.x}
           y1={hi.Point.y}
           x2={computed.userLine.end.x}
           y2={computed.userLine.end.y}
-          stroke="#2e7d32"
+          stroke="#0071BC"
           strokeWidth={4}
           strokeDasharray="6 6"
-          markerEnd="url(#arrowEndGreen)"
+          markerEnd="url(#arrowEndBlue)"
         />
       )}
     </svg>

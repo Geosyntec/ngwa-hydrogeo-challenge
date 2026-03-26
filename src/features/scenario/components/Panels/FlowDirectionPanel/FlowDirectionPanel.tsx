@@ -33,18 +33,18 @@ export default function FlowDirectionPanel() {
   const { selectedPanel, isTest } = useAppSelector(selectScenarioState);
   const [rcOpen, setRcOpen] = useState(false);
 
-  useEffect(() => {
-    if (ready && !selectedPanel) {
-      dispatch(setSelectedPanel("flow"));
-    }
-  }, [ready, selectedPanel, dispatch]);
+  // useEffect(() => {
+  //   if (ready && !selectedPanel) {
+  //     dispatch(setSelectedPanel("flow"));
+  //   }
+  // }, [ready, selectedPanel, dispatch]);
 
-  useEffect(() => {
-    console.log("flow done?:",flowDone)
-    if (flowDone) {
-      dispatch(setSelectedPanel("gradient"));
-    }
-  }, [flowDone, dispatch]);
+  // useEffect(() => {
+  //   console.log("flow done?:",flowDone)
+  //   if (flowDone) {
+  //     dispatch(setSelectedPanel("gradient"));
+  //   }
+  // }, [flowDone, dispatch]);
 
   const onToggle = useCallback(
     (_e: any, expanded: boolean) => {
@@ -70,11 +70,6 @@ export default function FlowDirectionPanel() {
       <AccordionDetails>
         {/* Host container for the slide-out: must be relative + overflow visible */}
         <Box sx={{ position: "relative", overflow: "visible" }}>
-          {!ready && (
-            <Typography variant="body2" color="text.secondary">
-              Select three wells to begin this section.
-            </Typography>
-          )}
           {ready && (
             <Box>
             <Typography variant="body2" color="text.secondary" sx={{marginBottom:"12px"}}>
@@ -86,11 +81,6 @@ export default function FlowDirectionPanel() {
               <FDStep2 />
               <Divider />
               <FDStep3 />
-              {!isTest && (
-                <Typography variant="caption" color="text.secondary">
-                  Right: {flow.rightAnswers} &nbsp; Wrong: {flow.wrongAnswers}
-                </Typography>
-              )}
               </Stack>
               </Box>
           )}

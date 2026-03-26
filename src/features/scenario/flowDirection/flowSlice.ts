@@ -47,7 +47,7 @@ const initialState: FlowDirectionUIState = {
   ElevResult_X_DistanceHighMid: makeField(""),
   isCheckingStep2: false,
   isSolutionShowingStep2: false,
-  SelectedDirection: makeField("90"),
+  SelectedDirection: makeField(""),
   DirectionAngle: 90,
   DirectionAngleDisplay: 180,
   isCheckingStep3: false,
