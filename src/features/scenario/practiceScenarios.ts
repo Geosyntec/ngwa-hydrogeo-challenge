@@ -9,7 +9,7 @@ export const practiceScenarios: ScenarioDefinition[] = [
     "id": "9a8b1d9f-387d-4b14-910a-d0d104c7cd47",
     "name": "001-Choose Your Map: River Heights",
     "map": {
-      "url": "/MapImages/9a8b1d9f-387d-4b14-910a-d0d104c7cd47.jpg",
+      "url": "/assets/img/river_heights_map.jpg",
       "width": 1024,
       "height": 685,
       "physicalWidth": 10
@@ -349,7 +349,7 @@ export const practiceScenarios: ScenarioDefinition[] = [
     "id": "e8521e4b-e25a-4481-8aaf-d0a74db677cc",
     "name": "002 -  Filmore Grove",
     "map": {
-      "url": "/MapImages/e8521e4b-e25a-4481-8aaf-d0a74db677cc.jpg",
+      "url": "/assets/img/filmore_grove_map.jpg",
       "width": 1024,
       "height": 685,
       "physicalWidth": 4.5
