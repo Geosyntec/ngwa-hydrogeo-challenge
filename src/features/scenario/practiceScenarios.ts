@@ -675,7 +675,7 @@ export const practiceScenarios: ScenarioDefinition[] = [
     "id": "6b99a6cc-c763-4f44-9c54-c4c997e22586",
     "name": "003 - Filmore City",
     "map": {
-      "url": "/MapImages/6b99a6cc-c763-4f44-9c54-c4c997e22586.jpg",
+      "url": "/assets/img/filmore_city_map.jpg",
       "width": 1024,
       "height": 685,
       "physicalWidth": 6
@@ -971,7 +971,7 @@ export const practiceScenarios: ScenarioDefinition[] = [
     "id": "29795340-493b-4930-989e-621a47966e4c",
     "name": "004 - Filmore Springs",
     "map": {
-      "url": "/MapImages/29795340-493b-4930-989e-621a47966e4c.jpg",
+      "url": "/assets/img/filmore_springs_map.jpg",
       "width": 1024,
       "height": 685,
       "physicalWidth": 4.5
@@ -1419,7 +1419,7 @@ export const practiceScenarios: ScenarioDefinition[] = [
     "id": "d58f4add-de38-4494-965f-e144f8a46784",
     "name": "005 - High Plains Aquifer",
     "map": {
-      "url": "/MapImages/d58f4add-de38-4494-965f-e144f8a46784.jpg",
+      "url": "/assets/img/high_plains_aquifer_map.jpg",
       "width": 1024,
       "height": 685,
       "physicalWidth": 8
@@ -1716,7 +1716,7 @@ export const practiceScenarios: ScenarioDefinition[] = [
     "id": "8eed0d68-1120-4a95-9ded-da9eaf556b0f",
     "name": "006 - Peoria",
     "map": {
-      "url": "/MapImages/8eed0d68-1120-4a95-9ded-da9eaf556b0f.jpg",
+      "url": "/assets/img/peoria_map.jpg",
       "width": 1024,
       "height": 685,
       "physicalWidth": 0.6
