@@ -10,7 +10,6 @@ import {
   selectWells,
 } from "../ScenarioSlice";
 import type { WellModel } from "../scenarioTypes";
-import { computeActualFlowDirectionAngle } from "../services/drawingMath";
 
 const precise_round = (n: number, d: number) => {
   const p = Math.pow(10, d);
@@ -48,9 +47,9 @@ const initialState: FlowDirectionUIState = {
   ElevResult_X_DistanceHighMid: makeField(""),
   isCheckingStep2: false,
   isSolutionShowingStep2: false,
-  SelectedDirection: makeField(""),
+  SelectedDirection: makeField("90"),
   DirectionAngle: 90,
-  DirectionAngleDisplay: 0,
+  DirectionAngleDisplay: 180,
   isCheckingStep3: false,
   isSolutionShowingStep3: false,
   rightAnswers: 0,
@@ -83,11 +82,15 @@ export const selectAllWellsChosen = createSelector(
   selectSelectedWellTriplet,
   (arr) => arr.length === 3,
 );
-const toDisplayAngle = (angle: number) => {
-  let a = angle - 90;
-  if (a < 0) a = 360 + a;
-  return a;
-};
+
+/** Compass UI: 0° = North (up), 90° = East; same convention as CompassSelector. */
+export function compassDegreesFromInternal(internalDeg: number): number {
+  return ((internalDeg + 90) % 360 + 360) % 360;
+}
+
+export function internalDegreesFromCompass(compassDeg: number): number {
+  return ((compassDeg - 90) % 360 + 360) % 360;
+}
 
 const flowSlice = createSlice({
   name: "flowDirection",
@@ -103,9 +106,10 @@ const flowSlice = createSlice({
       }
     },
     setDirectionAngle(s, a: PayloadAction<number>) {
-      s.DirectionAngle = a.payload;
-      s.SelectedDirection.input = String(a.payload);
-      s.DirectionAngleDisplay = toDisplayAngle(a.payload);
+      const normalized = ((a.payload % 360) + 360) % 360;
+      s.DirectionAngle = normalized;
+      s.SelectedDirection.input = String(normalized);
+      s.DirectionAngleDisplay = compassDegreesFromInternal(normalized);
     },
     reset(s) {
       Object.assign(s, initialState);
@@ -276,7 +280,8 @@ const flowSlice = createSlice({
       }>,
     ) {
       const { actualAngle, threshold, options } = a.payload;
-      const userDir = parseFloat(s.SelectedDirection.input || "0");
+      /** Same convention as computeActualFlowDirectionAngle: atan2 on map, 0° = East, clockwise in SVG. */
+      const userDir = ((s.DirectionAngle % 360) + 360) % 360;
       let start = actualAngle - threshold,
         end = actualAngle + threshold;
       if (start < 0 && userDir > 180) {
@@ -289,7 +294,8 @@ const flowSlice = createSlice({
       }
       const correct = userDir >= start && userDir <= end;
       s.SelectedDirection.isCorrect = correct;
-      s.SelectedDirection.answer = `${toDisplayAngle(actualAngle)}° +/- ${threshold}°`;
+      const answerCompass = Math.round(compassDegreesFromInternal(actualAngle));
+      s.SelectedDirection.answer = `${answerCompass}° ± ${threshold}° (clockwise from North)`;
       if (options.checkAnswers) s.SelectedDirection.checked = true;
       if (options.showAnswers) {
         s.SelectedDirection.showAnswer = true;

@@ -1,5 +1,6 @@
 import type { RootState } from '../../../app/store'
 import { selectMap } from '../ScenarioSlice'
+import { computeActualFlowDirectionAngle } from '../services/drawingMath'
 import {
   selectSortedByElevation,
   waterTableElevationFt,
@@ -107,12 +108,19 @@ export const runCheckStep2 = (options: StepCheckOptions = {}) =>
     dispatch(_applyStep2Result({ diffHighLow, diffHighMid, elevationRatio, distHighLow, formulaResult, options }))
   }
 
-export const runCheckStep3 = (options: StepCheckOptions = {}, actualAngle?: number) =>
+export const runCheckStep3 = (options: StepCheckOptions = {}, actualAngleOverride?: number) =>
   (dispatch: any, getState: () => RootState) => {
-    // computeActualFlowDirectionAngle is called in the reducer path already;
-    // here we pass the angle (computed externally if needed)
-    const fallbackAngle = 90
     const s = getState()
-    // we call the reducer with `actualAngle ?? fallback` – computation was already done in your prior code path
-    dispatch(_applyStep3Result({ actualAngle: actualAngle ?? fallbackAngle, threshold: 10, options }))
+    const computed =
+      actualAngleOverride !== undefined
+        ? actualAngleOverride
+        : computeActualFlowDirectionAngle(s)
+    if (computed == null) return
+    dispatch(
+      _applyStep3Result({
+        actualAngle: computed,
+        threshold: 10,
+        options,
+      }),
+    )
   }

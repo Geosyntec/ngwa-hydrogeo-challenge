@@ -1,6 +1,5 @@
-import { Stack, TextField, Typography, Button } from "@mui/material";
+import { Stack, Typography, Button } from "@mui/material";
 import { useAppDispatch, useAppSelector } from "../../../../../app/hooks";
-import { setDirectionAngle, setField } from "../../../flowDirection/flowSlice";
 import { selectFlow, selectFlowStep2Complete, runCheckStep3 } from "../../../flowDirection/flowSelectors";
 import { selectScenarioState } from "../../../ScenarioSlice";
 import CompassSelector from "./CompassSelector";
@@ -10,63 +9,39 @@ export default function FDStep3() {
   const dispatch = useAppDispatch();
   const stepReady = useAppSelector(selectFlowStep2Complete);
   const isTest = useAppSelector(selectScenarioState).isTest;
+  const showAnswerLine = flow.SelectedDirection.showAnswer;
+  const showIncorrect =
+    flow.SelectedDirection.checked &&
+    !flow.SelectedDirection.isCorrect &&
+    !flow.SelectedDirection.showAnswer;
+
   return (
     <>
       <Typography variant="h6">Step 3</Typography>
       <Typography variant="body2" color="text.secondary">
-        Choose the groundwater flow direction (degrees). Drag the dial or type a
-        value.
+        Choose the groundwater flow direction. Drag the compass dial (Alt/Option to
+        snap 5°).
       </Typography>
       <Stack
-        direction={{ xs: "column", md: "row" }}
-        spacing={2}
-        alignItems="center"
+        direction="column"
+        alignItems="flex-start"
+        spacing={1}
         sx={{ mt: 1 }}
       >
         <CompassSelector display={stepReady} />
-        <Stack
-          spacing={2}
-          direction={{ xs: "column", md: "row" }}
-          alignItems="center"
-        >
-          <TextField
-            size="small"
-            label="Direction (degrees)"
-            value={flow.SelectedDirection.input}
-            disabled={!stepReady}
-            onChange={(e) =>
-              dispatch(
-                setField({ key: "SelectedDirection", value: e.target.value })
-              )
-            }
-            error={
-              flow.SelectedDirection.checked &&
-              !flow.SelectedDirection.isCorrect
-            }
-            helperText={
-              flow.SelectedDirection.showAnswer
-                ? `Answer: ${flow.SelectedDirection.answer}`
-                : "0..360 (Raphael angle)"
-            }
-            sx={{ width: 220 }}
-          />
-          <TextField
-            size="small"
-            label="Internal Angle"
-            value={Math.round(flow.DirectionAngle)}
-            onChange={(e) =>
-              dispatch(setDirectionAngle(parseFloat(e.target.value) || 0))
-            }
-            sx={{ width: 220 }}
-            disabled={!stepReady}
-          />
-          <Typography variant="body2">
-            Display Angle: {Math.round(flow.DirectionAngleDisplay)}°
+        {showAnswerLine && (
+          <Typography variant="body2" color="text.secondary" sx={{ maxWidth: 280 }}>
+            Answer: {flow.SelectedDirection.answer}
           </Typography>
-        </Stack>
+        )}
+        {showIncorrect && (
+          <Typography variant="body2" color="error">
+            Not within tolerance — use Show Step 3 Solution to see the answer.
+          </Typography>
+        )}
       </Stack>
       {!isTest && (
-        <Stack direction="row" spacing={1}>
+        <Stack direction="row" spacing={1} sx={{ mt: 2 }}>
           <Button
             variant="outlined"
             onClick={() => dispatch(runCheckStep3({ checkAnswers: true }))}

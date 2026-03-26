@@ -1,21 +1,13 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Box } from "@mui/material";
 import { useAppDispatch, useAppSelector } from "../../../../../app/hooks";
-import { setDirectionAngle } from "../../../flowDirection/flowSlice";
+import {
+  compassDegreesFromInternal,
+  internalDegreesFromCompass,
+  setDirectionAngle,
+} from "../../../flowDirection/flowSlice";
 import { selectFlow } from "../../../flowDirection/flowSelectors";
 import { unitVectorFromRaphaelAngle } from "../../../services/drawingMath";
-
-/**
- * Redux / map overlay use atan2-style angles: 0° = East (+x), increasing clockwise
- * in SVG (90° = South, 270° = North). Legacy compass UI uses 0° = North, 90° = East.
- */
-function compassDegreesFromInternal(internalDeg: number): number {
-  return (internalDeg + 90 + 360) % 360;
-}
-
-function internalDegreesFromCompass(compassDeg: number): number {
-  return (compassDeg - 90 + 360) % 360;
-}
 
 export default function CompassSelector({ display = true }: { display?: boolean }) {
   const size = 150;
