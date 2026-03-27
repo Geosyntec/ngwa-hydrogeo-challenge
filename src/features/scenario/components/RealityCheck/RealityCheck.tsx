@@ -1,7 +1,15 @@
-import { ReactNode } from "react";
+import { ReactNode, useLayoutEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { Box, IconButton, Typography, Divider, Tooltip } from "@mui/material";
 import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
+
+type PanelCoords = {
+  top: number;
+  left: number;
+  width: number;
+  height: number;
+};
 
 type RealityCheckProps = {
   title: string;
@@ -16,9 +24,9 @@ type RealityCheckProps = {
 };
 
 /**
- * Slide-out panel that attaches to the right side of whatever container you put it in.
- * Put the host container in position: 'relative' and overflow: 'visible'.
- * Mirrors the legacy `.reality-check` -> `.reality-check-tab` -> `.reality-check-panel` behavior.  [1](https://geosyntec-my.sharepoint.com/personal/aang_geosyntec_com/Documents/Microsoft%20Copilot%20Chat%20Files/scenario.html)
+ * Help icon stays in the host (absolute on the panel’s right edge).
+ * The text panel is portaled to document.body with position:fixed so it isn’t
+ * clipped by accordion overflow. When closed, only the icon is shown.
  */
 export default function RealityCheck({
   title,
@@ -28,9 +36,89 @@ export default function RealityCheck({
   width = 360,
   children,
 }: RealityCheckProps) {
+  const hostRef = useRef<HTMLDivElement | null>(null);
+  const [panelCoords, setPanelCoords] = useState<PanelCoords | null>(null);
+
+  useLayoutEffect(() => {
+    if (!open || !available) {
+      setPanelCoords(null);
+      return;
+    }
+    const el = hostRef.current;
+    if (!el) {
+      setPanelCoords(null);
+      return;
+    }
+    const update = () => {
+      const r = el.getBoundingClientRect();
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+      const panelW = Math.min(width, r.width, 420, vw - 16);
+      const left = Math.max(8, r.right - panelW);
+      const top = r.top + 8;
+      const maxH = Math.max(120, Math.min(r.height - 16, vh - top - 8));
+      setPanelCoords({
+        top,
+        left,
+        width: panelW,
+        height: maxH,
+      });
+    };
+    update();
+    window.addEventListener("scroll", update, true);
+    window.addEventListener("resize", update);
+    return () => {
+      window.removeEventListener("scroll", update, true);
+      window.removeEventListener("resize", update);
+    };
+  }, [open, available, width]);
+
+  const panel = panelCoords && (
+    <Box
+      role="dialog"
+      aria-label={`${title} (reality check)`}
+      sx={{
+        position: "fixed",
+        zIndex: 1300,
+        top: panelCoords.top,
+        left: panelCoords.left,
+        width: panelCoords.width,
+        height: panelCoords.height,
+        maxHeight: `min(${panelCoords.height}px, calc(100vh - ${panelCoords.top + 8}px))`,
+        display: "flex",
+        flexDirection: "column",
+        bgcolor: "background.paper",
+        borderLeft: (t) => `1px solid ${t.palette.divider}`,
+        boxShadow: 3,
+        overflow: "hidden",
+      }}
+    >
+      <Box sx={{ display: "flex", alignItems: "center", px: 2, py: 1, flexShrink: 0 }}>
+        <Typography variant="subtitle1" sx={{ flex: 1, fontWeight: 700 }}>
+          {title}
+        </Typography>
+        <IconButton aria-label="Close" onClick={onToggle} size="small">
+          <CloseRoundedIcon />
+        </IconButton>
+      </Box>
+      <Divider />
+      <Box sx={{ p: 2, overflowY: "auto", flex: 1, minHeight: 0 }}>{children}</Box>
+    </Box>
+  );
+
   return (
     <>
-      {/* Floating tab/button, positioned just outside the host panel’s right edge */}
+      {/* Fills the positioned parent so we can align the portaled panel to this region */}
+      <Box
+        ref={hostRef}
+        sx={{
+          position: "absolute",
+          inset: 0,
+          pointerEvents: "none",
+        }}
+        aria-hidden
+      />
+
       {available && (
         <Tooltip title={open ? "Hide reality check" : "Show reality check"}>
           <IconButton
@@ -46,6 +134,7 @@ export default function RealityCheck({
               boxShadow: 2,
               border: (theme) => `1px solid ${theme.palette.divider}`,
               zIndex: 3,
+              pointerEvents: "auto",
               "&:hover": {
                 bgcolor: open ? "primary.light" : "background.default",
               },
@@ -57,38 +146,7 @@ export default function RealityCheck({
         </Tooltip>
       )}
 
-      {/* Slide-out panel */}
-      <Box
-        role="dialog"
-        aria-label={`${title} (reality check)`}
-        sx={{
-          position: "absolute",
-          top: 8,
-          right: 0,
-          height: "calc(100% - 16px)",
-          width,
-          maxWidth: "min(92vw, 420px)",
-          transform: open ? "translateX(0)" : "translateX(100%)",
-          transition: "transform 300ms ease",
-          bgcolor: "background.paper",
-          borderLeft: (theme) => `1px solid ${theme.palette.divider}`,
-          boxShadow: 3,
-          zIndex: 2,
-          display: "flex",
-          flexDirection: "column",
-        }}
-      >
-        <Box sx={{ display: "flex", alignItems: "center", px: 2, py: 1 }}>
-          <Typography variant="subtitle1" sx={{ flex: 1, fontWeight: 700 }}>
-            {title}
-          </Typography>
-          <IconButton aria-label="Close" onClick={onToggle} size="small">
-            <CloseRoundedIcon />
-          </IconButton>
-        </Box>
-        <Divider />
-        <Box sx={{ p: 2, overflowY: "auto" }}>{children}</Box>
-      </Box>
+      {open && available && panel && createPortal(panel, document.body)}
     </>
   );
 }
