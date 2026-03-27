@@ -71,7 +71,7 @@ export function legacyMeasuredLineGeometry(
     capHalfLengthPx?: number;
   },
 ): LegacyMeasuredLineGeom | null {
-  const offsetPx = opts?.offsetPx ?? 20;
+  const offsetPx = opts?.offsetPx ?? 30;
   const arrowInsetPx = opts?.arrowInsetPx ?? 4;
   const capHalfLengthPx = opts?.capHalfLengthPx ?? 10;
 

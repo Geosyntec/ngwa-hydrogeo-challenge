@@ -155,7 +155,7 @@ export default memo(function MapOverlay() {
   if (!computed) return null;
 
   const { width, height, hi, mid, lo } = computed;
-  const showY = computed.step1YEngaged || computed.step2Engaged;
+  const showY = computed.step1YEngaged;
 
   return (
     <svg
@@ -356,8 +356,8 @@ function LegacyMeasuredSide({
           <marker
             id={startId}
             markerUnits="userSpaceOnUse"
-            markerWidth="5"
-            markerHeight="5"
+            markerWidth="10"
+            markerHeight="10"
             viewBox="0 0 10 10"
             refX="10"
             refY="5"
@@ -368,8 +368,8 @@ function LegacyMeasuredSide({
           <marker
             id={endId}
             markerUnits="userSpaceOnUse"
-            markerWidth="5"
-            markerHeight="5"
+            markerWidth="10"
+            markerHeight="10"
             viewBox="0 0 10 10"
             refX="10"
             refY="5"
@@ -405,12 +405,20 @@ function LegacyMeasuredSide({
         markerStart={bothArrows ? `url(#${startId})` : undefined}
         markerEnd={bothArrows ? `url(#${endId})` : undefined}
       />
+      <rect
+        x={geom.labelMid.x-35}
+        y={geom.labelMid.y-20}
+        width='70'
+        height='20'
+        fill="lightblue"
+      />
       <text
         x={geom.labelMid.x}
         y={geom.labelMid.y - 6}
         fontSize={12}
         fill="#333"
         textAnchor="middle"
+        color="white"
       >
         {label}
       </text>
