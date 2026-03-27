@@ -71,6 +71,7 @@ export default function GradientPanel() {
         onChange={(e) => dispatch(setField({ key, value: e.target.value }))}
         error={f.checked && !f.isCorrect}
         helperText={f.showAnswer ? `Answer: ${f.answer}` : helper}
+        InputLabelProps={{ shrink: true }}
         sx={{ width: width ?? 280 }}
       />
     );
@@ -153,42 +154,81 @@ export default function GradientPanel() {
                     item
                     lg={6}
                     columnSpacing={1}
-                    sx={{ display: "flex", flexDirection: "row" }}
+                    sx={{ display: "flex", flexDirection: "row",flexWrap:"wrap" }}
                   >
                     <Grid item lg={4}>
                       {bind(
                         "HighestWaterTableValue",
-                        "Highest elevation (ft)",
+                        "Elevation " + sorted[2].Name,
                         "",
                         100
                       )}
                     </Grid>
-                    <Grid item lg={4} sx={{display:'flex',paddingTop:'2%',justifyContent:'center'}}>
+                    <Grid
+                      item
+                      lg={4}
+                      sx={{
+                        display: "flex",
+                        paddingTop: "2%",
+                        justifyContent: "center",
+                      }}
+                    >
                       <Typography variant="body2">-</Typography>
                     </Grid>
                     <Grid item lg={4}>
                       {bind(
                         "RemainingWellValue",
-                        "Middle elevation (ft)",
+                        "Elevation " + sorted[1].Name,
                         "",
                         100
                       )}
                     </Grid>
-                    <Grid item lg={12} sx={{display:'flex',justifyContent:'center',alignItems:'center'}}>
+                    <Grid lg={12}>
+                      <Box
+                        sx={{
+                          borderTop: (t) => `2px solid ${t.palette.divider}`,
+                          alignSelf: "stretch",
+                          flexShrink: 0,
+                          mt: 2,
+                          mb: 2,
+                        }}
+                      />
+                    </Grid>
+                    <Grid
+                      item
+                      lg={12}
+                      sx={{
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                      }}
+                    >
                       {bind(
                         "WhatIsDistanceYValue2",
                         "Distance Y (ft)",
                         "",
-                        100
+                        120
                       )}
                     </Grid>
                   </Grid>
-                  <Grid item lg={6} sx={{display:'flex',flexDirection:'row'}}>
-                    <Grid item lg={2} sx={{display:'flex',paddingTop:'2%',justifyContent:'center'}}>
+                  <Grid
+                    item
+                    lg={6}
+                    sx={{ display: "flex", flexDirection: "row",alignItems:"center" }}
+                  >
+                    <Grid
+                      item
+                      lg={2}
+                      sx={{
+                        display: "flex",
+                        paddingTop: "2%",
+                        justifyContent: "center",
+                      }}
+                    >
                       <Typography variant="body2">=</Typography>
                     </Grid>
                     <Grid item lg={10}>
-                      {bind("Gradient", "Gradient (4 dp)","",100)}
+                      {bind("Gradient", "Gradient (4 dp)", "", 150)}
                     </Grid>
                   </Grid>
                 </Grid>

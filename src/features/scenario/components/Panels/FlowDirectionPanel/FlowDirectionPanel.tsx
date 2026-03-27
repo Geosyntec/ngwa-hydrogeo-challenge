@@ -48,6 +48,7 @@ export default function FlowDirectionPanel() {
 
   const onToggle = useCallback(
     (_e: any, expanded: boolean) => {
+      console.log("herro")
       dispatch(setSelectedPanel(expanded ? "flow" : null));
     },
     [dispatch]
@@ -58,39 +59,19 @@ export default function FlowDirectionPanel() {
       disabled={!ready}
       expanded={selectedPanel === "flow"}
       onChange={onToggle}
-      sx={{
-        maxHeight: "20%",
-        overflow:"scroll"
-      }}
+      // sx={{
+      //   maxHeight: "20%",
+      //   overflow:"scroll"
+      // }}
     >
-      <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+      <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{position:'sticky',top:0}}>
         <Typography variant="h5">Flow Direction</Typography>
-      </AccordionSummary>
-
-      <AccordionDetails>
-        {/* Host container for the slide-out: must be relative + overflow visible */}
-        <Box sx={{ position: "relative", overflow: "visible" }}>
-          {ready && (
-            <Box>
-            <Typography variant="body2" color="text.secondary" sx={{marginBottom:"12px"}}>
-            To determine the flow direction of groundwater between three wells you will need to work through three basic steps.
-          </Typography>
-            <Stack spacing={2}>
-              <FDStep1 />
-              <Divider />
-              <FDStep2 />
-              <Divider />
-              <FDStep3 />
-              </Stack>
-              </Box>
-          )}
-
-          {!isTest && (
+        {!isTest && (
           <RealityCheck
             title="Reality Check: Flow Direction"
             open={rcOpen}
-            onToggle={() => setRcOpen((o) => !o)}
-            available={selectedPanel === "flow"}
+            onToggleDisplay={() => setRcOpen((o) => !o)}
+            available={true}
           >
             {/* You can paste/extend the legacy text here. The snippet below summarizes the first block. */}
             <Typography paragraph>
@@ -108,6 +89,27 @@ export default function FlowDirectionPanel() {
             </Typography>
           </RealityCheck>
           )}
+      </AccordionSummary>
+
+      <AccordionDetails sx={{maxHeight:"400px",overflowY:"auto",minHeight:0}}>
+        {/* Host container for the slide-out: must be relative + overflow visible */}
+        <Box sx={{ position: "relative", overflow: "visible" }}>
+          {ready && (
+            <Box>
+            <Typography variant="body2" color="text.secondary" sx={{marginBottom:"12px"}}>
+            To determine the flow direction of groundwater between three wells you will need to work through three basic steps.
+          </Typography>
+            <Stack spacing={2}>
+              <FDStep1 />
+              <Divider />
+              <FDStep2 />
+              <Divider />
+              <FDStep3 />
+              </Stack>
+              </Box>
+          )}
+
+         
         </Box>
       </AccordionDetails>
     </Accordion>

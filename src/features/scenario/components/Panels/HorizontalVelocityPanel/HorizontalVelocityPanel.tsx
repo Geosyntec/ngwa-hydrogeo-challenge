@@ -79,7 +79,12 @@ export default function HorizontalVelocityPanel() {
     },
     [dispatch]
   );
-  const bind = (key: keyof VelocityState, label: string, helper?: string,width?:number) => {
+  const bind = (
+    key: keyof VelocityState,
+    label: string,
+    helper?: string,
+    width?: number
+  ) => {
     const f: any = (v as any)[key];
     return (
       <TextField
@@ -89,6 +94,7 @@ export default function HorizontalVelocityPanel() {
         onChange={(e) => dispatch(setField({ key, value: e.target.value }))}
         error={f.checked && !f.isCorrect}
         helperText={f.showAnswer ? `Answer: ${f.answer}` : helper}
+        InputLabelProps={{ shrink: true }}
         sx={{ width: width ?? 50 }}
       />
     );
@@ -137,37 +143,79 @@ export default function HorizontalVelocityPanel() {
                     Find these values:
                   </Typography>
                   <Grid container spacing={1} sx={{ mt: 1 }}>
-                    <Grid item lg={12} sx={{display:'flex',flexDirection:'row'}}>
-                      <Grid item lg={4} sx={{display:'flex',alignItems:'center'}}>
+                    <Grid
+                      item
+                      lg={12}
+                      sx={{ display: "flex", flexDirection: "row" }}
+                    >
+                      <Grid
+                        item
+                        lg={4}
+                        sx={{ display: "flex", alignItems: "center" }}
+                      >
                         <Typography variant="body2">i (gradient) = </Typography>
                       </Grid>
                       <Grid item lg={2}>
-                        {bind("Gradient", "","",100)}
+                        {bind("Gradient", "", "", 100)}
                       </Grid>
-                      <Grid item lg={6} sx={{display:'flex',alignItems:'center'}}>
-                        <Typography variant="body2">ft/ft (round to 4 Decimal Places)</Typography>
+                      <Grid
+                        item
+                        lg={6}
+                        sx={{ display: "flex", alignItems: "center" }}
+                      >
+                        <Typography variant="body2">
+                          ft/ft (round to 4 Decimal Places)
+                        </Typography>
                       </Grid>
                     </Grid>
-                    <Grid item lg={12} sx={{display:'flex',flexDirection:'row'}}>
-                      <Grid item lg={4} sx={{display:'flex',alignItems:'center'}}>
-                        <Typography variant="body2">K (conductivity) = </Typography>
+                    <Grid
+                      item
+                      lg={12}
+                      sx={{ display: "flex", flexDirection: "row" }}
+                    >
+                      <Grid
+                        item
+                        lg={4}
+                        sx={{ display: "flex", alignItems: "center" }}
+                      >
+                        <Typography variant="body2">
+                          K (conductivity) ={" "}
+                        </Typography>
                       </Grid>
                       <Grid item lg={2}>
-                        {bind("Conductivity", "","",100)}
+                        {bind("Conductivity", "", "", 100)}
                       </Grid>
-                      <Grid item lg={6} sx={{display:'flex',alignItems:'center'}}>
+                      <Grid
+                        item
+                        lg={6}
+                        sx={{ display: "flex", alignItems: "center" }}
+                      >
                         <Typography variant="body2">ft/day</Typography>
                       </Grid>
                     </Grid>
-                    <Grid item lg={12} sx={{display:'flex',flexDirection:'row'}}>
-                      <Grid item lg={4} sx={{display:'flex',alignItems:'center'}}>
+                    <Grid
+                      item
+                      lg={12}
+                      sx={{ display: "flex", flexDirection: "row" }}
+                    >
+                      <Grid
+                        item
+                        lg={4}
+                        sx={{ display: "flex", alignItems: "center" }}
+                      >
                         <Typography variant="body2">n (porosity) = </Typography>
                       </Grid>
                       <Grid item lg={2}>
-                        {bind("Porosity", "","",100)}
+                        {bind("Porosity", "", "", 100)}
                       </Grid>
-                      <Grid item lg={6} sx={{display:'flex',alignItems:'center'}}>
-                        <Typography variant="body2">(Percentage expressed as a value from 0-1)</Typography>
+                      <Grid
+                        item
+                        lg={6}
+                        sx={{ display: "flex", alignItems: "center" }}
+                      >
+                        <Typography variant="body2">
+                          (Percentage expressed as a value from 0-1)
+                        </Typography>
                       </Grid>
                     </Grid>
                   </Grid>
@@ -205,53 +253,97 @@ export default function HorizontalVelocityPanel() {
                 <div>
                   <Typography variant="h6">Step 2</Typography>
                   <Typography variant="body2" color="text.secondary">
-                    Use Darcy's Law to find the horizontal velocity of groundwater between the wells:
+                    Use Darcy's Law to find the horizontal velocity of
+                    groundwater between the wells:
                   </Typography>
                   <Grid container spacing={1} sx={{ mt: 1 }}>
-                  <Grid
-                    item
-                    xl={6}
-                    columnSpacing={1}
-                    sx={{ display: "flex", flexDirection: "row" }}
-                  >
-                    <Grid item xl={4}>
-                      {bind(
-                        "Conductivity2",
-                        "k",
-                        "",
-                        100
-                      )}
+                    <Grid
+                      item
+                      lg={6}
+                      columnSpacing={1}
+                      sx={{
+                        display: "flex",
+                        flexDirection: "row",
+                        flexWrap: "wrap",
+                      }}
+                    >
+                      <Grid item lg={4}>
+                        {bind("Conductivity2", "k", "", 100)}
+                      </Grid>
+                      <Grid
+                        item
+                        lg={4}
+                        sx={{
+                          display: "flex",
+                          paddingTop: "2%",
+                          justifyContent: "center",
+                        }}
+                      >
+                        <Typography variant="body2">x</Typography>
+                      </Grid>
+                      <Grid item lg={4}>
+                        {bind("Gradient2", "i", "", 100)}
+                      </Grid>
+                      <Grid lg={12}>
+                        <Box
+                          sx={{
+                            borderTop: (t) => `2px solid ${t.palette.divider}`,
+                            alignSelf: "stretch",
+                            flexShrink: 0,
+                            mt: 2,
+                            mb: 2,
+                          }}
+                        />
+                      </Grid>
+                      <Grid
+                        item
+                        lg={12}
+                        sx={{
+                          display: "flex",
+                          justifyContent: "center",
+                          alignItems: "center",
+                        }}
+                      >
+                        {bind("Porosity2", "n", "", 100)}
+                      </Grid>
                     </Grid>
-                    <Grid item xl={4} sx={{display:'flex',paddingTop:'2%',justifyContent:'center'}}>
-                      <Typography variant="body2">x</Typography>
-                    </Grid>
-                    <Grid item xl={4}>
-                      {bind(
-                        "Gradient2",
-                        "i",
-                        "",
-                        100
-                      )}
-                    </Grid>
-                    <Grid item xl={12} sx={{display:'flex',justifyContent:'center',alignItems:'center'}}>
-                      {bind(
-                        "Porosity2",
-                        "n",
-                        "",
-                        100
-                      )}
-                    </Grid>
-                  </Grid>
-                  <Grid item xl={6} sx={{display:'flex',flexDirection:'row'}}>
-                    <Grid item xl={2} sx={{display:'flex',paddingTop:'2%',justifyContent:'center'}}>
-                      <Typography variant="body2">=</Typography>
-                    </Grid>
-                    <Grid item xl={10}>
+                    <Grid
+                      item
+                      lg={6}
+                      sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        flexDirection: "row",
+                      }}
+                    >
+                      <Grid
+                        item
+                        lg={2}
+                        sx={{
+                          display: "flex",
+                          paddingTop: "2%",
+                          justifyContent: "center",
+                        }}
+                      >
+                        <Typography variant="body2">=</Typography>
+                      </Grid>
+                      <Grid
+                        item
+                        lg={10}
+                        columnSpacing={1}
+                        sx={{
+                          display: "flex",
+                          alignItems: "center",
+                          flexDirection: "row",
+                        }}
+                      >
                         {bind("HorizontalVelocity", "v", "", 100)}
-                        <Typography variant="body2" color="text.secondary">ft/day</Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          ft/day
+                        </Typography>
+                      </Grid>
                     </Grid>
                   </Grid>
-                </Grid>
                   {!isTest && (
                     <Stack direction="row" spacing={1} sx={{ mt: 1 }}>
                       <Button

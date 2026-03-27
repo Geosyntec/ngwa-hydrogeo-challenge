@@ -1,6 +1,6 @@
-import { Grid, TextField, Typography, Stack, Button } from "@mui/material";
+import { Grid, TextField, Typography, Stack, Button, Box } from "@mui/material";
 import { useAppDispatch, useAppSelector } from "../../../../../app/hooks";
-import { setField } from "../../../flowDirection/flowSlice";
+import { setField,selectSortedByElevation } from "../../../flowDirection/flowSlice";
 import {
   selectFlow,
   selectFlowStep1Complete,
@@ -13,7 +13,8 @@ export default function FDStep2() {
   const dispatch = useAppDispatch();
   const stepReady = useAppSelector(selectFlowStep1Complete);
   const isTest = useAppSelector(selectScenarioState).isTest;
-  const bind = (key: any, label: string, helper?: string) => {
+  const sorted = useAppSelector(selectSortedByElevation)
+  const bind = (key: any, label: string, helper?: string,width?:number) => {
     const f = (flow as any)[key];
     return (
       <TextField
@@ -24,7 +25,8 @@ export default function FDStep2() {
         onChange={(e) => dispatch(setField({ key, value: e.target.value }))}
         error={f.checked && !f.isCorrect}
         helperText={f.showAnswer ? `Answer: ${f.answer}` : helper}
-        sx={{ width: 100 }}
+        InputLabelProps={{ shrink: true }}
+        sx={{ width: width ?? 100 }}
       />
     );
   };
@@ -32,15 +34,27 @@ export default function FDStep2() {
     <>
       <Typography variant="h6">Step 2</Typography>
       <Typography variant="body2" color="text.secondary">
-        Compute elevation ratio and distances.
+        Somewhere between the highest and lowest wells the groundwater elevation will be equal to the middle well elevation.
+        How far from the highest well is that position?
       </Typography>
       <Grid container spacing={1}>
         <Grid item lg={3}>
-          <Grid lg={12}>
-            {bind("DiffBtwnHighestMiddle2", "Δ Elev (High - Mid)")}
+          <Grid lg={12} sx={{display:'flex',justifyContent:'center'}}>
+            {bind("DiffBtwnHighestMiddle2", "Δ Elev " + sorted[2].Name + " - " + sorted[1].Name)}
           </Grid>
           <Grid lg={12}>
-            {bind("DiffBtwnHighestLowest2", "Δ Elev (High - Low)")}
+            <Box
+              sx={{
+                borderTop: (t) => `2px solid black`,
+                alignSelf: "stretch",
+                flexShrink: 0,
+                mt: 2,
+                mb: 2,
+              }}
+            />
+          </Grid>
+          <Grid lg={12} sx={{display:'flex',justifyContent:'center'}}>
+            {bind("DiffBtwnHighestLowest2", "Δ Elev " + sorted[2].Name + " - " + sorted[0].Name)}
           </Grid>
         </Grid>
         <Grid
@@ -48,11 +62,11 @@ export default function FDStep2() {
           lg={3}
           sx={{ display: "flex", flexDirection: "row", alignItems: "center" }}
         >
-          <Grid item lg={12}>
+          <Grid item lg={2}>
             =
           </Grid>
-          <Grid item lg={12}>
-            {bind("ElevationRatio", "Elevation Ratio (2dp)")}
+          <Grid item lg={10} sx={{display:'flex',justifyContent:'center'}}>
+            {bind("ElevationRatio", "","Round to 2 dp")}
           </Grid>
         </Grid>
         <Grid
@@ -64,7 +78,7 @@ export default function FDStep2() {
             x
           </Grid>
           <Grid item lg={12}>
-            {bind("DistanceHighestLowest", "Distance High ↔ Low (ft)")}
+            {bind("DistanceHighestLowest", "Dist " + sorted[2].Name + " to " + sorted[0].Name)}
           </Grid>
         </Grid>
         <Grid
@@ -76,7 +90,7 @@ export default function FDStep2() {
             =
           </Grid>
           <Grid item lg={12}>
-          {bind("ElevResult_X_DistanceHighMid", "X * Distance High-Mid (ft)")}
+            {bind("ElevResult_X_DistanceHighMid", "")}
           </Grid>
         </Grid>
       </Grid>
