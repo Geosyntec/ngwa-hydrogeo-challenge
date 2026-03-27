@@ -44,15 +44,16 @@ export default function ChooseWellsPanel() {
     );
   };
   return (
-    <Accordion defaultExpanded>
-      <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+    <Accordion>
+      <AccordionSummary>
         <Stack
           direction="row"
           spacing={2}
           sx={{ alignItems: "center", width: "100%" }}
         >
-          <Stack direction="row" spacing={1} flexGrow={1} alignItems="center">
-            <Typography variant="subtitle1">Choose 3 Wells</Typography>
+          <Stack direction="row" spacing={2} flexGrow={1} alignItems="center">
+            <Typography variant="h5">Choose 3 Wells</Typography>
+            <Typography variant = "body2" sx={{fontSize:10}}>Click on any three <br/>well icons on the map</Typography>
           </Stack>
           <Stack direction="row" spacing={1}>
             <Slot n={3} id={ids.three} />
@@ -61,12 +62,6 @@ export default function ChooseWellsPanel() {
           </Stack>
         </Stack>
       </AccordionSummary>
-      <AccordionDetails>
-        <Typography variant="body2" color="text.secondary">
-          Click any three well icons on the map to select them.{" "}
-          {allSel ? "" : "Selections remaining shown on the right."}
-        </Typography>
-      </AccordionDetails>
     </Accordion>
   );
 }

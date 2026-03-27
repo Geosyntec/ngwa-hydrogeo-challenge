@@ -106,7 +106,6 @@ export default function TopBar() {
           >
             {NAV_ITEMS.map((item, i) => (
               <Box key={item.path} component="span" sx={{ display: 'flex', alignItems: 'center' }}>
-                {i > 0 && <span className="nav-divider" />}
                 <NavLink
                   to={item.path}
                   className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}

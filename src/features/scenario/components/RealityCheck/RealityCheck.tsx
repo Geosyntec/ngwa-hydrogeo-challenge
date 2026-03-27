@@ -24,7 +24,7 @@ type HelpCoords = {
 type RealityCheckProps = {
   title: string;
   open: boolean;
-  onToggle: () => void;
+  onToggleDisplay: () => void;
   /** show the floating button only when the host panel is “available/open” */
   available?: boolean;
   /** width of the slide-out in px */
@@ -41,7 +41,7 @@ type RealityCheckProps = {
 export default function RealityCheck({
   title,
   open,
-  onToggle,
+  onToggleDisplay,
   available = true,
   width = 360,
   children,
@@ -117,7 +117,7 @@ export default function RealityCheck({
       <Tooltip title={open ? "Hide reality check" : "Show reality check"}>
         <IconButton
           color={open ? "primary" : "default"}
-          onClick={onToggle}
+          // onClick={onToggleDisplay}
           size="small"
           sx={{
             position: "fixed",
@@ -177,7 +177,7 @@ export default function RealityCheck({
           <Typography variant="subtitle1" sx={{ flex: 1, fontWeight: 700 }}>
             {title}
           </Typography>
-          <IconButton aria-label="Close" onClick={onToggle} size="small">
+          <IconButton aria-label="Close" onClick={onToggleDisplay} size="small">
             <CloseRoundedIcon />
           </IconButton>
         </Box>
