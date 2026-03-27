@@ -19,12 +19,20 @@ import { ROUTES } from './app/routes'
 
 const theme = createTheme()
 
+/** Align with Vite `base` (`import.meta.env.BASE_URL`) for subdirectory deploys. */
+function routerBasenameFromVite(): string | undefined {
+  let base = import.meta.env.BASE_URL
+  if (base === './' || base === '/') return undefined
+  if (base.endsWith('/')) base = base.slice(0, -1)
+  return base === '' ? undefined : base
+}
+
 export default function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <ErrorBoundary>
-        <BrowserRouter>
+        <BrowserRouter basename={routerBasenameFromVite()}>
           <Routes>
           <Route element={<AppLayout />}>
             <Route path={ROUTES.home} element={<LandingPage />} />

@@ -60,7 +60,19 @@ From the repo root:
 npm run build:azure
 ```
 
-This builds the frontend and copies `dist/` → `backend/static/`. Then run the backend locally to test:
+This builds the frontend and copies `dist/` → `backend/static/`.
+
+#### Staging path `/ngwa-dev/`
+
+If the app is served under that subdirectory (Vite `base` `/ngwa-dev/` when `vite build --mode staging`), use:
+
+```bash
+npm run build:azure:staging
+```
+
+The default `npm run build:azure` is a **production** build (`base` = `.`). Using it for a `/ngwa-dev/` host yields wrong asset and route URLs.
+
+Then run the backend locally to test:
 
 ```bash
 cd backend && uvicorn backend.main:app --host 0.0.0.0 --port 8000
