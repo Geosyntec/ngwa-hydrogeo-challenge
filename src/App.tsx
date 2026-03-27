@@ -16,23 +16,16 @@ import ManageClassesPage from './pages/teacher/ManageClassesPage'
 import ViewGradesPage from './pages/teacher/ViewGradesPage'
 import CreateTestPage from './pages/teacher/CreateTestPage'
 import { ROUTES } from './app/routes'
+import { getRouterBasename } from './app/routerBasename'
 
 const theme = createTheme()
-
-/** Align with Vite `base` (`import.meta.env.BASE_URL`) for subdirectory deploys. */
-function routerBasenameFromVite(): string | undefined {
-  let base = import.meta.env.BASE_URL
-  if (base === './' || base === '/') return undefined
-  if (base.endsWith('/')) base = base.slice(0, -1)
-  return base === '' ? undefined : base
-}
 
 export default function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <ErrorBoundary>
-        <BrowserRouter basename={routerBasenameFromVite()}>
+        <BrowserRouter basename={getRouterBasename()}>
           <Routes>
           <Route element={<AppLayout />}>
             <Route path={ROUTES.home} element={<LandingPage />} />
