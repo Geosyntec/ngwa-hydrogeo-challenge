@@ -4,11 +4,21 @@ import { Box, IconButton, Typography, Divider, Tooltip } from "@mui/material";
 import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 
+const GAP_AFTER_HOST = 12;
+const HELP_GAP_FROM_HOST = 6;
+/** Approximate hit target width so the help chip clears the host edge without clipping. */
+const HELP_STRIDE = 44;
+
 type PanelCoords = {
   top: number;
   left: number;
   width: number;
   height: number;
+};
+
+type HelpCoords = {
+  top: number;
+  left: number;
 };
 
 type RealityCheckProps = {
@@ -24,9 +34,9 @@ type RealityCheckProps = {
 };
 
 /**
- * Help icon stays in the host (absolute on the panel’s right edge).
- * The text panel is portaled to document.body with position:fixed so it isn’t
- * clipped by accordion overflow. When closed, only the icon is shown.
+ * Help icon and (when open) the text panel are portaled to document.body with
+ * position:fixed so accordion overflow cannot clip them. The panel sits to the
+ * right of the question area with a fixed viewport height and scrollable body.
  */
 export default function RealityCheck({
   title,
@@ -37,15 +47,18 @@ export default function RealityCheck({
   children,
 }: RealityCheckProps) {
   const hostRef = useRef<HTMLDivElement | null>(null);
+  const [helpPos, setHelpPos] = useState<HelpCoords | null>(null);
   const [panelCoords, setPanelCoords] = useState<PanelCoords | null>(null);
 
   useLayoutEffect(() => {
-    if (!open || !available) {
+    if (!available) {
+      setHelpPos(null);
       setPanelCoords(null);
       return;
     }
     const el = hostRef.current;
     if (!el) {
+      setHelpPos(null);
       setPanelCoords(null);
       return;
     }
@@ -53,15 +66,39 @@ export default function RealityCheck({
       const r = el.getBoundingClientRect();
       const vw = window.innerWidth;
       const vh = window.innerHeight;
-      const panelW = Math.min(width, r.width, 420, vw - 16);
-      const left = Math.max(8, r.right - panelW);
-      const top = r.top + 8;
-      const maxH = Math.max(120, Math.min(r.height - 16, vh - top - 8));
+      const topPad = 12;
+      const bottomPad = 12;
+
+      // Help: just outside the host’s right edge (fully visible, not clipped)
+      setHelpPos({
+        top: Math.max(topPad, r.top + 8),
+        left: r.right + HELP_GAP_FROM_HOST,
+      });
+
+      if (!open) {
+        setPanelCoords(null);
+        return;
+      }
+
+      // Panel: to the right of the host, after the help control band
+      let panelLeft = r.right + HELP_STRIDE + GAP_AFTER_HOST;
+      let panelW = Math.min(width, vw - panelLeft - 8);
+      if (panelW < 200) {
+        panelW = Math.min(width, vw - 16);
+        panelLeft = Math.max(8, vw - panelW - 8);
+      }
+      const panelTop = Math.max(topPad, r.top);
+      // Fixed height from viewport — does not grow when the page scrolls; body scrolls inside
+      const panelHeight = Math.max(
+        200,
+        Math.min(640, vh - panelTop - bottomPad),
+      );
+
       setPanelCoords({
-        top,
-        left,
+        top: panelTop,
+        left: panelLeft,
         width: panelW,
-        height: maxH,
+        height: panelHeight,
       });
     };
     update();
@@ -73,42 +110,95 @@ export default function RealityCheck({
     };
   }, [open, available, width]);
 
-  const panel = panelCoords && (
-    <Box
-      role="dialog"
-      aria-label={`${title} (reality check)`}
-      sx={{
-        position: "fixed",
-        zIndex: 1300,
-        top: panelCoords.top,
-        left: panelCoords.left,
-        width: panelCoords.width,
-        height: panelCoords.height,
-        maxHeight: `min(${panelCoords.height}px, calc(100vh - ${panelCoords.top + 8}px))`,
-        display: "flex",
-        flexDirection: "column",
-        bgcolor: "background.paper",
-        borderLeft: (t) => `1px solid ${t.palette.divider}`,
-        boxShadow: 3,
-        overflow: "hidden",
-      }}
-    >
-      <Box sx={{ display: "flex", alignItems: "center", px: 2, py: 1, flexShrink: 0 }}>
-        <Typography variant="subtitle1" sx={{ flex: 1, fontWeight: 700 }}>
-          {title}
-        </Typography>
-        <IconButton aria-label="Close" onClick={onToggle} size="small">
-          <CloseRoundedIcon />
+  const helpButton =
+    available &&
+    helpPos &&
+    createPortal(
+      <Tooltip title={open ? "Hide reality check" : "Show reality check"}>
+        <IconButton
+          color={open ? "primary" : "default"}
+          onClick={onToggle}
+          size="small"
+          sx={{
+            position: "fixed",
+            top: helpPos.top,
+            left: helpPos.left,
+            zIndex: 1301,
+            bgcolor: open ? "primary.light" : "background.paper",
+            boxShadow: 2,
+            border: (theme) => `1px solid ${theme.palette.divider}`,
+            pointerEvents: "auto",
+            "&:hover": {
+              bgcolor: open ? "primary.light" : "background.default",
+            },
+          }}
+          aria-label="Reality check"
+        >
+          <HelpOutlineIcon fontSize="small" />
         </IconButton>
-      </Box>
-      <Divider />
-      <Box sx={{ p: 2, overflowY: "auto", flex: 1, minHeight: 0 }}>{children}</Box>
-    </Box>
-  );
+      </Tooltip>,
+      document.body,
+    );
+
+  const panel =
+    open &&
+    available &&
+    panelCoords &&
+    createPortal(
+      <Box
+        role="dialog"
+        aria-label={`${title} (reality check)`}
+        sx={{
+          position: "fixed",
+          zIndex: 1300,
+          top: panelCoords.top,
+          left: panelCoords.left,
+          width: panelCoords.width,
+          height: panelCoords.height,
+          maxHeight: panelCoords.height,
+          display: "flex",
+          flexDirection: "column",
+          bgcolor: "background.paper",
+          border: (t) => `1px solid ${t.palette.divider}`,
+          borderRadius: 1,
+          boxShadow: 3,
+          overflow: "hidden",
+        }}
+      >
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            px: 2,
+            py: 1,
+            flexShrink: 0,
+          }}
+        >
+          <Typography variant="subtitle1" sx={{ flex: 1, fontWeight: 700 }}>
+            {title}
+          </Typography>
+          <IconButton aria-label="Close" onClick={onToggle} size="small">
+            <CloseRoundedIcon />
+          </IconButton>
+        </Box>
+        <Divider flexItem />
+        <Box
+          sx={{
+            p: 2,
+            flex: 1,
+            minHeight: 0,
+            overflowY: "scroll",
+            overflowX: "hidden",
+          }}
+        >
+          {children}
+        </Box>
+      </Box>,
+      document.body,
+    );
 
   return (
     <>
-      {/* Fills the positioned parent so we can align the portaled panel to this region */}
       <Box
         ref={hostRef}
         sx={{
@@ -118,35 +208,8 @@ export default function RealityCheck({
         }}
         aria-hidden
       />
-
-      {available && (
-        <Tooltip title={open ? "Hide reality check" : "Show reality check"}>
-          <IconButton
-            color={open ? "primary" : "default"}
-            onClick={onToggle}
-            size="small"
-            sx={{
-              position: "absolute",
-              top: 12,
-              right: -18,
-              transform: "translateX(50%)",
-              bgcolor: open ? "primary.light" : "background.paper",
-              boxShadow: 2,
-              border: (theme) => `1px solid ${theme.palette.divider}`,
-              zIndex: 3,
-              pointerEvents: "auto",
-              "&:hover": {
-                bgcolor: open ? "primary.light" : "background.default",
-              },
-            }}
-            aria-label="Reality check"
-          >
-            <HelpOutlineIcon fontSize="small" />
-          </IconButton>
-        </Tooltip>
-      )}
-
-      {open && available && panel && createPortal(panel, document.body)}
+      {helpButton}
+      {panel}
     </>
   );
 }
