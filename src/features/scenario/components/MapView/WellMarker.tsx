@@ -1,6 +1,5 @@
 import { memo, useCallback, useEffect, useRef, useState } from "react";
 import { Box, Button } from "@mui/material";
-import RoomIcon from "@mui/icons-material/Room";
 import { useAppDispatch, useAppSelector } from "../../../../app/hooks";
 import {
   selectWellById,
@@ -74,10 +73,11 @@ export default memo(function WellMarker({
             position: "absolute",
             top: well.Top,
             left: well.Left,
-            transform: "translate(-50%, -100%)",
+            // Center symbol on map coordinates (legacy-style disc marker, not pin tip)
+            transform: "translate(-50%, -50%)",
             display: "flex",
+            flexDirection: "column",
             alignItems: "center",
-            gap: 1,
             overflow: "visible",
           }}
           onMouseEnter={beginHover}
@@ -85,21 +85,39 @@ export default memo(function WellMarker({
         >
           <Button
             ref={markerRef}
-            variant={well.IsSelected ? "contained" : "outlined"}
-            color={well.IsSelected ? "primary" : "inherit"}
-            size="small"
+            disableRipple
             onClick={handleSelect}
             onFocus={() => setFocus(true)}
             onBlur={() => setFocus(false)}
-            sx={{ minWidth: 0, p: 0.5, borderRadius: 2 }}
             aria-label={`Well ${well.Name}`}
             title={`Well ${well.Name}`}
+            sx={{
+              minWidth: 40,
+              width: 40,
+              height: 40,
+              p: 0,
+              borderRadius: "50%",
+              fontSize: "1rem",
+              fontWeight: 700,
+              lineHeight: 1,
+              color: "common.white",
+              textTransform: "none",
+              bgcolor: "primary.main",
+              border: (theme) =>
+                `2px solid ${
+                  well.IsSelected
+                    ? theme.palette.common.white
+                    : theme.palette.primary.dark
+                }`,
+              boxShadow: well.IsSelected ? 3 : 1,
+              "&:hover": {
+                bgcolor: "primary.dark",
+                borderColor: "common.white",
+              },
+            }}
           >
-            <RoomIcon fontSize="small" />
-          </Button>
-          <Box component="span" sx={{ fontWeight: 600, userSelect: "none" }}>
             {well.Name}
-          </Box>
+          </Button>
 
           {/* Non-modal, anchored info card (rendered for selected wells) */}
           <WellInfoCard

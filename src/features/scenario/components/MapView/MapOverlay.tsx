@@ -16,6 +16,8 @@ import {
   intersectRayWithLine,
   isPointOnSegment,
   rightAngleTicks,
+  legacyMeasuredLineGeometry,
+  type LegacyMeasuredLineGeom,
 } from "../../services/drawingMath";
 
 export default memo(function MapOverlay() {
@@ -75,7 +77,6 @@ export default memo(function MapOverlay() {
       !!flow.DistanceHighestLowest.input ||
       !!flow.DistanceHighestLowest.answer;
 
-    console.log(flow.SelectedDirection.input)
     const step3Engaged =
       !!flow.SelectedDirection.input || !!flow.SelectedDirection.answer;
     const step1YEngaged =
@@ -104,6 +105,11 @@ export default memo(function MapOverlay() {
       };
     }
 
+    // Legacy DrawingHelper.drawMeasuredLine: offset sides + caps from each well
+    const sideHM = legacyMeasuredLineGeometry(hi.Point, mid.Point, lo.Point);
+    const sideML = legacyMeasuredLineGeometry(mid.Point, lo.Point, hi.Point);
+    const sideLH = legacyMeasuredLineGeometry(lo.Point, hi.Point, mid.Point);
+
     return {
       // map dims
       width,
@@ -125,6 +131,9 @@ export default memo(function MapOverlay() {
       step3Engaged,
       step1YEngaged,
       userLine,
+      sideHM,
+      sideML,
+      sideLH,
     };
   }, [map, sorted, flow, g]);
 
@@ -188,31 +197,34 @@ export default memo(function MapOverlay() {
         </marker>
       </defs>
 
-      {/* side lengths */}
-      <LineWithLabel
-        a={hi.Point}
-        b={mid.Point}
-        color="#666"
-        width={2}
-        bothArrows
-        label={`${computed.dHM_Ft.toLocaleString()} ft.`}
-      />
-      <LineWithLabel
-        a={mid.Point}
-        b={lo.Point}
-        color="#666"
-        width={2}
-        bothArrows
-        label={`${computed.dML_Ft.toLocaleString()} ft.`}
-      />
-      <LineWithLabel
-        a={lo.Point}
-        b={hi.Point}
-        color="#666"
-        width={2}
-        bothArrows
-        label={`${computed.dLH_Ft.toLocaleString()} ft.`}
-      />
+      {/* side lengths (legacy: offset from wells + bounding caps from well locations) */}
+      {computed.sideHM && (
+        <LegacyMeasuredSide
+          geom={computed.sideHM}
+          color="#666"
+          width={2}
+          bothArrows
+          label={`${computed.dHM_Ft.toLocaleString()} ft.`}
+        />
+      )}
+      {computed.sideML && (
+        <LegacyMeasuredSide
+          geom={computed.sideML}
+          color="#666"
+          width={2}
+          bothArrows
+          label={`${computed.dML_Ft.toLocaleString()} ft.`}
+        />
+      )}
+      {computed.sideLH && (
+        <LegacyMeasuredSide
+          geom={computed.sideLH}
+          color="#666"
+          width={2}
+          bothArrows
+          label={`${computed.dLH_Ft.toLocaleString()} ft.`}
+        />
+      )}
 
       {/* highlighted segments once step 2 is engaged */}
       {computed.step2Engaged && (
@@ -329,38 +341,52 @@ export default memo(function MapOverlay() {
   );
 });
 
-function LineWithLabel({
-  a,
-  b,
+/** Matches legacy `DrawingHelper.drawMeasuredLine` SVG output. */
+function LegacyMeasuredSide({
+  geom,
   label,
-  color = "#333",
+  color = "#666",
   width = 2,
   bothArrows = false,
 }: {
-  a: { x: number; y: number };
-  b: { x: number; y: number };
+  geom: LegacyMeasuredLineGeom;
   label: string;
   color?: string;
   width?: number;
   bothArrows?: boolean;
 }) {
-  const mid = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
   const marker = bothArrows ? "url(#arrowBoth)" : undefined;
   return (
     <>
       <line
-        x1={a.x}
-        y1={a.y}
-        x2={b.x}
-        y2={b.y}
+        x1={geom.cap1Start.x}
+        y1={geom.cap1Start.y}
+        x2={geom.cap1End.x}
+        y2={geom.cap1End.y}
+        stroke={color}
+        strokeWidth={width}
+      />
+      <line
+        x1={geom.cap2Start.x}
+        y1={geom.cap2Start.y}
+        x2={geom.cap2End.x}
+        y2={geom.cap2End.y}
+        stroke={color}
+        strokeWidth={width}
+      />
+      <line
+        x1={geom.segmentStart.x}
+        y1={geom.segmentStart.y}
+        x2={geom.segmentEnd.x}
+        y2={geom.segmentEnd.y}
         stroke={color}
         strokeWidth={width}
         markerStart={marker}
         markerEnd={marker}
       />
       <text
-        x={mid.x}
-        y={mid.y - 6}
+        x={geom.labelMid.x}
+        y={geom.labelMid.y - 6}
         fontSize={12}
         fill="#333"
         textAnchor="middle"

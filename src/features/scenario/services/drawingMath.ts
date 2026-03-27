@@ -33,6 +33,91 @@ export const pointOnLine = (a: Pt, b: Pt, d: number): Pt => {
     y: a.y + d * ((b.y - a.y) / total),
   };
 };
+
+/** Barycentric-style inside test (matches Raphael triangle fill for non-degenerate triangles). */
+export function isPointInTriangle(p: Pt, a: Pt, b: Pt, c: Pt): boolean {
+  const sign = (p1: Pt, p2: Pt, p3: Pt) =>
+    (p1.x - p3.x) * (p2.y - p3.y) - (p2.x - p3.x) * (p1.y - p3.y);
+  const d1 = sign(p, a, b);
+  const d2 = sign(p, b, c);
+  const d3 = sign(p, c, a);
+  const hasNeg = d1 < 0 || d2 < 0 || d3 < 0;
+  const hasPos = d1 > 0 || d2 > 0 || d3 > 0;
+  return !(hasNeg && hasPos);
+}
+
+/**
+ * Legacy `DrawingHelper.drawMeasuredLine`: offset segment parallel to edge AB,
+ * short “bounding” ticks from wells A and B toward that segment, arrow inset.
+ * `c` is the third triangle vertex (opposite edge AB).
+ */
+export type LegacyMeasuredLineGeom = {
+  segmentStart: Pt;
+  segmentEnd: Pt;
+  cap1Start: Pt;
+  cap1End: Pt;
+  cap2Start: Pt;
+  cap2End: Pt;
+  labelMid: Pt;
+};
+
+export function legacyMeasuredLineGeometry(
+  a: Pt,
+  b: Pt,
+  c: Pt,
+  opts?: {
+    offsetPx?: number;
+    arrowInsetPx?: number;
+    capHalfLengthPx?: number;
+  },
+): LegacyMeasuredLineGeom | null {
+  const offsetPx = opts?.offsetPx ?? 20;
+  const arrowInsetPx = opts?.arrowInsetPx ?? 4;
+  const capHalfLengthPx = opts?.capHalfLengthPx ?? 10;
+
+  const slopeAB = { x: b.x - a.x, y: b.y - a.y };
+  const perpSlope = { x: -slopeAB.y, y: slopeAB.x };
+
+  const midAB = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
+  let test1 = { x: midAB.x + perpSlope.x, y: midAB.y + perpSlope.y };
+  test1 = pointOnLine(midAB, test1, 1);
+
+  const inside = isPointInTriangle(test1, a, b, c);
+
+  const dFar = inside
+    ? { x: a.x - perpSlope.x, y: a.y - perpSlope.y }
+    : { x: a.x + perpSlope.x, y: a.y + perpSlope.y };
+  const eFar = inside
+    ? { x: b.x - perpSlope.x, y: b.y - perpSlope.y }
+    : { x: b.x + perpSlope.x, y: b.y + perpSlope.y };
+
+  const d = pointOnLine(a, dFar, offsetPx);
+  const e = pointOnLine(b, eFar, offsetPx);
+
+  const deLen = distance(d, e);
+  if (deLen < 1e-6) return null;
+
+  const inset = Math.min(arrowInsetPx, deLen / 2 - 1e-3);
+  const segmentStart = pointOnLine(d, e, Math.max(0, inset));
+  const segmentEnd = pointOnLine(d, e, deLen - Math.max(0, inset));
+
+  const cap1Start = pointOnLine(a, d, offsetPx - capHalfLengthPx);
+  const cap1End = pointOnLine(a, d, offsetPx + capHalfLengthPx);
+  const cap2Start = pointOnLine(b, e, offsetPx - capHalfLengthPx);
+  const cap2End = pointOnLine(b, e, offsetPx + capHalfLengthPx);
+
+  const labelMid = { x: (d.x + e.x) / 2, y: (d.y + e.y) / 2 };
+
+  return {
+    segmentStart,
+    segmentEnd,
+    cap1Start,
+    cap1End,
+    cap2Start,
+    cap2End,
+    labelMid,
+  };
+}
 export const findIntersectionPoint = (a: Pt, b: Pt, c: Pt, d: Pt): Pt => {
   const m1 = slopeVal(a, b),
     m2 = slopeVal(c, d);
