@@ -1,4 +1,4 @@
-import React, { memo, useMemo } from "react";
+import React, { memo, useId, useMemo } from "react";
 import { useAppSelector } from "../../../../app/hooks";
 import { selectMap } from "../../ScenarioSlice";
 import {
@@ -165,16 +165,6 @@ export default memo(function MapOverlay() {
       style={{ position: "absolute", inset: 0, pointerEvents: "none" }}
     >
       <defs>
-        <marker
-          id="arrowBoth"
-          markerWidth="10"
-          markerHeight="10"
-          refX="5"
-          refY="5"
-          orient="auto"
-        >
-          <path d="M10 5 L0 0 L0 10 z" fill="#333" />
-        </marker>
         <marker
           id="arrowEndBlue"
           markerWidth="10"
@@ -355,9 +345,40 @@ function LegacyMeasuredSide({
   width?: number;
   bothArrows?: boolean;
 }) {
-  const marker = bothArrows ? "url(#arrowBoth)" : undefined;
+  const uid = useId().replace(/:/g, "");
+  const startId = `measSideArrowStart-${uid}`;
+  const endId = `measSideArrowEnd-${uid}`;
+
   return (
     <>
+      {bothArrows && (
+        <defs>
+          <marker
+            id={startId}
+            markerUnits="userSpaceOnUse"
+            markerWidth="5"
+            markerHeight="5"
+            viewBox="0 0 10 10"
+            refX="10"
+            refY="5"
+            orient="auto-start-reverse"
+          >
+            <path d="M10 5 L0 0 L0 10 z" fill={color} />
+          </marker>
+          <marker
+            id={endId}
+            markerUnits="userSpaceOnUse"
+            markerWidth="5"
+            markerHeight="5"
+            viewBox="0 0 10 10"
+            refX="10"
+            refY="5"
+            orient="auto"
+          >
+            <path d="M10 5 L0 0 L0 10 z" fill={color} />
+          </marker>
+        </defs>
+      )}
       <line
         x1={geom.cap1Start.x}
         y1={geom.cap1Start.y}
@@ -381,8 +402,8 @@ function LegacyMeasuredSide({
         y2={geom.segmentEnd.y}
         stroke={color}
         strokeWidth={width}
-        markerStart={marker}
-        markerEnd={marker}
+        markerStart={bothArrows ? `url(#${startId})` : undefined}
+        markerEnd={bothArrows ? `url(#${endId})` : undefined}
       />
       <text
         x={geom.labelMid.x}
