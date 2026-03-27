@@ -60,6 +60,7 @@ export default function MapView() {
         backgroundPosition: "center",
       }}
     >
+      <MapOverlay />
       {wells.map((w) => (
         <WellMarker
           key={w.id}
@@ -67,7 +68,6 @@ export default function MapView() {
           cardPlacement={cardPlacements[w.id]}
         />
       ))}
-      <MapOverlay />
     </Box>
   );
 }

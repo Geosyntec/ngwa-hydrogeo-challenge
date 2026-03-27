@@ -162,7 +162,12 @@ export default memo(function MapOverlay() {
       width={width}
       height={height}
       viewBox={`0 0 ${width} ${height}`}
-      style={{ position: "absolute", inset: 0, pointerEvents: "none" }}
+      style={{
+        position: "absolute",
+        inset: 0,
+        pointerEvents: "none",
+        zIndex: 0,
+      }}
     >
       <defs>
         <marker

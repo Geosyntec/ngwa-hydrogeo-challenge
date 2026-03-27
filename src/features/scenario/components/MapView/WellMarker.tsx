@@ -73,6 +73,7 @@ export default memo(function WellMarker({
             position: "absolute",
             top: well.Top,
             left: well.Left,
+            zIndex: 1,
             // Center symbol on map coordinates (legacy-style disc marker, not pin tip)
             transform: "translate(-50%, -50%)",
             display: "flex",
