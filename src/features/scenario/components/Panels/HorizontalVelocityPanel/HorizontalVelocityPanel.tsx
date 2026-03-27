@@ -40,9 +40,7 @@ import {
   setSelectedPanel,
   clearWell,
 } from "../../../ScenarioSlice";
-import { reset as resetFlow } from "../../../flowDirection/flowSlice";
-import { resetGradient } from "../../../gradient/gradientSlice";
-import { resetVelocity } from "../../../velocity/velocitySlice";
+import { dispatchResetChallenge } from "../../../resetChallengeState";
 import { useCallback, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import RealityCheck from "../../RealityCheck/RealityCheck";
@@ -440,10 +438,7 @@ export default function HorizontalVelocityPanel() {
               dispatch(clearWell(1));
               dispatch(clearWell(2));
               dispatch(clearWell(3));
-              dispatch(resetFlow());
-              dispatch(resetGradient());
-              dispatch(resetVelocity());
-              dispatch(setSelectedPanel(null));
+              dispatchResetChallenge(dispatch);
               setSubmitModalOpen(false);
             }}
             onReturnHome={() => {

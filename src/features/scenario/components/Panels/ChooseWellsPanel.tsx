@@ -1,28 +1,23 @@
 import {
   Accordion,
-  AccordionDetails,
   AccordionSummary,
   Chip,
   Stack,
   Typography,
 } from "@mui/material";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import BackspaceIcon from "@mui/icons-material/Backspace";
 import { useAppDispatch, useAppSelector } from "../../../../app/hooks";
 import {
   clearWell,
-  selectAllWellsSelected,
   selectSelectedWellIds,
   selectWells,
 } from "../../ScenarioSlice";
-import { reset } from "../../flowDirection/flowSlice"
-import { selectFlow } from "../../flowDirection/flowSelectors";
+import { dispatchResetChallenge } from "../../resetChallengeState";
 
 export default function ChooseWellsPanel() {
   const dispatch = useAppDispatch();
   const ids = useAppSelector(selectSelectedWellIds);
   const wells = useAppSelector(selectWells);
-  const allSel = useAppSelector(selectAllWellsSelected);
   const nameOf = (id: string | null) =>
     wells.find((w) => w.id === id)?.Name ?? "";
   const Slot = ({ n, id }: { n: 1 | 2 | 3; id: string | null }) => {
@@ -34,8 +29,8 @@ export default function ChooseWellsPanel() {
         color={color as any}
         onDelete={() => {
           if (id) {
-            dispatch(clearWell(n))
-            dispatch(reset())
+            dispatch(clearWell(n));
+            dispatchResetChallenge(dispatch);
           }
         }}
         deleteIcon={id ? <BackspaceIcon /> : undefined}
@@ -65,4 +60,3 @@ export default function ChooseWellsPanel() {
     </Accordion>
   );
 }
-``;

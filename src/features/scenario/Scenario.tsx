@@ -21,6 +21,7 @@ import {
   selectScenarioByIndex,
   selectScenarioState,
 } from "./ScenarioSlice";
+import { dispatchResetChallenge } from "./resetChallengeState";
 import { practiceScenarios } from "./practiceScenarios";
 import { testScenario } from "./testScenario";
 import { verifyStudent } from "../../api/mockVerifyStudentApi";
@@ -49,6 +50,7 @@ export default function Scenario({ isTest = false }: { isTest?: boolean }) {
     const list = isTest ? [testScenario] : practiceScenarios;
     dispatch(setScenarios(list));
     dispatch(selectScenarioByIndex(0));
+    dispatchResetChallenge(dispatch);
   }, [isTest, dispatch]);
 
   const handleVerify = async (e: React.FormEvent) => {
@@ -142,7 +144,10 @@ export default function Scenario({ isTest = false }: { isTest?: boolean }) {
         <FormControl size="small" sx={{ minWidth: 240 }}>
           <Select
             value={scenarioValue}
-            onChange={(e) => dispatch(selectScenarioByIndex(Number(e.target.value)))}
+            onChange={(e) => {
+              dispatch(selectScenarioByIndex(Number(e.target.value)));
+              dispatchResetChallenge(dispatch);
+            }}
             displayEmpty
             renderValue={() =>
               currentScenario ? currentScenario.name : "Select a scenario"

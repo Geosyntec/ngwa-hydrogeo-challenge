@@ -108,6 +108,15 @@ export const scenarioSlice = createSlice({
     setSubmitResultText(s, a: PayloadAction<string>) {
       s.submitResultText = a.payload;
     },
+    /** Clears panel chrome and test submit fields; use with flow/gradient/velocity resets. */
+    resetChallengeScenarioUi(s) {
+      s.selectedPanel = null;
+      s.openWellPopoverId = null;
+      s.teamName = "";
+      s.testLocation = "";
+      s.submitResultText = "";
+      s.allowCollapsing = false;
+    },
   },
 });
 export const {
@@ -122,6 +131,7 @@ export const {
   setTeamName,
   setTestLocation,
   setSubmitResultText,
+  resetChallengeScenarioUi,
 } = scenarioSlice.actions;
 export default scenarioSlice.reducer;
 
