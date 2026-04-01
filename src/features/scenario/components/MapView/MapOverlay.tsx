@@ -50,11 +50,13 @@ export default memo(function MapOverlay() {
     const elevRatio =
       diffHighLow === 0 ? 0 : Number((diffHighMid / diffHighLow).toFixed(2));
 
-    const dHL_Ft = dLH_Ft;
-    const dToIntersection_Ft = Math.round(dHL_Ft * elevRatio);
+    const dToIntersection_Ft = Math.round(dLH_Ft);
     const dToIntersection_Px = dToIntersection_Ft / ratioFtPerPx;
-
+    const userDToIntersection_Ft = Math.round(Number(flow.ElevResult_X_DistanceHighMid.input))
+    const userDToIntersection_Px = userDToIntersection_Ft / ratioFtPerPx
+    
     const intersection = pointOnLine(hi.Point, lo.Point, dToIntersection_Px);
+    const userIntersection = pointOnLine(hi.Point, lo.Point,userDToIntersection_Px)
     const foot = findPerpPoint(mid.Point, intersection, hi.Point);
     const yLen_Ft = Math.round(distPx(hi.Point, foot) * ratioFtPerPx);
 
@@ -128,6 +130,7 @@ export default memo(function MapOverlay() {
       dML_Ft,
       dLH_Ft,
       intersection,
+      userIntersection,
       foot,
       yLen_Ft,
       actualOnSegment,
@@ -241,8 +244,8 @@ export default memo(function MapOverlay() {
           <line
             x1={mid.Point.x}
             y1={mid.Point.y}
-            x2={computed.intersection.x}
-            y2={computed.intersection.y}
+            x2={computed.userIntersection.x}
+            y2={computed.userIntersection.y}
             stroke="#998675"
             strokeWidth={7}
             opacity={0.9}
@@ -251,9 +254,10 @@ export default memo(function MapOverlay() {
       )}
 
       {/* Legacy .point-btwn: disc at high–low line intersection (Site.css + DrawingVM) */}
-      <g transform={`translate(${computed.intersection.x}, ${computed.intersection.y})`}>
+      {computed.userIntersection && (
+        <g transform={`translate(${computed.userIntersection.x}, ${computed.userIntersection.y})`}>
         <circle
-          r={20}
+          r={15}
           fill="#FBB03B"
           stroke="#CC8800"
           strokeWidth={2}
@@ -265,7 +269,7 @@ export default memo(function MapOverlay() {
           textAnchor="middle"
           dominantBaseline="central"
           fill="#ffffff"
-          fontSize={computed.intersectionLabel.length > 2 ? 11 : 14}
+          fontSize={12}
           fontWeight={700}
           style={{ userSelect: "none" }}
         >
@@ -273,6 +277,8 @@ export default memo(function MapOverlay() {
         </text>
       </g>
 
+      )
+      }
       {/* Y distance */}
       {showY && (
         <>
