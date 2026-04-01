@@ -6,6 +6,7 @@ import type { WellModel } from "../../scenarioTypes";
 import type { WellInfoCardPlacement } from "./WellInfoCard";
 import WellMarker from "./WellMarker";
 import MapOverlay from "./MapOverlay";
+import { resolvePublicAssetUrl } from "../../../../utils/publicAssetUrl";
 
 /**
  * Compute card placement for each selected well so popovers stay visible and don't overlap.
@@ -55,7 +56,9 @@ export default function MapView() {
         position: "relative",
         width: map?.width || 800,
         height: map?.height || 600,
-        backgroundImage: map?.url ? `url(${map.url})` : "none",
+        backgroundImage: map?.url
+          ? `url(${resolvePublicAssetUrl(map.url)})`
+          : "none",
         backgroundSize: "cover",
         backgroundPosition: "center",
       }}

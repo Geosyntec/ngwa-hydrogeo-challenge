@@ -62,6 +62,8 @@ npm run build:azure
 
 This builds the frontend and copies `dist/` → `backend/static/`.
 
+**Map backgrounds:** practice scenarios load JPEGs from `public/assets/img/` (see that folder’s `README.md`). Those files are copied into `dist/assets/img/` by Vite and must be present in the repo (or CI workspace) before build. Run `npm run check:map-assets` to confirm all six map files exist.
+
 #### Staging path `/ngwa-dev/`
 
 If the app is served under that subdirectory (Vite `base` `/ngwa-dev/` when `vite build --mode staging`), use:
