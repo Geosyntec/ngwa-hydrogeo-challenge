@@ -2,14 +2,15 @@ import type { ScenarioDefinition } from "./scenarioTypes";
 
 /**
  * Practice scenarios (legacy Hydrogeology Challenge content).
- * Map images live under `public/MapImages/` (same paths as `map.url`).
+ * Map JPEGs must live under `public/assets/img/` (see `map.url` and `public/assets/img/README.md`).
+ * Vite copies `public/` into `dist/` on build.
  */
 export const practiceScenarios: ScenarioDefinition[] = [
   {
     "id": "9a8b1d9f-387d-4b14-910a-d0d104c7cd47",
     "name": "001-Choose Your Map: River Heights",
     "map": {
-      "url": "/assets/img/river_heights_map.jpg",
+      "url": "assets/img/river_heights_map.jpg",
       "width": 1024,
       "height": 685,
       "physicalWidth": 10
@@ -349,7 +350,7 @@ export const practiceScenarios: ScenarioDefinition[] = [
     "id": "e8521e4b-e25a-4481-8aaf-d0a74db677cc",
     "name": "002 -  Filmore Grove",
     "map": {
-      "url": "/assets/img/filmore_grove_map.jpg",
+      "url": "assets/img/filmore_grove_map.jpg",
       "width": 1024,
       "height": 685,
       "physicalWidth": 4.5
@@ -675,7 +676,7 @@ export const practiceScenarios: ScenarioDefinition[] = [
     "id": "6b99a6cc-c763-4f44-9c54-c4c997e22586",
     "name": "003 - Filmore City",
     "map": {
-      "url": "/assets/img/filmore_city_map.jpg",
+      "url": "assets/img/filmore_city_map.jpg",
       "width": 1024,
       "height": 685,
       "physicalWidth": 6
@@ -971,7 +972,7 @@ export const practiceScenarios: ScenarioDefinition[] = [
     "id": "29795340-493b-4930-989e-621a47966e4c",
     "name": "004 - Filmore Springs",
     "map": {
-      "url": "/assets/img/filmore_springs_map.jpg",
+      "url": "assets/img/filmore_springs_map.jpg",
       "width": 1024,
       "height": 685,
       "physicalWidth": 4.5
@@ -1419,7 +1420,7 @@ export const practiceScenarios: ScenarioDefinition[] = [
     "id": "d58f4add-de38-4494-965f-e144f8a46784",
     "name": "005 - High Plains Aquifer",
     "map": {
-      "url": "/assets/img/high_plains_aquifer_map.jpg",
+      "url": "assets/img/high_plains_aquifer_map.jpg",
       "width": 1024,
       "height": 685,
       "physicalWidth": 8
@@ -1716,7 +1717,7 @@ export const practiceScenarios: ScenarioDefinition[] = [
     "id": "8eed0d68-1120-4a95-9ded-da9eaf556b0f",
     "name": "006 - Peoria",
     "map": {
-      "url": "/assets/img/peoria_map.jpg",
+      "url": "assets/img/peoria_map.jpg",
       "width": 1024,
       "height": 685,
       "physicalWidth": 0.6

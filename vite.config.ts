@@ -8,4 +8,7 @@ import react from '@vitejs/plugin-react'
 export default defineConfig(({ mode }) => ({
   plugins: [react()],
   base: mode === 'staging' ? '/ngwa-dev/' : '.',
+  // Map JPEGs and other static files: put them under `public/` (e.g. public/assets/img/).
+  // They are copied verbatim into dist/ on build.
+  publicDir: 'public',
 }))
