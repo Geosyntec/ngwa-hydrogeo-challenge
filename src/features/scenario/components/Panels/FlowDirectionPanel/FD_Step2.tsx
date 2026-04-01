@@ -90,7 +90,8 @@ export default function FDStep2() {
             =
           </Grid>
           <Grid item lg={12}>
-            {bind("ElevResult_X_DistanceHighMid", "")}
+            {bind("ElevResult_X_DistanceHighMid", sorted[2].Name + "-" + sorted[2].Name + sorted[1].Name.toLowerCase() + " Dist"
+            )}
           </Grid>
         </Grid>
       </Grid>

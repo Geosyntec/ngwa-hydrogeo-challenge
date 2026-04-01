@@ -110,6 +110,10 @@ export default memo(function MapOverlay() {
     const sideML = legacyMeasuredLineGeometry(mid.Point, lo.Point, hi.Point);
     const sideLH = legacyMeasuredLineGeometry(lo.Point, hi.Point, mid.Point);
 
+    /** Legacy `point-btwn`: highest + mid well names. */
+    const intersectionLabel =
+      `${hi.Name ?? ""}${mid.Name.toLowerCase() ?? ""}`;
+
     return {
       // map dims
       width,
@@ -134,6 +138,7 @@ export default memo(function MapOverlay() {
       sideHM,
       sideML,
       sideLH,
+      intersectionLabel,
     };
   }, [map, sorted, flow, g]);
 
@@ -244,6 +249,29 @@ export default memo(function MapOverlay() {
           />
         </>
       )}
+
+      {/* Legacy .point-btwn: disc at high–low line intersection (Site.css + DrawingVM) */}
+      <g transform={`translate(${computed.intersection.x}, ${computed.intersection.y})`}>
+        <circle
+          r={20}
+          fill="#FBB03B"
+          stroke="#CC8800"
+          strokeWidth={2}
+          style={{
+            filter: "drop-shadow(0px 2px 3px rgba(0,0,0,0.35))",
+          }}
+        />
+        <text
+          textAnchor="middle"
+          dominantBaseline="central"
+          fill="#ffffff"
+          fontSize={computed.intersectionLabel.length > 2 ? 11 : 14}
+          fontWeight={700}
+          style={{ userSelect: "none" }}
+        >
+          {computed.intersectionLabel}
+        </text>
+      </g>
 
       {/* Y distance */}
       {showY && (
