@@ -270,7 +270,7 @@ export default function GradientPanel() {
             <RealityCheck
               title="Reality Check: Gradient"
               open={rcOpen}
-              onToggle={() => setRcOpen((o) => !o)}
+              onToggleDisplay={() => setRcOpen((o) => !o)}
               available={selectedPanel === "gradient"}
             >
               <Typography paragraph>

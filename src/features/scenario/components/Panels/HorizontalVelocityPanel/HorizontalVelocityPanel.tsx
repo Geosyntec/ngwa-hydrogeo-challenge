@@ -451,7 +451,7 @@ export default function HorizontalVelocityPanel() {
             <RealityCheck
               title="Reality Check: Horizontal Velocity"
               open={rcOpen}
-              onToggle={() => setRcOpen((o) => !o)}
+              onToggleDisplay={() => setRcOpen((o) => !o)}
               available={selectedPanel === "velocity"}
             >
               <Typography paragraph>
