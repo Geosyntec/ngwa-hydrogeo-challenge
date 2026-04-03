@@ -19,7 +19,7 @@ import School from '@mui/icons-material/School'
 import { useAppDispatch, useAppSelector } from '../../app/hooks'
 import { logout as logoutAction, selectIsAuthenticated, selectAuthUser } from '../../features/auth/authSlice'
 import { logout as logoutApi } from '../../api/mockLogoutApi'
-import { ROUTES, NAV_ITEMS } from '../../app/routes'
+import { ROUTES, NAV_ITEMS, testHrefWithTeacherId } from '../../app/routes'
 
 const brandColor = '#6CB5F4'
 
@@ -104,17 +104,19 @@ export default function TopBar() {
               },
             }}
           >
-            {NAV_ITEMS.map((item, i) => (
-              <Box key={item.path} component="span" sx={{ display: 'flex', alignItems: 'center' }}>
-                <NavLink
-                  to={item.path}
-                  className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}
-                  end={item.path === ROUTES.home}
-                >
-                  {item.label}
-                </NavLink>
-              </Box>
-            ))}
+            {NAV_ITEMS.map((item) => {
+              return (
+                <Box key={item.path} component="span" sx={{ display: 'flex', alignItems: 'center' }}>
+                  <NavLink
+                    to={item.path}
+                    className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}
+                    end={item.path === ROUTES.home}
+                  >
+                    {item.label}
+                  </NavLink>
+                </Box>
+              )
+            })}
           </Box>
 
           <Box sx={{ display: 'flex', alignItems: 'center', ml: 1 }}>

@@ -4,7 +4,7 @@ const AUTH_KEY = 'ngwa-auth'
 
 export interface AuthState {
   isAuthenticated: boolean
-  user: { name: string } | null
+  user: { name: string; id?: string } | null
 }
 
 const loadStored = (): AuthState => {
@@ -28,13 +28,12 @@ export const authSlice = createSlice({
   reducers: {
     login(
       s,
-      a: PayloadAction<{ username: string; password?: string }>,
+      a: PayloadAction<{ username: string; password?: string; id?: string }>,
     ) {
-      // Mock: accept any non-empty username; in production replace with API call
       const name = (a.payload.username || '').trim()
       if (!name) return
       s.isAuthenticated = true
-      s.user = { name }
+      s.user = { name, id: a.payload.id }
       try {
         sessionStorage.setItem(
           AUTH_KEY,

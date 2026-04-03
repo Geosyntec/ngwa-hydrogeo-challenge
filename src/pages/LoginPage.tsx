@@ -37,7 +37,7 @@ export default function LoginPage() {
     setLoading(true)
     try {
       const res = await loginApi({ username: username.trim(), password })
-      dispatch(login({ username: res.user.name }))
+      dispatch(login({ username: res.user.name, id: res.user.id }))
       navigate(from, { replace: true })
     } catch (err: any) {
       setError(err?.message ?? 'Sign in failed.')

@@ -14,7 +14,7 @@ from pathlib import Path
 from dotenv import load_dotenv
 load_dotenv()
 
-from fastapi import Depends, FastAPI, HTTPException, Request
+from fastapi import Depends, FastAPI, HTTPException, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
@@ -59,7 +59,7 @@ class LoginBody(BaseModel):
 
 
 class LoginResponse(BaseModel):
-    user: dict  # {"name": str}  # name is the username as stored for display
+    user: dict  # {"name": str, "id": str}  # id is user UUID for public links (e.g. /test?teacherID=)
 
 
 @app.post("/api/login", response_model=LoginResponse)
@@ -90,7 +90,9 @@ async def login(body: LoginBody, conn=Depends(get_db)):
             detail="Please verify your email before signing in. Check your inbox for the verification link.",
         )
 
-    return LoginResponse(user={"name": row["email"]})
+    return LoginResponse(
+        user={"name": row["email"], "id": str(row["id"])}
+    )
 
 
 # --- Register & email verification ---
@@ -218,42 +220,85 @@ async def resend_verification(body: ResendVerificationBody, conn=Depends(get_db)
 
 # --- Classes (DB-backed) ---
 @app.get("/api/classes")
-async def get_classes(teacher: str, conn=Depends(get_db)):
-    """Return classes keyed by class name; teacher is the user's email."""
+async def get_classes(
+    teacher: str | None = None,
+    teacherID: str | None = Query(None, alias="teacherID"),
+    conn=Depends(get_db),
+):
+    """Return classes keyed by class name. Pass `teacher` (email) or `teacherID` (user UUID)."""
     if conn is None:
         raise HTTPException(status_code=503, detail="Database not configured.")
-    teacher_email = (teacher or "").strip().lower()
-    if not teacher_email:
-        return {}
-    user = await conn.fetchrow(
-        "SELECT id FROM users WHERE LOWER(email) = $1", teacher_email
-    )
-    if not user:
+    teacher_uuid = None
+    if teacherID and str(teacherID).strip():
+        try:
+            teacher_uuid = uuid_mod.UUID(str(teacherID).strip())
+        except ValueError:
+            raise HTTPException(status_code=400, detail="Invalid teacherID (expected UUID).")
+    elif teacher and str(teacher).strip():
+        teacher_email = str(teacher).strip().lower()
+        user = await conn.fetchrow(
+            "SELECT id FROM users WHERE LOWER(email) = $1", teacher_email
+        )
+        if not user:
+            return {}
+        teacher_uuid = user["id"]
+    else:
         return {}
     rows = await conn.fetch(
         "SELECT id, name FROM classes WHERE teacher_id = $1 ORDER BY name",
-        user["id"],
+        teacher_uuid,
     )
+    # Test flow uses `teacherID` + GET /api/class-students per class; skip N+1 student queries here.
+    skip_embedded_roster = bool(teacherID and str(teacherID).strip())
     result = {}
     for row in rows:
         class_id = str(row["id"])
         class_name = row["name"]
-        students = await conn.fetch(
-            "SELECT id, first_name, last_name FROM students WHERE class_id = $1 ORDER BY created_at",
-            row["id"],
-        )
-        result[class_name] = {
-            "classId": class_id,
-            "students": [
+        if skip_embedded_roster:
+            stud_list = []
+        else:
+            students = await conn.fetch(
+                "SELECT id, first_name, last_name FROM students WHERE class_id = $1 ORDER BY created_at",
+                row["id"],
+            )
+            stud_list = [
                 {
                     "id": str(s["id"]),
                     "first_name": s["first_name"] or "",
                     "last_name": s["last_name"] or "",
                 }
                 for s in students
-            ],
-        }
+            ]
+        result[class_name] = {"classId": class_id, "students": stud_list}
     return result
+
+
+@app.get("/api/class-students")
+async def get_class_students(
+    classId: str = Query(..., alias="classId"),
+    conn=Depends(get_db),
+):
+    """Roster for a class (used by test verification UI after a class is selected)."""
+    if conn is None:
+        raise HTTPException(status_code=503, detail="Database not configured.")
+    try:
+        cid = uuid_mod.UUID(str(classId).strip())
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid classId (expected UUID).")
+    rows = await conn.fetch(
+        "SELECT id, first_name, last_name FROM students WHERE class_id = $1 ORDER BY created_at",
+        cid,
+    )
+    return {
+        "students": [
+            {
+                "id": str(s["id"]),
+                "first_name": s["first_name"] or "",
+                "last_name": s["last_name"] or "",
+            }
+            for s in rows
+        ]
+    }
 
 
 class CreateClassStudent(BaseModel):

@@ -41,6 +41,7 @@ import {
   clearWell,
 } from "../../../ScenarioSlice";
 import { dispatchResetChallenge } from "../../../resetChallengeState";
+import { selectIsAuthenticated } from "../../../../auth/authSlice";
 import { useCallback, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import RealityCheck from "../../RealityCheck/RealityCheck";
@@ -64,6 +65,8 @@ export default function HorizontalVelocityPanel() {
   const velocityRight = useAppSelector(selectVelocityRightCount);
   const [submitModalOpen, setSubmitModalOpen] = useState(false);
   const { selectedPanel, isTest } = useAppSelector(selectScenarioState);
+  const isAuthenticated = useAppSelector(selectIsAuthenticated);
+  const showTestSubmit = isTest && !isAuthenticated;
   const ready = sorted.length === 3;
   // useEffect(() => {
   //   if (gradReady && selectedPanel !== "gradient") {
@@ -387,7 +390,7 @@ export default function HorizontalVelocityPanel() {
                     Submit Answers
                   </Button>
                 )}
-                {isTest && (
+                {showTestSubmit && (
                   <Button
                     variant="contained"
                     color="primary"

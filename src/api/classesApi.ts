@@ -34,6 +34,35 @@ export async function fetchClasses(teacherEmail: string): Promise<ClassesRespons
   return res.json()
 }
 
+/** Classes for a teacher user id (UUID), e.g. `/test?teacherID=…`. Same response shape as email-based fetch. */
+export async function fetchClassesByTeacherId(teacherId: string): Promise<ClassesResponse> {
+  const base = getApiUrl()
+  const q = new URLSearchParams({ teacherID: teacherId.trim() })
+  const res = await fetch(`${base}/api/classes?${q}`, { credentials: 'include' })
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}))
+    const msg = typeof data.detail === 'string' ? data.detail : 'Failed to load classes'
+    throw new Error(msg)
+  }
+  return res.json()
+}
+
+export type ClassStudentsResponse = {
+  students: StudentWithId[]
+}
+
+export async function fetchStudentsByClassId(classId: string): Promise<ClassStudentsResponse> {
+  const base = getApiUrl()
+  const q = new URLSearchParams({ classId: classId.trim() })
+  const res = await fetch(`${base}/api/class-students?${q}`, { credentials: 'include' })
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}))
+    const msg = typeof data.detail === 'string' ? data.detail : 'Failed to load students'
+    throw new Error(msg)
+  }
+  return res.json()
+}
+
 export type CreateClassPayload = {
   teacherId: string
   name: string
