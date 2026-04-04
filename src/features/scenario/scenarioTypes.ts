@@ -68,4 +68,6 @@ export interface ScenarioState {
   testLocation: string;
   submitResultText: string;
   openWellPopoverId: string | null;
+  /** Roster / verify-student UUID; required to POST grade_submissions for tests. */
+  testStudentId: string | null;
 }

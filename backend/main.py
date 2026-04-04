@@ -3,6 +3,7 @@ FastAPI backend for the Hydrogeology Challenge app.
 Run with: uvicorn backend.main:app --reload --port 8000
 In production (e.g. Azure App Service), serves the built React app from backend/static.
 """
+import json
 import os
 import re
 import secrets
@@ -18,7 +19,7 @@ from fastapi import Depends, FastAPI, HTTPException, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from backend.database import create_pool, close_pool, get_connection, Pool
 from backend.auth import verify_password, hash_password
@@ -305,6 +306,232 @@ async def get_class_students(
             }
             for s in rows
         ]
+    }
+
+
+class SubmitGradesBody(BaseModel):
+    """Payload aligned with `grade_submissions` columns (excluding id, submitted_at)."""
+
+    student_id: str
+    scenario_id: str
+    selected_wells: list = Field(default_factory=list)
+    answers: dict = Field(default_factory=dict)
+    flow_right: int = Field(ge=0)
+    flow_total: int = Field(ge=0)
+    gradient_right: int = Field(ge=0)
+    gradient_total: int = Field(ge=0)
+    velocity_right: int = Field(ge=0)
+    velocity_total: int = Field(ge=0)
+    percentage: int = Field(ge=0)
+
+
+class SubmitGradesResponse(BaseModel):
+    ok: bool
+    submission_id: str | None = None
+    message: str | None = None
+
+
+@app.post("/api/submit-grades", response_model=SubmitGradesResponse)
+async def submit_grades(body: SubmitGradesBody, conn=Depends(get_db)):
+    """Persist a student's test submission to `grade_submissions`."""
+    if conn is None:
+        raise HTTPException(
+            status_code=503,
+            detail="Submit grades is unavailable (database not configured).",
+        )
+    sid_raw = (body.student_id or "").strip()
+    try:
+        sid = uuid_mod.UUID(sid_raw)
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid student_id (expected UUID).")
+    scenario_id = (body.scenario_id or "").strip()
+    if not scenario_id:
+        raise HTTPException(status_code=400, detail="scenario_id is required.")
+
+    student_row = await conn.fetchrow("SELECT id FROM students WHERE id = $1", sid)
+    if not student_row:
+        raise HTTPException(status_code=404, detail="Student not found.")
+
+    wells_json = json.dumps(body.selected_wells)
+    answers_json = json.dumps(body.answers)
+
+    row = await conn.fetchrow(
+        """
+        INSERT INTO grade_submissions (
+          student_id, scenario_id, selected_wells, answers,
+          flow_right, flow_total, gradient_right, gradient_total,
+          velocity_right, velocity_total, percentage
+        )
+        VALUES ($1::uuid, $2, $3::jsonb, $4::jsonb, $5, $6, $7, $8, $9, $10, $11)
+        RETURNING id
+        """,
+        sid,
+        scenario_id,
+        wells_json,
+        answers_json,
+        body.flow_right,
+        body.flow_total,
+        body.gradient_right,
+        body.gradient_total,
+        body.velocity_right,
+        body.velocity_total,
+        body.percentage,
+    )
+    return SubmitGradesResponse(
+        ok=True,
+        submission_id=str(row["id"]) if row else None,
+        message="Grades submitted.",
+    )
+
+
+async def _resolve_teacher_uuid(
+    teacher: str | None,
+    teacher_id_param: str | None,
+    conn,
+) -> uuid_mod.UUID:
+    """Match GET /api/classes: email in `teacher` or user UUID in `teacherID`."""
+    if teacher_id_param and str(teacher_id_param).strip():
+        try:
+            return uuid_mod.UUID(str(teacher_id_param).strip())
+        except ValueError:
+            raise HTTPException(
+                status_code=400,
+                detail="Invalid teacherID (expected UUID).",
+            )
+    if teacher and str(teacher).strip():
+        user = await conn.fetchrow(
+            "SELECT id FROM users WHERE LOWER(email) = $1",
+            str(teacher).strip().lower(),
+        )
+        if not user:
+            raise HTTPException(status_code=404, detail="Teacher not found.")
+        return user["id"]
+    raise HTTPException(
+        status_code=400,
+        detail="Query parameter `teacher` (email) or `teacherID` (UUID) is required.",
+    )
+
+
+@app.get("/api/teacher-grades")
+async def get_teacher_grades(
+    teacher: str | None = None,
+    teacherID: str | None = Query(None, alias="teacherID"),
+    conn=Depends(get_db),
+):
+    """Latest grade submission per (student, test) for all students in the teacher's classes."""
+    if conn is None:
+        raise HTTPException(status_code=503, detail="Database not configured.")
+    teacher_uuid = await _resolve_teacher_uuid(teacher, teacherID, conn)
+
+    rows = await conn.fetch(
+        """
+        SELECT DISTINCT ON (gs.student_id, gs.scenario_id)
+          gs.id AS submission_id,
+          gs.scenario_id,
+          gs.flow_right,
+          gs.flow_total,
+          gs.gradient_right,
+          gs.gradient_total,
+          gs.velocity_right,
+          gs.velocity_total,
+          gs.percentage,
+          gs.submitted_at,
+          s.id AS student_id,
+          s.first_name,
+          s.last_name,
+          c.id AS class_id,
+          c.name AS class_name
+        FROM grade_submissions gs
+        INNER JOIN students s ON s.id = gs.student_id
+        INNER JOIN classes c ON c.id = s.class_id
+        WHERE c.teacher_id = $1
+        ORDER BY gs.student_id, gs.scenario_id, gs.submitted_at DESC
+        """,
+        teacher_uuid,
+    )
+
+    out = []
+    for r in rows:
+        ts = r["submitted_at"]
+        out.append(
+            {
+                "submission_id": str(r["submission_id"]),
+                "scenario_id": r["scenario_id"],
+                "class_id": str(r["class_id"]),
+                "class_name": r["class_name"] or "",
+                "student_id": str(r["student_id"]),
+                "first_name": r["first_name"] or "",
+                "last_name": r["last_name"] or "",
+                "flow_right": int(r["flow_right"]),
+                "flow_total": int(r["flow_total"]),
+                "gradient_right": int(r["gradient_right"]),
+                "gradient_total": int(r["gradient_total"]),
+                "velocity_right": int(r["velocity_right"]),
+                "velocity_total": int(r["velocity_total"]),
+                "percentage": int(r["percentage"]),
+                "submitted_at": ts.isoformat() if ts else None,
+            }
+        )
+    return {"submissions": out}
+
+
+@app.get("/api/grade-submission/{submission_id}")
+async def get_grade_submission(
+    submission_id: str,
+    teacher: str | None = None,
+    teacherID: str | None = Query(None, alias="teacherID"),
+    conn=Depends(get_db),
+):
+    """Full answers + summary for one submission; teacher must own the student's class."""
+    if conn is None:
+        raise HTTPException(status_code=503, detail="Database not configured.")
+    teacher_uuid = await _resolve_teacher_uuid(teacher, teacherID, conn)
+    try:
+        sid = uuid_mod.UUID(str(submission_id).strip())
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid submission id.")
+
+    row = await conn.fetchrow(
+        """
+        SELECT
+          gs.answers,
+          gs.flow_right,
+          gs.flow_total,
+          gs.gradient_right,
+          gs.gradient_total,
+          gs.velocity_right,
+          gs.velocity_total,
+          gs.percentage,
+          c.teacher_id
+        FROM grade_submissions gs
+        INNER JOIN students s ON s.id = gs.student_id
+        INNER JOIN classes c ON c.id = s.class_id
+        WHERE gs.id = $1
+        """,
+        sid,
+    )
+    if not row:
+        raise HTTPException(status_code=404, detail="Submission not found.")
+    if row["teacher_id"] != teacher_uuid:
+        raise HTTPException(status_code=403, detail="Not allowed to view this submission.")
+
+    answers = row["answers"]
+    if answers is None:
+        answers = {}
+    elif not isinstance(answers, dict):
+        answers = dict(answers) if hasattr(answers, "keys") else {}
+
+    return {
+        "gradesSummary": {
+            "flowRight": int(row["flow_right"]),
+            "flowTotal": int(row["flow_total"]),
+            "gradientRight": int(row["gradient_right"]),
+            "gradientTotal": int(row["gradient_total"]),
+            "velocityRight": int(row["velocity_right"]),
+            "velocityTotal": int(row["velocity_total"]),
+            "percentage": int(row["percentage"]),
+        },
+        "answers": answers,
     }
 
 

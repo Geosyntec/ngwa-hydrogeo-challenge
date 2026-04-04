@@ -19,6 +19,7 @@ import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import {
   setIsTest,
   setScenarios,
+  setTestStudentId,
   selectScenarioByIndex,
   selectScenarioState,
 } from "./ScenarioSlice";
@@ -157,6 +158,7 @@ export default function Scenario({
       }
       setVerifyLoading(true);
       try {
+        dispatch(setTestStudentId(selectedStudentId));
         setVerified(true);
       } finally {
         setVerifyLoading(false);
@@ -174,6 +176,7 @@ export default function Scenario({
     try {
       const res = await verifyStudent({ className: c, studentName: s });
       if (res.ok) {
+        if (res.studentId) dispatch(setTestStudentId(res.studentId));
         setVerified(true);
       } else {
         setVerifyError(res.message ?? "That student cannot be verified.");

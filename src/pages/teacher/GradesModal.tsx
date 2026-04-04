@@ -14,7 +14,7 @@ import {
   Typography,
 } from '@mui/material'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
-import type { GetGradesResponse } from '../../api/mockGetGradesApi'
+import type { GetGradesResponse } from '../../api/getGradesApi'
 
 export type GradesModalProps = {
   open: boolean
@@ -22,6 +22,8 @@ export type GradesModalProps = {
   studentName: string | null
   data: GetGradesResponse | null
   loading: boolean
+  /** Shown when the detail request failed (not loading). */
+  error?: string | null
 }
 
 export default function GradesModal({
@@ -30,6 +32,7 @@ export default function GradesModal({
   studentName,
   data,
   loading,
+  error = null,
 }: GradesModalProps) {
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
@@ -109,7 +112,10 @@ export default function GradesModal({
             </Accordion>
           </>
         )}
-        {!loading && !data && (
+        {!loading && error && (
+          <Typography color="error">{error}</Typography>
+        )}
+        {!loading && !error && !data && (
           <Typography color="text.secondary">No grades data.</Typography>
         )}
       </DialogContent>

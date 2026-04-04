@@ -30,6 +30,7 @@ const initialState: ScenarioState = {
   testLocation: "",
   submitResultText: "",
   openWellPopoverId: null,
+  testStudentId: null,
 };
 
 export const scenarioSlice = createSlice({
@@ -38,6 +39,9 @@ export const scenarioSlice = createSlice({
   reducers: {
     setIsTest(s, a: PayloadAction<boolean>) {
       s.isTest = a.payload;
+      if (!a.payload) {
+        s.testStudentId = null;
+      }
       if (a.payload) {
         s.showCheckAnswerButton = false;
         s.showSolutionButton = false;
@@ -108,6 +112,10 @@ export const scenarioSlice = createSlice({
     setSubmitResultText(s, a: PayloadAction<string>) {
       s.submitResultText = a.payload;
     },
+    setTestStudentId(s, a: PayloadAction<string | null>) {
+      const id = a.payload?.trim() ?? "";
+      s.testStudentId = id || null;
+    },
     /** Clears panel chrome and test submit fields; use with flow/gradient/velocity resets. */
     resetChallengeScenarioUi(s) {
       s.selectedPanel = null;
@@ -131,6 +139,7 @@ export const {
   setTeamName,
   setTestLocation,
   setSubmitResultText,
+  setTestStudentId,
   resetChallengeScenarioUi,
 } = scenarioSlice.actions;
 export default scenarioSlice.reducer;

@@ -1,5 +1,8 @@
 import type { RootState } from "../../app/store";
-import type { SubmitGradesPayload, SubmitGradesAnswers } from "../../api/mockSubmitGradesApi";
+import type {
+  GradeSubmissionPayload,
+  SubmitGradesAnswers,
+} from "../../api/submitGradesApi";
 import { selectScenarioState, selectSelectedWellIds } from "./ScenarioSlice";
 import {
   selectFlow,
@@ -69,14 +72,19 @@ function getAnswersFromFields(
 }
 
 /**
- * Builds the payload for POST /submit-grades from the current app state.
- * Use when the student submits the test scenario.
+ * Builds the payload for POST /api/submit-grades from the current app state.
+ * Returns null if the verified student id is missing (test flow only).
  */
-export function buildSubmitGradesPayload(state: RootState): SubmitGradesPayload | null {
+export function buildSubmitGradesPayload(
+  state: RootState,
+): GradeSubmissionPayload | null {
   const scenario = selectScenarioState(state);
-  const { scenarios, scenarioIndex } = scenario;
+  const { scenarios, scenarioIndex, testStudentId } = scenario;
   const currentScenario = scenarios[scenarioIndex];
   if (!currentScenario) return null;
+
+  const student_id = (testStudentId ?? "").trim();
+  if (!student_id) return null;
 
   const selectedWells = selectSelectedWellIds(state);
   const wellIds = [
@@ -105,17 +113,16 @@ export function buildSubmitGradesPayload(state: RootState): SubmitGradesPayload 
     totalQuestions > 0 ? Math.round((totalRight / totalQuestions) * 100) : 0;
 
   return {
-    scenarioId: currentScenario.id,
-    selectedWells: wellIds,
+    student_id,
+    scenario_id: currentScenario.id,
+    selected_wells: wellIds,
     answers,
-    grades: {
-      flowRight,
-      flowTotal: FLOW_TOTAL_QUESTIONS,
-      gradientRight,
-      gradientTotal: GRADIENT_TOTAL_QUESTIONS,
-      velocityRight,
-      velocityTotal: VELOCITY_TOTAL_QUESTIONS,
-      percentage,
-    },
+    flow_right: flowRight,
+    flow_total: FLOW_TOTAL_QUESTIONS,
+    gradient_right: gradientRight,
+    gradient_total: GRADIENT_TOTAL_QUESTIONS,
+    velocity_right: velocityRight,
+    velocity_total: VELOCITY_TOTAL_QUESTIONS,
+    percentage,
   };
 }

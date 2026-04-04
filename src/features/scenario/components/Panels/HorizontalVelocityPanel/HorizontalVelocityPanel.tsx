@@ -49,7 +49,7 @@ import SubmitResultsModal from "../SubmitResultsModal";
 import { ROUTES } from "../../../../../app/routes";
 import { store } from "../../../../../app/store";
 import { buildSubmitGradesPayload } from "../../../submitGradesPayload";
-import { submitGrades } from "../../../../../api/mockSubmitGradesApi";
+import { submitGrades } from "../../../../../api/submitGradesApi";
 
 export default function HorizontalVelocityPanel() {
   const dispatch = useAppDispatch();
@@ -103,13 +103,24 @@ export default function HorizontalVelocityPanel() {
   const [rcOpen, setRcOpen] = useState(false);
   const [testSubmitting, setTestSubmitting] = useState(false);
   const [testSubmitSuccessOpen, setTestSubmitSuccessOpen] = useState(false);
+  const [testSubmitError, setTestSubmitError] = useState<string | null>(null);
   const handleTestSubmit = useCallback(async () => {
+    setTestSubmitError(null);
     const payload = buildSubmitGradesPayload(store.getState());
-    if (!payload) return;
+    if (!payload) {
+      setTestSubmitError(
+        "Student ID is missing. Close the test and verify your identity again.",
+      );
+      return;
+    }
     setTestSubmitting(true);
     try {
       await submitGrades(payload);
       setTestSubmitSuccessOpen(true);
+    } catch (e) {
+      setTestSubmitError(
+        e instanceof Error ? e.message : "Failed to submit grades.",
+      );
     } finally {
       setTestSubmitting(false);
     }
@@ -391,17 +402,24 @@ export default function HorizontalVelocityPanel() {
                   </Button>
                 )}
                 {showTestSubmit && (
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    size="large"
-                    fullWidth
-                    disabled={!allPanelsComplete || testSubmitting}
-                    onClick={handleTestSubmit}
-                    sx={{ mt: 3 }}
-                  >
-                    {testSubmitting ? "Submitting…" : "Submit test"}
-                  </Button>
+                  <>
+                    {testSubmitError && (
+                      <Typography color="error" variant="body2" sx={{ mt: 2 }}>
+                        {testSubmitError}
+                      </Typography>
+                    )}
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      size="large"
+                      fullWidth
+                      disabled={!allPanelsComplete || testSubmitting}
+                      onClick={handleTestSubmit}
+                      sx={{ mt: 3 }}
+                    >
+                      {testSubmitting ? "Submitting…" : "Submit test"}
+                    </Button>
+                  </>
                 )}
               </Stack>
             </>
