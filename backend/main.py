@@ -58,8 +58,15 @@ class LoginBody(BaseModel):
     password: str
 
 
+class LoginUserOut(BaseModel):
+    """Logged-in user for the client (email + stable id for teacher links)."""
+
+    name: str
+    id: str
+
+
 class LoginResponse(BaseModel):
-    user: dict  # {"name": str, "id": str}  # id is user UUID for public links (e.g. /test?teacherID=)
+    user: LoginUserOut
 
 
 @app.post("/api/login", response_model=LoginResponse)
@@ -91,7 +98,7 @@ async def login(body: LoginBody, conn=Depends(get_db)):
         )
 
     return LoginResponse(
-        user={"name": row["email"], "id": str(row["id"])}
+        user=LoginUserOut(name=row["email"], id=str(row["id"]))
     )
 
 

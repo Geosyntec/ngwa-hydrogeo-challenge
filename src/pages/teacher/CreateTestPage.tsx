@@ -174,7 +174,6 @@ export default function CreateTestPage() {
                         </InputLabel>
                         <Select
                           labelId={`test-label-${classId}`}
-                          label="Test"
                           value={selected}
                           displayEmpty
                           onChange={(e) =>

@@ -12,7 +12,14 @@ const loadStored = (): AuthState => {
     const raw = sessionStorage.getItem(AUTH_KEY)
     if (raw) {
       const { isAuthenticated, user } = JSON.parse(raw) as AuthState
-      if (isAuthenticated && user) return { isAuthenticated: true, user }
+      if (isAuthenticated && user) {
+        const id = typeof user.id === 'string' ? user.id.trim() : ''
+        if (!id) {
+          sessionStorage.removeItem(AUTH_KEY)
+          return { isAuthenticated: false, user: null }
+        }
+        return { isAuthenticated: true, user: { name: user.name, id } }
+      }
     }
   } catch {
     // ignore
@@ -31,9 +38,10 @@ export const authSlice = createSlice({
       a: PayloadAction<{ username: string; password?: string; id?: string }>,
     ) {
       const name = (a.payload.username || '').trim()
-      if (!name) return
+      const id = (a.payload.id ?? '').trim()
+      if (!name || !id) return
       s.isAuthenticated = true
-      s.user = { name, id: a.payload.id }
+      s.user = { name, id }
       try {
         sessionStorage.setItem(
           AUTH_KEY,

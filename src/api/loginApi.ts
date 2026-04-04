@@ -11,7 +11,7 @@ export type LoginCredentials = {
 }
 
 export type LoginResponse = {
-  user: { name: string; id?: string }
+  user: { name: string; id: string }
 }
 
 export type LoginError = {
@@ -49,10 +49,22 @@ export async function login(credentials: LoginCredentials): Promise<LoginRespons
     return Promise.reject({ message: 'Invalid response from server.' })
   }
 
+  const rawId = (data.user as { id?: unknown }).id
+  const id =
+    rawId != null && String(rawId).trim() !== ''
+      ? String(rawId).trim()
+      : undefined
+
+  if (!id) {
+    return Promise.reject({
+      message: 'Invalid response from server (missing user id).',
+    })
+  }
+
   return {
     user: {
       name: data.user.name,
-      id: typeof data.user.id === 'string' ? data.user.id : undefined,
+      id,
     },
   }
 }
