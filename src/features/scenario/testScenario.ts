@@ -6,9 +6,9 @@ import type { ScenarioDefinition } from "./scenarioTypes";
  */
 export const testScenarios: ScenarioDefinition[] = [
   {
-    id: "test-1",
-    name: "Test Scenario",
-    map: { url: "", width: 800, height: 600, physicalWidth: 1 },
+    id: "Test-1",
+    name: "Ashland",
+    map: { url: "assets/img/river_heights_map.jpg", width: 800, height: 600, physicalWidth: 1 },
     allowPumping: true,
     showCheckAnswerButton: false,
     showSolutionButton: false,
