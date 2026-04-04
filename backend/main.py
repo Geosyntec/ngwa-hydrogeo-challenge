@@ -567,6 +567,40 @@ async def delete_grade_submissions(
     return {"ok": True, "deleted": len(deleted)}
 
 
+def _jsonb_to_answer_dict(value) -> dict:
+    """
+    Coerce grade_submissions.answers from the DB for JSON responses.
+
+    asyncpg commonly returns JSONB columns as str (JSON text), not dict. The prior
+    logic used ``dict(value) if hasattr(value, 'keys') else {}``, which turns str
+    into {} because str has no .keys(), so the modal showed no answers.
+    """
+    if value is None:
+        return {}
+    if isinstance(value, dict):
+        return value
+    if isinstance(value, (bytes, bytearray)):
+        try:
+            value = value.decode("utf-8")
+        except Exception:
+            return {}
+    if isinstance(value, str):
+        s = value.strip()
+        if not s:
+            return {}
+        try:
+            parsed = json.loads(s)
+        except json.JSONDecodeError:
+            return {}
+        return parsed if isinstance(parsed, dict) else {}
+    if hasattr(value, "keys") and callable(getattr(value, "keys", None)):
+        try:
+            return dict(value)
+        except (TypeError, ValueError):
+            return {}
+    return {}
+
+
 @app.get("/api/grade-submission/{submission_id}")
 async def get_grade_submission(
     submission_id: str,
@@ -607,11 +641,7 @@ async def get_grade_submission(
     if row["teacher_id"] != teacher_uuid:
         raise HTTPException(status_code=403, detail="Not allowed to view this submission.")
 
-    answers = row["answers"]
-    if answers is None:
-        answers = {}
-    elif not isinstance(answers, dict):
-        answers = dict(answers) if hasattr(answers, "keys") else {}
+    answers = _jsonb_to_answer_dict(row["answers"])
 
     return {
         "gradesSummary": {

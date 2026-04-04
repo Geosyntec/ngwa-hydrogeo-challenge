@@ -169,9 +169,6 @@ export default function CreateTestPage() {
                     </TableCell>
                     <TableCell>
                       <FormControl size="small" fullWidth sx={{ minWidth: 200 }}>
-                        <InputLabel id={`test-label-${classId}`}>
-                          Test
-                        </InputLabel>
                         <Select
                           labelId={`test-label-${classId}`}
                           value={selected}
