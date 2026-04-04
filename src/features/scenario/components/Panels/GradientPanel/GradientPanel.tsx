@@ -25,6 +25,7 @@ import {
 import { selectFlowAllStepsComplete } from "../../../flowDirection/flowSelectors";
 import { selectScenarioState, setSelectedPanel } from "../../../ScenarioSlice";
 import RealityCheck from "../../RealityCheck/RealityCheck";
+import { panelBindTextFieldSx } from "../panelBindTextFieldSx";
 import { useCallback, useEffect, useState } from "react";
 
 export default function GradientPanel() {
@@ -70,9 +71,13 @@ export default function GradientPanel() {
         value={f.input}
         onChange={(e) => dispatch(setField({ key, value: e.target.value }))}
         error={f.checked && !f.isCorrect}
-        helperText={f.showAnswer ? `Answer: ${f.answer}` : helper}
+        helperText={
+          f.showAnswer ? `${f.answer}` : helper != null && helper !== ""
+            ? helper
+            : "\u00a0"
+        }
         InputLabelProps={{ shrink: true }}
-        sx={{ width: width ?? 280 }}
+        sx={panelBindTextFieldSx(width ?? 280, !!f.showAnswer)}
       />
     );
   };

@@ -8,7 +8,6 @@ import {
   DialogContent,
   DialogTitle,
   FormControl,
-  Grid,
   InputLabel,
   MenuItem,
   Select,
@@ -42,6 +41,17 @@ import HorizontalVelocityPanel from "./components/Panels/HorizontalVelocityPanel
 import { selectIsAuthenticated } from "../auth/authSlice";
 
 type ClassOption = { id: string; name: string };
+
+/** Fixed question column width from `md` up; does not shrink until layout stacks below `md`. */
+const SCENARIO_QUESTION_PANEL_WIDTH_PX = 520;
+/** Minimum map width on `md+` so the row triggers horizontal scroll instead of crushing columns. */
+const SCENARIO_MAP_MIN_WIDTH_PX = 480;
+/** Default MUI `spacing(2)` gap between columns (must match `gap: 2` below). */
+const SCENARIO_ROW_GAP_PX = 16;
+const SCENARIO_ROW_MIN_WIDTH_MD =
+  SCENARIO_QUESTION_PANEL_WIDTH_PX +
+  SCENARIO_ROW_GAP_PX +
+  SCENARIO_MAP_MIN_WIDTH_PX;
 
 export default function Scenario({
   isTest = false,
@@ -431,26 +441,54 @@ export default function Scenario({
           </Typography>
         </Box>
 
-        <Grid container spacing={2}>
-          <Grid item xs={12} md={6}>
-            <ChooseWellsPanel />
-            <FlowDirectionPanel />
-            <GradientPanel />
-            <HorizontalVelocityPanel />
-          </Grid>
-
-          <Grid item xs={12} md={6}>
+        <Box
+          sx={{
+            width: "100%",
+            overflowX: { xs: "visible", md: "auto" },
+            WebkitOverflowScrolling: "touch",
+          }}
+        >
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: { xs: "column", md: "row" },
+              alignItems: "flex-start",
+              gap: 2,
+              flexWrap: { md: "nowrap" },
+              minWidth: { xs: 0, md: SCENARIO_ROW_MIN_WIDTH_MD },
+            }}
+          >
             <Box
               sx={{
+                width: { xs: "100%", md: SCENARIO_QUESTION_PANEL_WIDTH_PX },
+                minWidth: { xs: 0, md: SCENARIO_QUESTION_PANEL_WIDTH_PX },
+                maxWidth: { xs: "100%", md: SCENARIO_QUESTION_PANEL_WIDTH_PX },
+                flexShrink: { md: 0 },
+                boxSizing: "border-box",
+              }}
+            >
+              <ChooseWellsPanel />
+              <FlowDirectionPanel />
+              <GradientPanel />
+              <HorizontalVelocityPanel />
+            </Box>
+
+            <Box
+              sx={{
+                width: { xs: "100%", md: "auto" },
+                minWidth: { xs: 0, md: SCENARIO_MAP_MIN_WIDTH_PX },
+                flex: { md: "1 1 auto" },
+                flexShrink: { md: 0 },
                 border: "1px solid #e0e0e0",
                 borderRadius: 1,
                 overflow: "hidden",
+                boxSizing: "border-box",
               }}
             >
               <MapView />
             </Box>
-          </Grid>
-        </Grid>
+          </Box>
+        </Box>
       </Container>
     </>
   );

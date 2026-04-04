@@ -46,6 +46,7 @@ import { useCallback, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import RealityCheck from "../../RealityCheck/RealityCheck";
 import SubmitResultsModal from "../SubmitResultsModal";
+import { panelBindTextFieldSx } from "../panelBindTextFieldSx";
 import { ROUTES } from "../../../../../app/routes";
 import { store } from "../../../../../app/store";
 import { buildSubmitGradesPayload } from "../../../submitGradesPayload";
@@ -94,9 +95,13 @@ export default function HorizontalVelocityPanel() {
         value={f.input}
         onChange={(e) => dispatch(setField({ key, value: e.target.value }))}
         error={f.checked && !f.isCorrect}
-        helperText={f.showAnswer ? `Answer: ${f.answer}` : helper}
+        helperText={
+          f.showAnswer ? `${f.answer}` : helper != null && helper !== ""
+            ? helper
+            : "\u00a0"
+        }
         InputLabelProps={{ shrink: true }}
-        sx={{ width: width ?? 50 }}
+        sx={panelBindTextFieldSx(width ?? 50, !!f.showAnswer)}
       />
     );
   };
