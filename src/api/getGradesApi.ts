@@ -89,3 +89,30 @@ export async function fetchGradeSubmissionDetail(
     answers: answers as SubmitGradesAnswers,
   }
 }
+
+export async function deleteGradeSubmissionsForStudentScenario(
+  studentId: string,
+  scenarioId: string,
+  teacherEmail: string,
+  teacherUserId?: string,
+): Promise<{ ok: boolean; deleted: number }> {
+  const base = getApiUrl()
+  const q = new URLSearchParams()
+  q.set('studentId', studentId.trim())
+  q.set('scenarioId', scenarioId.trim())
+  teacherQueryParams(teacherEmail, teacherUserId).forEach((v, k) => q.set(k, v))
+  const res = await fetch(`${base}/api/grade-submissions?${q}`, {
+    method: 'DELETE',
+    credentials: 'include',
+  })
+  const data = (await res.json().catch(() => ({}))) as {
+    detail?: string
+    ok?: boolean
+    deleted?: number
+  }
+  if (!res.ok) {
+    const msg = typeof data.detail === 'string' ? data.detail : 'Failed to reset submission.'
+    throw new Error(msg)
+  }
+  return { ok: data.ok ?? true, deleted: data.deleted ?? 0 }
+}

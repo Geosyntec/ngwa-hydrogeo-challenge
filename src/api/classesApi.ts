@@ -63,6 +63,33 @@ export async function fetchStudentsByClassId(classId: string): Promise<ClassStud
   return res.json()
 }
 
+/** Students in the class who already have a submission for this test scenario (test verify modal). */
+export async function fetchClassScenarioSubmittedStudentIds(
+  classId: string,
+  scenarioId: string,
+  teacherId: string,
+): Promise<string[]> {
+  const base = getApiUrl()
+  const q = new URLSearchParams({
+    classId: classId.trim(),
+    scenarioId: scenarioId.trim(),
+    teacherID: teacherId.trim(),
+  })
+  const res = await fetch(`${base}/api/class-scenario-grade-status?${q}`, {
+    credentials: 'include',
+  })
+  const data = (await res.json().catch(() => ({}))) as {
+    detail?: string
+    submitted_student_ids?: string[]
+  }
+  if (!res.ok) {
+    const msg =
+      typeof data.detail === 'string' ? data.detail : 'Failed to load submission status.'
+    throw new Error(msg)
+  }
+  return data.submitted_student_ids ?? []
+}
+
 export type CreateClassPayload = {
   teacherId: string
   name: string

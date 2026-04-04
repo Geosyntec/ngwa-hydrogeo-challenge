@@ -475,6 +475,98 @@ async def get_teacher_grades(
     return {"submissions": out}
 
 
+@app.get("/api/class-scenario-grade-status")
+async def class_scenario_grade_status(
+    classId: str = Query(..., alias="classId"),
+    scenarioId: str = Query(..., alias="scenarioId"),
+    teacherID: str = Query(..., alias="teacherID"),
+    conn=Depends(get_db),
+):
+    """Student UUIDs in the class who have any grade_submissions row for this test (verify modal)."""
+    if conn is None:
+        raise HTTPException(status_code=503, detail="Database not configured.")
+    try:
+        cid = uuid_mod.UUID(str(classId).strip())
+        tid = uuid_mod.UUID(str(teacherID).strip())
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid classId or teacherID (expected UUID).")
+    scenario_id = (scenarioId or "").strip()
+    if not scenario_id:
+        raise HTTPException(status_code=400, detail="scenarioId is required.")
+
+    ok = await conn.fetchrow(
+        """
+        SELECT 1 FROM classes c
+        WHERE c.id = $1 AND c.teacher_id = $2
+        """,
+        cid,
+        tid,
+    )
+    if not ok:
+        raise HTTPException(status_code=403, detail="Class not found for this teacher.")
+
+    rows = await conn.fetch(
+        """
+        SELECT DISTINCT gs.student_id
+        FROM grade_submissions gs
+        INNER JOIN students s ON s.id = gs.student_id
+        WHERE s.class_id = $1 AND gs.scenario_id = $2
+        """,
+        cid,
+        scenario_id,
+    )
+    return {
+        "submitted_student_ids": [str(r["student_id"]) for r in rows],
+    }
+
+
+@app.delete("/api/grade-submissions")
+async def delete_grade_submissions(
+    studentId: str = Query(..., alias="studentId"),
+    scenarioId: str = Query(..., alias="scenarioId"),
+    teacher: str | None = None,
+    teacherID: str | None = Query(None, alias="teacherID"),
+    conn=Depends(get_db),
+):
+    """Delete all grade_submissions for a student + test; teacher must own the student's class."""
+    if conn is None:
+        raise HTTPException(status_code=503, detail="Database not configured.")
+    teacher_uuid = await _resolve_teacher_uuid(teacher, teacherID, conn)
+    try:
+        stu = uuid_mod.UUID(str(studentId).strip())
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid studentId.")
+    scen = (scenarioId or "").strip()
+    if not scen:
+        raise HTTPException(status_code=400, detail="scenarioId is required.")
+
+    owner = await conn.fetchrow(
+        """
+        SELECT s.id FROM students s
+        INNER JOIN classes c ON c.id = s.class_id
+        WHERE s.id = $1 AND c.teacher_id = $2
+        """,
+        stu,
+        teacher_uuid,
+    )
+    if not owner:
+        raise HTTPException(
+            status_code=403,
+            detail="Not allowed to reset grades for this student.",
+        )
+
+    deleted = await conn.fetch(
+        """
+        DELETE FROM grade_submissions
+        WHERE student_id = $1 AND scenario_id = $2
+        RETURNING id
+        """,
+        stu,
+        scen,
+    )
+    return {"ok": True, "deleted": len(deleted)}
+
+
 @app.get("/api/grade-submission/{submission_id}")
 async def get_grade_submission(
     submission_id: str,

@@ -29,6 +29,7 @@ import { getTestScenarioById } from "./testScenario";
 import { verifyStudent } from "../../api/mockVerifyStudentApi";
 import {
   fetchClassesByTeacherId,
+  fetchClassScenarioSubmittedStudentIds,
   fetchStudentsByClassId,
   studentDisplayName,
 } from "../../api/classesApi";
@@ -78,6 +79,14 @@ export default function Scenario({
   const [studentsLoading, setStudentsLoading] = useState(false);
   const [studentsError, setStudentsError] = useState<string | null>(null);
   const [selectedStudentId, setSelectedStudentId] = useState("");
+  const [submittedStudentIds, setSubmittedStudentIds] = useState<Set<string>>(
+    () => new Set(),
+  );
+  const [submissionsStatusLoading, setSubmissionsStatusLoading] =
+    useState(false);
+  const [submissionsStatusError, setSubmissionsStatusError] = useState<
+    string | null
+  >(null);
 
   useEffect(() => {
     dispatch(setIsTest(!!isTest));
@@ -147,6 +156,52 @@ export default function Scenario({
     };
   }, [useRosterUi, selectedClassId]);
 
+  useEffect(() => {
+    if (!useRosterUi || !selectedClassId || !teacherIdForTest) {
+      setSubmittedStudentIds(new Set());
+      setSubmissionsStatusError(null);
+      setSubmissionsStatusLoading(false);
+      return;
+    }
+    const scenarioId = scenarios[scenarioIndex]?.id ?? "";
+    if (!scenarioId) {
+      setSubmittedStudentIds(new Set());
+      return;
+    }
+    let cancelled = false;
+    setSubmissionsStatusLoading(true);
+    setSubmissionsStatusError(null);
+    setSubmittedStudentIds(new Set());
+    fetchClassScenarioSubmittedStudentIds(
+      selectedClassId,
+      scenarioId,
+      teacherIdForTest,
+    )
+      .then((ids) => {
+        if (!cancelled) setSubmittedStudentIds(new Set(ids));
+      })
+      .catch((e: Error) => {
+        if (!cancelled) {
+          setSubmissionsStatusError(
+            e.message ?? "Could not load who already submitted this test.",
+          );
+          setSubmittedStudentIds(new Set());
+        }
+      })
+      .finally(() => {
+        if (!cancelled) setSubmissionsStatusLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [useRosterUi, selectedClassId, teacherIdForTest, scenarios[scenarioIndex]?.id]);
+
+  useEffect(() => {
+    if (selectedStudentId && submittedStudentIds.has(selectedStudentId)) {
+      setSelectedStudentId("");
+    }
+  }, [submittedStudentIds, selectedStudentId]);
+
   const handleVerify = async (e: React.FormEvent) => {
     e.preventDefault();
     setVerifyError(null);
@@ -193,6 +248,9 @@ export default function Scenario({
 
   const showVerifyModal =
     isTest && !isTeacherViewingTest && !verified;
+  const selectedAlreadySubmitted =
+    Boolean(selectedStudentId) &&
+    submittedStudentIds.has(selectedStudentId);
   const verifyDisabled =
     verifyLoading ||
     classesLoading ||
@@ -200,7 +258,11 @@ export default function Scenario({
       (!selectedClassId ||
         !selectedStudentId ||
         studentsLoading ||
-        !!classesError));
+        submissionsStatusLoading ||
+        selectedAlreadySubmitted ||
+        !!classesError ||
+        !!studentsError ||
+        !!submissionsStatusError));
 
   return (
     <>
@@ -216,7 +278,7 @@ export default function Scenario({
         <DialogContent>
           <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
             {useRosterUi
-              ? "Select your class and your name to start the test."
+              ? "Select your class and your name to start the test. Anyone who already submitted this test for the selected class cannot be chosen again unless your teacher resets their submission."
               : "Enter your class name and student name to start the test."}
           </Typography>
           <Box
@@ -227,9 +289,9 @@ export default function Scenario({
           >
             {useRosterUi ? (
               <>
-                {(classesError || studentsError) && (
+                {(classesError || studentsError || submissionsStatusError) && (
                   <Typography color="error" variant="body2">
-                    {classesError ?? studentsError}
+                    {classesError ?? studentsError ?? submissionsStatusError}
                   </Typography>
                 )}
                 <FormControl fullWidth size="small" required disabled={classesLoading}>
@@ -254,7 +316,9 @@ export default function Scenario({
                   fullWidth
                   size="small"
                   required
-                  disabled={!selectedClassId || studentsLoading}
+                  disabled={
+                    !selectedClassId || studentsLoading || submissionsStatusLoading
+                  }
                 >
                   <InputLabel id="verify-student-label">Student name</InputLabel>
                   <Select
@@ -265,11 +329,15 @@ export default function Scenario({
                       setSelectedStudentId(e.target.value as string)
                     }
                   >
-                    {rosterStudents.map((s) => (
-                      <MenuItem key={s.id} value={s.id}>
-                        {studentDisplayName(s)}
-                      </MenuItem>
-                    ))}
+                    {rosterStudents.map((s) => {
+                      const done = submittedStudentIds.has(s.id);
+                      return (
+                        <MenuItem key={s.id} value={s.id} disabled={done}>
+                          {studentDisplayName(s)}
+                          {done ? " (already submitted)" : ""}
+                        </MenuItem>
+                      );
+                    })}
                   </Select>
                 </FormControl>
                 {classesLoading && (
@@ -280,6 +348,11 @@ export default function Scenario({
                 {selectedClassId && studentsLoading && (
                   <Typography variant="caption" color="text.secondary">
                     Loading students…
+                  </Typography>
+                )}
+                {selectedClassId && !studentsLoading && submissionsStatusLoading && (
+                  <Typography variant="caption" color="text.secondary">
+                    Checking who has already submitted this test…
                   </Typography>
                 )}
                 {selectedClassId &&

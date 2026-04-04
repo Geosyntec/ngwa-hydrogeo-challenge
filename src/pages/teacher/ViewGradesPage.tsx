@@ -9,6 +9,7 @@ import {
   Box,
   Button,
   IconButton,
+  Stack,
   Table,
   TableBody,
   TableCell,
@@ -21,11 +22,13 @@ import {
 import ArrowBack from '@mui/icons-material/ArrowBack'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import Visibility from '@mui/icons-material/Visibility'
+import RestartAlt from '@mui/icons-material/RestartAlt'
 import { ROUTES } from '../../app/routes'
 import { studentDisplayName } from '../../api/classesApi'
 import {
   fetchTeacherGrades,
   fetchGradeSubmissionDetail,
+  deleteGradeSubmissionsForStudentScenario,
   type GetGradesResponse,
   type TeacherGradeSubmissionRow,
 } from '../../api/getGradesApi'
@@ -98,16 +101,18 @@ export default function ViewGradesPage() {
   const [selectedStudent, setSelectedStudent] = useState<{
     displayName: string
   } | null>(null)
+  const [resettingKey, setResettingKey] = useState<string | null>(null)
+  const [resetError, setResetError] = useState<string | null>(null)
 
-  const loadGrades = useCallback(() => {
+  const loadGrades = useCallback((): Promise<void> => {
     if (!teacherEmail) {
       setSubmissions([])
       setLoading(false)
-      return
+      return Promise.resolve()
     }
     setLoading(true)
     setError(null)
-    fetchTeacherGrades(teacherEmail, teacherUserId)
+    return fetchTeacherGrades(teacherEmail, teacherUserId)
       .then((res) => setSubmissions(res.submissions))
       .catch((err) => {
         setError(err instanceof Error ? err.message : 'Failed to load grades')
@@ -156,6 +161,34 @@ export default function ViewGradesPage() {
     setGradeDetailError(null)
   }
 
+  const handleResetSubmission = async (row: TeacherGradeSubmissionRow) => {
+    if (
+      !window.confirm(
+        'Delete all stored submissions for this student on this test? They will be able to take the test again.',
+      )
+    ) {
+      return
+    }
+    setResetError(null)
+    const key = `${row.student_id}:${row.scenario_id}`
+    setResettingKey(key)
+    try {
+      await deleteGradeSubmissionsForStudentScenario(
+        row.student_id,
+        row.scenario_id,
+        teacherEmail,
+        teacherUserId,
+      )
+      await loadGrades()
+    } catch (err) {
+      setResetError(
+        err instanceof Error ? err.message : 'Failed to reset submission.',
+      )
+    } finally {
+      setResettingKey(null)
+    }
+  }
+
   return (
     <Box sx={{ p: 2 }}>
       <IconButton
@@ -170,8 +203,15 @@ export default function ViewGradesPage() {
       </Typography>
       <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
         Grades are grouped by test, then class. Open a section to see each student&apos;s
-        latest submission for that test. Use View to see full answers.
+        latest submission for that test. Use View to see full answers. Reset removes all
+        database rows for that student and test so they can submit again.
       </Typography>
+
+      {resetError && (
+        <Typography color="error" sx={{ mb: 2 }}>
+          {resetError}
+        </Typography>
+      )}
 
       {!teacherEmail && (
         <Typography color="text.secondary" sx={{ py: 2 }}>
@@ -273,13 +313,30 @@ export default function ViewGradesPage() {
                                     : '—'}
                                 </TableCell>
                                 <TableCell align="right">
-                                  <Button
-                                    size="small"
-                                    startIcon={<Visibility />}
-                                    onClick={() => openGrades(row)}
+                                  <Stack
+                                    direction="row"
+                                    spacing={0.5}
+                                    justifyContent="flex-end"
+                                    flexWrap="wrap"
                                   >
-                                    View
-                                  </Button>
+                                    <Button
+                                      size="small"
+                                      startIcon={<Visibility />}
+                                      onClick={() => openGrades(row)}
+                                    >
+                                      View
+                                    </Button>
+                                    <Button
+                                      size="small"
+                                      color="warning"
+                                      variant="outlined"
+                                      startIcon={<RestartAlt />}
+                                      disabled={resettingKey === `${row.student_id}:${row.scenario_id}`}
+                                      onClick={() => handleResetSubmission(row)}
+                                    >
+                                      Reset
+                                    </Button>
+                                  </Stack>
                                 </TableCell>
                               </TableRow>
                             ))}
