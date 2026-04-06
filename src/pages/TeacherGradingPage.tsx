@@ -1,10 +1,10 @@
 import { useNavigate } from 'react-router-dom'
 import {
+  Box,
   Card,
   CardActionArea,
   CardContent,
-  Container,
-  Grid,
+  Stack,
   Typography,
 } from '@mui/material'
 import { ROUTES } from '../app/routes'
@@ -19,7 +19,7 @@ export default function TeacherGradingPage() {
   const navigate = useNavigate()
 
   return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
+    <Box>
       <Typography variant="h4" component="h1" gutterBottom>
         Teacher Portal
       </Typography>
@@ -27,10 +27,17 @@ export default function TeacherGradingPage() {
         Review and grade student results.
       </Typography>
 
-      <Grid container spacing={3}>
-        {PORTAL_CARDS.map(({ title, route }) => (
-          <Grid item xs={12} sm={6} md={4} key={route}>
-            <Card>
+      <Box sx={{ overflowX: 'auto', width: '100%', pb: 1 }}>
+        <Stack direction="row" spacing={3} sx={{ flexWrap: 'nowrap', width: 'min-content' }}>
+          {PORTAL_CARDS.map(({ title, route }) => (
+            <Card
+              key={route}
+              sx={{
+                width: 300,
+                minWidth: 300,
+                flexShrink: 0,
+              }}
+            >
               <CardActionArea onClick={() => navigate(route)}>
                 <CardContent sx={{ py: 3 }}>
                   <Typography variant="h6" component="h2">
@@ -39,9 +46,9 @@ export default function TeacherGradingPage() {
                 </CardContent>
               </CardActionArea>
             </Card>
-          </Grid>
-        ))}
-      </Grid>
-    </Container>
+          ))}
+        </Stack>
+      </Box>
+    </Box>
   )
 }

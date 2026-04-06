@@ -107,7 +107,7 @@ export default function CreateTestPage() {
     !teacherId || !selectedTestByClassId[classId]?.trim();
 
   return (
-    <Box sx={{ p: 2 }}>
+    <Box>
       <IconButton
         aria-label="Back to Teacher portal"
         onClick={() => navigate(ROUTES.grading)}
@@ -148,7 +148,11 @@ export default function CreateTestPage() {
             : "Sign in to load your classes."}
         </Typography>
       ) : (
-        <TableContainer component={Paper} variant="outlined">
+        <TableContainer
+          component={Paper}
+          variant="outlined"
+          sx={{ overflowX: "auto", minWidth: 720 }}
+        >
           <Table size="small">
             <TableHead>
               <TableRow>

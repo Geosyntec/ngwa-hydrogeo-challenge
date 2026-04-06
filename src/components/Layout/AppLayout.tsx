@@ -12,6 +12,7 @@ export default function AppLayout() {
           flex: 1,
           display: 'flex',
           flexDirection: 'column',
+          minHeight: 0,
           overflow: 'auto',
         }}
       >

@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { CssBaseline, ThemeProvider, createTheme } from '@mui/material'
 import AppLayout from './components/Layout/AppLayout'
+import TeacherPortalLayout from './components/Layout/TeacherPortalLayout'
 import ErrorBoundary from './components/ErrorBoundary'
 import AuthGuard from './components/AuthGuard'
 import LandingPage from './pages/LandingPage'
@@ -38,10 +39,12 @@ export default function App() {
             <Route path={ROUTES.verifyEmail} element={<VerifyEmailPage />} />
             <Route path={ROUTES.resetPassword} element={<ResetPasswordPage />} />
             <Route element={<AuthGuard />}>
-              <Route path={ROUTES.grading} element={<TeacherGradingPage />} />
-              <Route path={ROUTES.gradingClasses} element={<ManageClassesPage />} />
-              <Route path={ROUTES.gradingGrades} element={<ViewGradesPage />} />
-              <Route path={ROUTES.gradingCreateTest} element={<CreateTestPage />} />
+              <Route element={<TeacherPortalLayout />}>
+                <Route path={ROUTES.grading} element={<TeacherGradingPage />} />
+                <Route path={ROUTES.gradingClasses} element={<ManageClassesPage />} />
+                <Route path={ROUTES.gradingGrades} element={<ViewGradesPage />} />
+                <Route path={ROUTES.gradingCreateTest} element={<CreateTestPage />} />
+              </Route>
             </Route>
             <Route path="*" element={<Navigate to={ROUTES.home} replace />} />
           </Route>

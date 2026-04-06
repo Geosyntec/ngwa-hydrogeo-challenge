@@ -224,7 +224,7 @@ export default function ManageClassesPage() {
   }
 
   return (
-    <Box sx={{ p: 2 }}>
+    <Box>
       <IconButton
         aria-label="Back to Teacher portal"
         onClick={() => navigate(ROUTES.grading)}
@@ -259,7 +259,7 @@ export default function ManageClassesPage() {
           >
             Add class
           </Button>
-          <TableContainer sx={{ maxWidth: 720 }}>
+          <TableContainer sx={{ overflowX: 'auto', minWidth: 720 }}>
           <Table size="small">
             <TableHead>
               <TableRow>

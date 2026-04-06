@@ -190,7 +190,7 @@ export default function ViewGradesPage() {
   }
 
   return (
-    <Box sx={{ p: 2 }}>
+    <Box>
       <IconButton
         aria-label="Back to Teacher portal"
         onClick={() => navigate(ROUTES.grading)}
@@ -238,7 +238,7 @@ export default function ViewGradesPage() {
       )}
 
       {teacherEmail && !loading && !error && grouped.length > 0 && (
-        <Box sx={{ maxWidth: 960 }}>
+        <Box sx={{ width: '100%' }}>
           {grouped.map((test) => (
             <Accordion
               key={test.scenarioId}
