@@ -15,6 +15,7 @@ import {
 import type { Theme } from "@mui/material/styles";
 import OpenInFullIcon from "@mui/icons-material/OpenInFull";
 import CloseFullscreenIcon from "@mui/icons-material/CloseFullscreen";
+import { Variant } from "@mui/material/styles/createTypography";
 
 /** Where to anchor the card relative to the well marker (legacy: optimal visibility when 3 wells selected). */
 export type WellInfoCardPlacement = "above" | "below" | "left" | "right";
@@ -124,7 +125,7 @@ const WELL_ELEVATIONS_PANEL_BG = "#e3f2fd";
 
 /** Subtle well graphic (casing + top cap) for background, low-opacity blue. */
 const WELL_ICON_BG_DATA_URI = (() => {
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 88" width="48" height="88"><ellipse cx="24" cy="12" rx="18" ry="9" fill="#1976d2" fill-opacity="0.14"/><rect x="15" y="14" width="18" height="66" rx="3" fill="#1976d2" fill-opacity="0.1"/><rect x="19" y="18" width="10" height="58" rx="1" fill="#1976d2" fill-opacity="0.06"/></svg>`;
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 88" width="48" height="88"></svg>`;
   return `url("data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}")`;
 })();
 
@@ -372,16 +373,21 @@ export default function WellInfoCard({
                   }}
                 /> */}
                 <Box sx={{ flexShrink: 0 }}>
-                  <Typography variant="subtitle2" sx={{ mb: 0.5 }}>
-                    <strong>Geology & Hydrology</strong>
+                  <Box sx={{ display: 'flex', justifyContent: 'flex-start' }}>
+                  <Typography variant="subtitle2" sx={{ mb: 0.5 ,flexGrow:0.5}}>
+                      <strong>Geology</strong>
                   </Typography>
+                  <Typography variant="subtitle2" sx={{ mb: 0.5,flexGrow:0.5 }}>
+                      <strong>Hydrology</strong>
+                  </Typography>
+                  </Box>
                   <Table size="small" sx={{ width: 400 }}>
                     <TableHead>
                       <TableRow>
-                        <TableCell><Typography variant="body2"> Depth (ft)</Typography></TableCell>
-                        <TableCell>Lithology</TableCell>
-                        <TableCell>K</TableCell>
-                        <TableCell>Porosity (%)</TableCell>
+                        <TableCell sx={{fontSize:'0.7rem',backgroundColor:'lightblue'}}> Depth (ft)</TableCell>
+                        <TableCell sx={{fontSize:'0.7rem',backgroundColor:'lightblue'}}>Lithology</TableCell>
+                        <TableCell sx={{fontSize:'0.7rem',backgroundColor:'lightblue'}}>K</TableCell>
+                        <TableCell sx={{fontSize:'0.7rem',backgroundColor:'lightblue'}}>Porosity (%)</TableCell>
                       </TableRow>
                     </TableHead>
                     <TableBody>

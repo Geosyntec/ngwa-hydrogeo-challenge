@@ -170,7 +170,7 @@ export default function TopBar() {
               <ListItemIcon>
                 <School fontSize="small" />
               </ListItemIcon>
-              <ListItemText>Teacher Grading</ListItemText>
+              <ListItemText>Teacher Portal</ListItemText>
             </MenuItem>
             {isAuthenticated ? (
               <MenuItem onClick={handleSignOut}>
