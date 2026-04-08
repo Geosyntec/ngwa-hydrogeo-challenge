@@ -78,7 +78,8 @@ export default function FlowDirectionPanel() {
           <Typography variant="h5" sx={{ flexGrow: 1 }}>
             Flow Direction
           </Typography>
-        {!isTest && (
+        {/* WIP: Am disabling Reality Checks for now */}
+        {false && (
           <RealityCheck
             title="Reality Check: Flow Direction"
             open={rcOpen}
