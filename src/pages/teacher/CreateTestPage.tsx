@@ -1,14 +1,9 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Box,
   Button,
-  CircularProgress,
-  FormControl,
   IconButton,
-  InputLabel,
-  MenuItem,
-  Select,
   Snackbar,
   Table,
   TableBody,
@@ -23,7 +18,6 @@ import ArrowBack from "@mui/icons-material/ArrowBack";
 import ContentCopy from "@mui/icons-material/ContentCopy";
 import OpenInNew from "@mui/icons-material/OpenInNew";
 import { ROUTES, testHrefWithTeacherId } from "../../app/routes";
-import { fetchClasses, type ClassesResponse } from "../../api/classesApi";
 import { useAppSelector } from "../../app/hooks";
 import { selectAuthUser } from "../../features/auth/authSlice";
 import { testScenarios } from "../../features/scenario/testScenario";
@@ -41,49 +35,10 @@ export default function CreateTestPage() {
   const teacherEmail = (authUser?.name ?? "").trim();
   const teacherId = (authUser?.id ?? "").trim();
 
-  const [classesData, setClassesData] = useState<ClassesResponse | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [loadError, setLoadError] = useState<string | null>(null);
-  const [selectedTestByClassId, setSelectedTestByClassId] = useState<
-    Record<string, string>
-  >({});
   const [copySnackbar, setCopySnackbar] = useState(false);
 
-  const loadClasses = useCallback(() => {
-    if (!teacherEmail) {
-      setClassesData(null);
-      setLoading(false);
-      return;
-    }
-    setLoading(true);
-    setLoadError(null);
-    fetchClasses(teacherEmail)
-      .then(setClassesData)
-      .catch((err) => {
-        setLoadError(
-          err instanceof Error ? err.message : "Failed to load classes.",
-        );
-      })
-      .finally(() => setLoading(false));
-  }, [teacherEmail]);
-
-  useEffect(() => {
-    loadClasses();
-  }, [loadClasses]);
-
-  const classRows = useMemo(() => {
-    if (!classesData) return [];
-    return Object.entries(classesData)
-      .map(([className, data]) => ({
-        className,
-        classId: data.classId,
-      }))
-      .sort((a, b) => a.className.localeCompare(b.className));
-  }, [classesData]);
-
-  const handleCopyLink = async (classId: string) => {
-    const testId = selectedTestByClassId[classId]?.trim();
-    if (!testId || !teacherId) return;
+  const handleCopyLink = async (testId: string) => {
+    if (!teacherId || !testId.trim()) return;
     const url = absoluteTestLink(teacherId, testId);
     try {
       await navigator.clipboard.writeText(url);
@@ -93,9 +48,8 @@ export default function CreateTestPage() {
     }
   };
 
-  const handlePreview = (classId: string) => {
-    const testId = selectedTestByClassId[classId]?.trim();
-    if (!testId || !teacherId) return;
+  const handlePreview = (testId: string) => {
+    if (!teacherId || !testId.trim()) return;
     const params = new URLSearchParams({
       teacherID: teacherId,
       testID: testId,
@@ -103,8 +57,7 @@ export default function CreateTestPage() {
     navigate({ pathname: ROUTES.test, search: `?${params.toString()}` });
   };
 
-  const rowActionsDisabled = (classId: string) =>
-    !teacherId || !selectedTestByClassId[classId]?.trim();
+  const actionsDisabled = !teacherId;
 
   return (
     <Box>
@@ -119,7 +72,7 @@ export default function CreateTestPage() {
         Create a Test
       </Typography>
       <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-        Choose a test for each class, then copy the student link or open a
+        Each row is a published test scenario. Copy the student link or open a
         preview. Students use the link to sign in and take the test; previews
         open while you are signed in as a teacher.
       </Typography>
@@ -131,94 +84,53 @@ export default function CreateTestPage() {
         </Typography>
       )}
 
-      {loadError && (
-        <Typography color="error" variant="body2" sx={{ mb: 2 }}>
-          {loadError}
-        </Typography>
-      )}
-
-      {loading ? (
-        <Box sx={{ display: "flex", justifyContent: "center", py: 4 }}>
-          <CircularProgress />
-        </Box>
-      ) : classRows.length === 0 ? (
+      {testScenarios.length === 0 ? (
         <Typography variant="body2" color="text.secondary">
-          {teacherEmail
-            ? "No classes yet. Add classes under Manage classes."
-            : "Sign in to load your classes."}
+          No test scenarios are configured yet.
         </Typography>
       ) : (
         <TableContainer
           component={Paper}
           variant="outlined"
-          sx={{ overflowX: "auto", minWidth: 720 }}
+          sx={{ overflowX: "auto", maxWidth: 640 }}
         >
           <Table size="small">
             <TableHead>
               <TableRow>
-                <TableCell>Class</TableCell>
-                <TableCell sx={{ minWidth: 220 }}>Test scenario</TableCell>
+                <TableCell>Test scenario</TableCell>
                 <TableCell align="center">Copy link</TableCell>
                 <TableCell align="center">Preview</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {classRows.map(({ className, classId }) => {
-                const selected = selectedTestByClassId[classId] ?? "";
-                const actionsDisabled = rowActionsDisabled(classId);
-                return (
-                  <TableRow key={classId}>
-                    <TableCell>
-                      <Typography fontWeight={600}>{className}</Typography>
-                    </TableCell>
-                    <TableCell>
-                      <FormControl size="small" fullWidth sx={{ minWidth: 200 }}>
-                        <Select
-                          labelId={`test-label-${classId}`}
-                          value={selected}
-                          displayEmpty
-                          onChange={(e) =>
-                            setSelectedTestByClassId((prev) => ({
-                              ...prev,
-                              [classId]: e.target.value as string,
-                            }))
-                          }
-                        >
-                          <MenuItem value="">
-                            <em>Select a test</em>
-                          </MenuItem>
-                          {testScenarios.map((s) => (
-                            <MenuItem key={s.id} value={s.id}>
-                              {s.name}
-                            </MenuItem>
-                          ))}
-                        </Select>
-                      </FormControl>
-                    </TableCell>
-                    <TableCell align="center">
-                      <IconButton
-                        aria-label={`Copy test link for ${className}`}
-                        onClick={() => handleCopyLink(classId)}
-                        disabled={actionsDisabled}
-                        color="primary"
-                      >
-                        <ContentCopy />
-                      </IconButton>
-                    </TableCell>
-                    <TableCell align="center">
-                      <Button
-                        variant="outlined"
-                        size="small"
-                        startIcon={<OpenInNew />}
-                        disabled={actionsDisabled}
-                        onClick={() => handlePreview(classId)}
-                      >
-                        Preview
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
+              {testScenarios.map((scenario) => (
+                <TableRow key={scenario.id}>
+                  <TableCell>
+                    <Typography fontWeight={600}>{scenario.name}</Typography>
+                  </TableCell>
+                  <TableCell align="center">
+                    <IconButton
+                      aria-label={`Copy test link for ${scenario.name}`}
+                      onClick={() => handleCopyLink(scenario.id)}
+                      disabled={actionsDisabled}
+                      color="primary"
+                    >
+                      <ContentCopy />
+                    </IconButton>
+                  </TableCell>
+                  <TableCell align="center">
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      startIcon={<OpenInNew />}
+                      disabled={actionsDisabled}
+                      onClick={() => handlePreview(scenario.id)}
+                    >
+                      Preview
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
             </TableBody>
           </Table>
         </TableContainer>
