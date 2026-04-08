@@ -50,14 +50,14 @@ export default memo(function MapOverlay() {
     const elevRatio =
       diffHighLow === 0 ? 0 : Number((diffHighMid / diffHighLow).toFixed(2));
 
-    const dToIntersection_Ft = Math.round(dLH_Ft);
+    const dToIntersection_Ft = Math.round(dHM_Ft);
     const dToIntersection_Px = dToIntersection_Ft / ratioFtPerPx;
     const userDToIntersection_Ft = Math.round(Number(flow.ElevResult_X_DistanceHighMid.input))
     const userDToIntersection_Px = userDToIntersection_Ft / ratioFtPerPx
     
     const intersection = pointOnLine(hi.Point, lo.Point, dToIntersection_Px);
     const userIntersection = pointOnLine(hi.Point, lo.Point,userDToIntersection_Px)
-    const foot = findPerpPoint(mid.Point, intersection, hi.Point);
+    const foot = findPerpPoint(mid.Point, userIntersection, hi.Point);
     const yLen_Ft = Math.round(distPx(hi.Point, foot) * ratioFtPerPx);
 
     const actualFlowIntersection = findIntersectionPoint(
