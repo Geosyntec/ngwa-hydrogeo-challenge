@@ -119,6 +119,15 @@ function portalPlacementStyle(
   }
 }
 
+/** Light blue panel behind G/S/P (legacy well info card). */
+const WELL_ELEVATIONS_PANEL_BG = "#e3f2fd";
+
+/** Subtle well graphic (casing + top cap) for background, low-opacity blue. */
+const WELL_ICON_BG_DATA_URI = (() => {
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 88" width="48" height="88"><ellipse cx="24" cy="12" rx="18" ry="9" fill="#1976d2" fill-opacity="0.14"/><rect x="15" y="14" width="18" height="66" rx="3" fill="#1976d2" fill-opacity="0.1"/><rect x="19" y="18" width="10" height="58" rx="1" fill="#1976d2" fill-opacity="0.06"/></svg>`;
+  return `url("data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}")`;
+})();
+
 /** Don't start a card drag from embedded controls or table (text selection). */
 function isWellCardDragTarget(target: EventTarget | null): boolean {
   if (!(target instanceof Element)) return false;
@@ -285,35 +294,74 @@ export default function WellInfoCard({
           <Stack
             direction="row"
             alignItems="flex-start"
-            justifyContent="space-between"
-            spacing={0.5}
+            justifyContent="flex-start"
+            spacing={1}
           >
-            <Stack spacing={0.5}>
-              <Row label="G" value={`${well.GroundElevationFt}`} />
-              <Row label="S" value={`${well.StaticElevationFt}`} />
-              <Row label="P" value={`${well.PumpingElevationFt}`} />
-              {allowPumping && (
-                <Stack
-                  direction="row"
-                  alignItems="center"
-                  spacing={1}
-                  sx={{ mt: 1 }}
-                >
-                  <Checkbox
-                    size="small"
-                    checked={!!well.IsPumpingOn}
-                    onChange={(e) => onTogglePumping?.(e.target.checked)}
-                    disabled={isTest}
-                  />
-                  <Typography
-                    variant="body2"
-                    color={isTest ? "text.disabled" : "text.primary"}
+            <Box
+              sx={{
+                position: "relative",
+                flexShrink: 0,
+                borderRadius: 1,
+                px: 1.25,
+                py: 1,
+                minWidth: 108,
+                overflow: "hidden",
+                bgcolor: WELL_ELEVATIONS_PANEL_BG,
+                border: (t: Theme) => `1px solid ${t.palette.primary.light}`,
+                backgroundImage: WELL_ICON_BG_DATA_URI,
+                backgroundRepeat: "no-repeat",
+                backgroundPosition: "right 4px center",
+                backgroundSize: "40px auto",
+              }}
+            >
+              <Typography
+                variant="h2"
+                component="span"
+                aria-hidden
+                sx={{
+                  position: "absolute",
+                  right: 2,
+                  top: "42%",
+                  transform: "translateY(-50%)",
+                  fontWeight: 800,
+                  fontSize: "3.25rem",
+                  lineHeight: 1,
+                  color: "primary.main",
+                  opacity: 0.11,
+                  pointerEvents: "none",
+                  userSelect: "none",
+                  letterSpacing: "-0.06em",
+                }}
+              >
+                {well.Name}
+              </Typography>
+              <Stack spacing={0.5} sx={{ position: "relative", zIndex: 1 }}>
+                <Row label="G" value={`${well.GroundElevationFt}`} />
+                <Row label="S" value={`${well.StaticElevationFt}`} />
+                <Row label="P" value={`${well.PumpingElevationFt}`} />
+                {allowPumping && (
+                  <Stack
+                    direction="row"
+                    alignItems="center"
+                    spacing={1}
+                    sx={{ mt: 1 }}
                   >
-                    Pumping ON
-                  </Typography>
-                </Stack>
-              )}
-            </Stack>
+                    <Checkbox
+                      size="small"
+                      checked={!!well.IsPumpingOn}
+                      onChange={(e) => onTogglePumping?.(e.target.checked)}
+                      disabled={isTest}
+                    />
+                    <Typography
+                      variant="body2"
+                      color={isTest ? "text.disabled" : "text.primary"}
+                    >
+                      Pumping ON
+                    </Typography>
+                  </Stack>
+                )}
+              </Stack>
+            </Box>
             {geologyExpanded && (
               <>
                 {/* <Box
@@ -359,7 +407,7 @@ export default function WellInfoCard({
                   ? "Hide Geology & Hydrology"
                   : "Show Geology & Hydrology"
               }
-              sx={{ mt: -0.5, mr: "24px" }}
+              sx={{ mt: -0.5, ml: "auto", mr: "24px", flexShrink: 0 }}
             >
               {geologyExpanded ? (
                 <CloseFullscreenIcon fontSize="small" sx={{mr:2}} />
