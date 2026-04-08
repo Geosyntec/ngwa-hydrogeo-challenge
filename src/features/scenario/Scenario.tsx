@@ -43,7 +43,7 @@ import { selectIsAuthenticated } from "../auth/authSlice";
 type ClassOption = { id: string; name: string };
 
 /** Fixed question column width from `md` up; does not shrink until layout stacks below `md`. */
-const SCENARIO_QUESTION_PANEL_WIDTH_PX = 520;
+const SCENARIO_QUESTION_PANEL_WIDTH_PX = 600;
 /** Minimum map width on `md+` so the row triggers horizontal scroll instead of crushing columns. */
 const SCENARIO_MAP_MIN_WIDTH_PX = 480;
 /** Default MUI `spacing(2)` gap between columns (must match `gap: 2` below). */
