@@ -90,7 +90,8 @@ export const DEFAULT_TEST_SCENARIO_ID = testScenarios[0]?.id ?? "test-1";
 /**
  * Resolve which test scenario to run.
  * - Empty `testId`: first scenario in `testScenarios` (default).
- * - Non-empty: must match `ScenarioDefinition.id` or returns `undefined`.
+ * - Non-empty: match `ScenarioDefinition.id` (exact, then case-insensitive) so links stay
+ *   valid if casing differs (e.g. `test-1` vs `Test-1`).
  */
 export function getTestScenarioById(
   testId: string | undefined | null,
@@ -99,7 +100,10 @@ export function getTestScenarioById(
   if (!id) {
     return testScenarios[0];
   }
-  return testScenarios.find((s) => s.id === id);
+  const exact = testScenarios.find((s) => s.id === id);
+  if (exact) return exact;
+  const lower = id.toLowerCase();
+  return testScenarios.find((s) => s.id.toLowerCase() === lower);
 }
 
 /** First test scenario; prefer `getTestScenarioById` / `testScenarios` for new code. */
