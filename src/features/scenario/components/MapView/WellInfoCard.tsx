@@ -10,6 +10,7 @@ import {
   TableCell,
   TableHead,
   TableRow,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import type { Theme } from "@mui/material/styles";
@@ -336,9 +337,21 @@ export default function WellInfoCard({
                 {well.Name}
               </Typography>
               <Stack spacing={0.5} sx={{ position: "relative", zIndex: 1 }}>
-                <Row label="G" value={`${well.GroundElevationFt}`} />
-                <Row label="S" value={`${well.StaticElevationFt}`} />
-                <Row label="P" value={`${well.PumpingElevationFt}`} />
+                <Row
+                  label="G"
+                  value={`${well.GroundElevationFt}`}
+                  explainer="Ground elevation"
+                />
+                <Row
+                  label="S"
+                  value={`${well.StaticElevationFt}`}
+                  explainer="Water table elevation in static conditions"
+                />
+                <Row
+                  label="P"
+                  value={`${well.PumpingElevationFt}`}
+                  explainer="Water table elevation in pumping conditions"
+                />
                 {allowPumping && (
                   <Stack
                     direction="row"
@@ -440,35 +453,65 @@ export default function WellInfoCard({
 /** Dark blue badge behind G / S / P labels (legacy well card). */
 const ROW_LABEL_SQUARE_BG = "#0d47a1";
 
-function Row({ label, value }: { label: string; value: string }) {
+function Row({
+  label,
+  value,
+  explainer,
+}: {
+  label: string;
+  value: string;
+  explainer: string;
+}) {
   return (
     <Stack direction="row" spacing={1} alignItems="center">
-      <Box
-        sx={{
-          width: 22,
-          height: 22,
-          minWidth: 22,
-          flexShrink: 0,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          bgcolor: ROW_LABEL_SQUARE_BG,
-          color: "#fff",
+      <Tooltip
+        title={explainer}
+        enterDelay={0}
+        enterNextDelay={0}
+        placement="top"
+        arrow
+        describeChild
+        componentsProps={{
+          tooltip: {
+            sx: {
+              fontSize: "0.75rem",
+              fontWeight: 500,
+              py: 0.5,
+              px: 1,
+              maxWidth: 220,
+            },
+          },
         }}
       >
-        <Typography
-          variant="body2"
+        <Box
           component="span"
           sx={{
-            color: "inherit",
-            fontWeight: 700,
-            lineHeight: 1,
-            fontSize: "0.8125rem",
+            width: 22,
+            height: 22,
+            minWidth: 22,
+            flexShrink: 0,
+            display: "inline-flex",
+            alignItems: "center",
+            justifyContent: "center",
+            bgcolor: ROW_LABEL_SQUARE_BG,
+            color: "#fff",
+            cursor: "default",
           }}
         >
-          {label}
-        </Typography>
-      </Box>
+          <Typography
+            variant="body2"
+            component="span"
+            sx={{
+              color: "inherit",
+              fontWeight: 700,
+              lineHeight: 1,
+              fontSize: "0.8125rem",
+            }}
+          >
+            {label}
+          </Typography>
+        </Box>
+      </Tooltip>
       <Box sx={{ minWidth: 28, textAlign: "left" }}>
         <Typography variant="body2">{value}</Typography>
       </Box>
