@@ -24,6 +24,7 @@ import FDStep1 from "./FD_Step1";
 import FDStep2 from "./FD_Step2";
 import FDStep3 from "./FD_Step3";
 import RealityCheck from "../../RealityCheck/RealityCheck";
+import { PanelAccordionIcon } from "../PanelAccordionIcon";
 
 export default function FlowDirectionPanel() {
   const dispatch = useAppDispatch();
@@ -48,7 +49,6 @@ export default function FlowDirectionPanel() {
 
   const onToggle = useCallback(
     (_e: any, expanded: boolean) => {
-      console.log("herro")
       dispatch(setSelectedPanel(expanded ? "flow" : null));
     },
     [dispatch]
@@ -64,8 +64,20 @@ export default function FlowDirectionPanel() {
       //   overflow:"scroll"
       // }}
     >
-      <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{position:'sticky',top:0}}>
-        <Typography variant="h5">Flow Direction</Typography>
+      <AccordionSummary
+        expandIcon={<ExpandMoreIcon />}
+        sx={{ position: "sticky", top: 0 }}
+      >
+        <Stack
+          direction="row"
+          alignItems="center"
+          spacing={1.5}
+          sx={{ width: "100%", pr: 1, minWidth: 0 }}
+        >
+          <PanelAccordionIcon panel="flowDirection" />
+          <Typography variant="h5" sx={{ flexGrow: 1 }}>
+            Flow Direction
+          </Typography>
         {!isTest && (
           <RealityCheck
             title="Reality Check: Flow Direction"
@@ -89,6 +101,7 @@ export default function FlowDirectionPanel() {
             </Typography>
           </RealityCheck>
           )}
+        </Stack>
       </AccordionSummary>
 
       <AccordionDetails sx={{maxHeight:"400px",overflowY:"auto",minHeight:0}}>

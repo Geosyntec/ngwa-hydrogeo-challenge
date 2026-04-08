@@ -51,6 +51,7 @@ import { ROUTES } from "../../../../../app/routes";
 import { store } from "../../../../../app/store";
 import { buildSubmitGradesPayload } from "../../../submitGradesPayload";
 import { submitGrades } from "../../../../../api/submitGradesApi";
+import { PanelAccordionIcon } from "../PanelAccordionIcon";
 
 export default function HorizontalVelocityPanel() {
   const dispatch = useAppDispatch();
@@ -138,7 +139,10 @@ export default function HorizontalVelocityPanel() {
       onChange={onToggle}
     >
       <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-        <Typography variant="h5">Horizontal Velocity</Typography>
+        <Stack direction="row" alignItems="center" spacing={1.5} sx={{ minWidth: 0 }}>
+          <PanelAccordionIcon panel="horizontalVelocity" />
+          <Typography variant="h5">Horizontal Velocity</Typography>
+        </Stack>
       </AccordionSummary>
       <AccordionDetails>
         <Box sx={{ position: "relative", overflow: "visible" }}>

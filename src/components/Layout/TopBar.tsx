@@ -20,6 +20,7 @@ import { useAppDispatch, useAppSelector } from '../../app/hooks'
 import { logout as logoutAction, selectIsAuthenticated, selectAuthUser } from '../../features/auth/authSlice'
 import { logout as logoutApi } from '../../api/mockLogoutApi'
 import { ROUTES, NAV_ITEMS, testHrefWithTeacherId } from '../../app/routes'
+import { resolvePublicAssetUrl } from '../../utils/publicAssetUrl'
 
 const brandColor = '#6CB5F4'
 
@@ -66,7 +67,19 @@ export default function TopBar() {
         }}
       >
         {/* Left: brand */}
-        <Box sx={{ display: 'flex', alignItems: 'center', flex: 1 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', flex: 1, gap: 1.25, minWidth: 0 }}>
+          <Box
+            component="img"
+            src={resolvePublicAssetUrl('/assets/img/gw_logo.png')}
+            alt="Hydrogeology"
+            sx={{
+              height: { xs: 28, sm: 32 },
+              width: 'auto',
+              objectFit: 'contain',
+              display: 'block',
+              flexShrink: 0,
+            }}
+          />
           <Typography
             component="span"
             variant="h6"

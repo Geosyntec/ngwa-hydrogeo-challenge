@@ -26,6 +26,7 @@ import { selectFlowAllStepsComplete } from "../../../flowDirection/flowSelectors
 import { selectScenarioState, setSelectedPanel } from "../../../ScenarioSlice";
 import RealityCheck from "../../RealityCheck/RealityCheck";
 import { panelBindTextFieldSx } from "../panelBindTextFieldSx";
+import { PanelAccordionIcon } from "../PanelAccordionIcon";
 import { useCallback, useEffect, useState } from "react";
 
 export default function GradientPanel() {
@@ -90,7 +91,10 @@ export default function GradientPanel() {
       onChange={onToggle}
     >
       <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-        <Typography variant="h5">Gradient</Typography>
+        <Stack direction="row" alignItems="center" spacing={1.5} sx={{ minWidth: 0 }}>
+          <PanelAccordionIcon panel="gradient" />
+          <Typography variant="h5">Gradient</Typography>
+        </Stack>
       </AccordionSummary>
       <AccordionDetails>
         <Box sx={{ position: "relative", overflow: "visible" }}>
