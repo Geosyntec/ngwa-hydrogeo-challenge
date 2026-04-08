@@ -307,8 +307,7 @@ export default function WellInfoCard({
                 minWidth: 108,
                 overflow: "hidden",
                 bgcolor: WELL_ELEVATIONS_PANEL_BG,
-                border: (t: Theme) => `1px solid ${t.palette.primary.light}`,
-                backgroundImage: WELL_ICON_BG_DATA_URI,
+                // border: (t: Theme) => `1px solid ${t.palette.primary.light}`,
                 backgroundRepeat: "no-repeat",
                 backgroundPosition: "right 4px center",
                 backgroundSize: "40px auto",
@@ -432,15 +431,39 @@ export default function WellInfoCard({
   return card;
 }
 
+/** Dark blue badge behind G / S / P labels (legacy well card). */
+const ROW_LABEL_SQUARE_BG = "#0d47a1";
+
 function Row({ label, value }: { label: string; value: string }) {
   return (
     <Stack direction="row" spacing={1} alignItems="center">
-      <Box sx={{ width: 16, textAlign: "center" }}>
-        <Typography variant="body2">
-          <strong>{label}</strong>
+      <Box
+        sx={{
+          width: 22,
+          height: 22,
+          minWidth: 22,
+          flexShrink: 0,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          bgcolor: ROW_LABEL_SQUARE_BG,
+          color: "#fff",
+        }}
+      >
+        <Typography
+          variant="body2"
+          component="span"
+          sx={{
+            color: "inherit",
+            fontWeight: 700,
+            lineHeight: 1,
+            fontSize: "0.8125rem",
+          }}
+        >
+          {label}
         </Typography>
       </Box>
-      <Box sx={{ width: 16, textAlign: "center" }}>
+      <Box sx={{ minWidth: 28, textAlign: "left" }}>
         <Typography variant="body2">{value}</Typography>
       </Box>
     </Stack>
