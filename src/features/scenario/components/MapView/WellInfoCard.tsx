@@ -362,12 +362,10 @@ export default function WellInfoCard({
                     <Checkbox
                       size="small"
                       checked={!!well.IsPumpingOn}
-                      onChange={(e) => onTogglePumping?.(e.target.checked)}
-                      disabled={isTest}
-                    />
+                      onChange={(e) => onTogglePumping?.(e.target.checked)}                    />
                     <Typography
                       variant="body2"
-                      color={isTest ? "text.disabled" : "text.primary"}
+                      color={"text.primary"}
                     >
                       Pumping ON
                     </Typography>
