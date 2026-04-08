@@ -259,7 +259,7 @@ export default function ManageClassesPage() {
           >
             Add class
           </Button>
-          <TableContainer sx={{ overflowX: 'auto', minWidth: 720 }}>
+          <TableContainer sx={{ overflowX: 'auto', maxWidth: 640 }}>
           <Table size="small">
             <TableHead>
               <TableRow>
