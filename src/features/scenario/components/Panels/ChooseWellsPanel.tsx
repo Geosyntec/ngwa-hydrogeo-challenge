@@ -13,6 +13,7 @@ import {
   selectWells,
 } from "../../ScenarioSlice";
 import { dispatchResetChallenge } from "../../resetChallengeState";
+import { PanelAccordionIcon } from "./PanelAccordionIcon";
 
 export default function ChooseWellsPanel() {
   const dispatch = useAppDispatch();
@@ -46,6 +47,7 @@ export default function ChooseWellsPanel() {
           spacing={2}
           sx={{ alignItems: "center", width: "100%" }}
         >
+          <PanelAccordionIcon panel="selectWells" />
           <Stack direction="row" spacing={2} flexGrow={1} alignItems="center">
             <Typography variant="h5">Choose 3 Wells</Typography>
             <Typography variant = "body2" sx={{fontSize:10}}>Click on any three <br/>well icons on the map</Typography>
