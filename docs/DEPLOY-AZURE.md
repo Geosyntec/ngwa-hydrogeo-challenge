@@ -48,8 +48,8 @@ At runtime, **the container’s own Python** is used (not the venv’s `bin/pyth
   In **Configuration → Application settings**, add these names **exactly** (case-sensitive):
   - **MAILJET_API_KEY** – your Mailjet API key
   - **MAILJET_SECRET_KEY** – your Mailjet Secret key
-  - **MAILJET_FROM_EMAIL** – sender address (must be allowed in Mailjet)
-  - **MAILJET_FROM_NAME** (optional) – sender display name  
+  - **MAILJET_FROM_EMAIL** (optional) – defaults to **no.reply@aquiferlab.com** (must match a verified sender in Mailjet if you override)
+  - **MAILJET_FROM_NAME** (optional) – sender display name (defaults to Hydrogeology Challenge)  
   Then **Save** and **Restart** the Web App so the process picks up the new variables. If emails are still skipped, check Log stream for a warning that shows which of the two (API key / Secret key) is not set.
 
 ## Local deploy prep

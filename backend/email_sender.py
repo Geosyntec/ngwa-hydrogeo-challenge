@@ -3,9 +3,11 @@ Send emails via Mailjet Send API v3.1.
 
 Where to set secrets:
 - Azure: Web App → Configuration → Application settings. Add names exactly:
-  MAILJET_API_KEY, MAILJET_SECRET_KEY, MAILJET_FROM_EMAIL (MAILJET_FROM_NAME optional).
+  MAILJET_API_KEY, MAILJET_SECRET_KEY (MAILJET_FROM_EMAIL / MAILJET_FROM_NAME optional overrides).
   Then Save and Restart the app so the process sees the new variables.
 - Local: .env in project root (loaded by main.py via python-dotenv).
+
+All transactional mail uses sender no.reply@aquiferlab.com unless MAILJET_FROM_EMAIL is set.
 
 Names are case-sensitive. We also check MJ_APIKEY_PUBLIC / MJ_APIKEY_PRIVATE as fallbacks.
 """
@@ -22,6 +24,18 @@ import urllib.request
 logger = logging.getLogger(__name__)
 
 MAILJET_SEND_URL = "https://api.mailjet.com/v3.1/send"
+
+# Verified sender in Mailjet; override with MAILJET_FROM_EMAIL if needed.
+DEFAULT_MAILJET_FROM_EMAIL = "no.reply@aquiferlab.com"
+DEFAULT_MAILJET_FROM_NAME = "Hydrogeology Challenge"
+
+
+def _mailjet_from() -> tuple[str, str]:
+    """Return (email, display_name) for the From header."""
+    raw = (os.environ.get("MAILJET_FROM_EMAIL") or "").strip()
+    email = raw or DEFAULT_MAILJET_FROM_EMAIL
+    name = (os.environ.get("MAILJET_FROM_NAME") or DEFAULT_MAILJET_FROM_NAME).strip()
+    return email, name
 
 
 def _get_auth_header() -> str | None:
@@ -57,11 +71,7 @@ def send_verification_email(to_email: str, verification_link: str) -> bool:
         )
         return False
 
-    from_email = (os.environ.get("MAILJET_FROM_EMAIL") or "").strip()
-    from_name = (os.environ.get("MAILJET_FROM_NAME") or "Hydrogeology Challenge").strip()
-    if not from_email:
-        logger.warning("MAILJET_FROM_EMAIL not set. Skipping send.")
-        return False
+    from_email, from_name = _mailjet_from()
     logger.info("Mailjet: about to send email to %s", to_email)
     body = {
         "Messages": [
