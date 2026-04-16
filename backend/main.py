@@ -108,11 +108,33 @@ async def login(body: LoginBody, conn=Depends(get_db)):
 
 
 # --- Register & email verification ---
-def _verification_base_url() -> str:
-    base = (os.environ.get("VERIFICATION_BASE_URL") or "").strip().rstrip("/")
-    if base:
-        return base
-    return "http://localhost:5173"  # dev default
+def _verification_base_url(request: Request | None) -> str:
+    """
+    Absolute origin for links in outbound email (clients do not resolve relative URLs).
+
+    Order: VERIFICATION_BASE_URL env → infer from this HTTP request (Host / X-Forwarded-*)
+    → http://localhost:5173 when there is no request (e.g. ad-hoc scripts).
+    """
+    env = (os.environ.get("VERIFICATION_BASE_URL") or "").strip().rstrip("/")
+    if env:
+        return env
+    if request is not None:
+        proto = (
+            (request.headers.get("x-forwarded-proto") or "")
+            .split(",")[0]
+            .strip()
+            or (request.url.scheme or "https")
+        )
+        host = (
+            (request.headers.get("x-forwarded-host") or "")
+            .split(",")[0]
+            .strip()
+            or (request.headers.get("host") or "").strip()
+        )
+        if host:
+            return f"{proto}://{host}".rstrip("/")
+        return str(request.base_url).rstrip("/")
+    return "http://localhost:5173"
 
 EMAIL_RE = re.compile(r"^[^@]+@[^@]+\.[^@]+$")
 
@@ -128,7 +150,7 @@ class RegisterResponse(BaseModel):
 
 
 @app.post("/api/register", response_model=RegisterResponse)
-async def register(body: RegisterBody, conn=Depends(get_db)):
+async def register(body: RegisterBody, request: Request, conn=Depends(get_db)):
     if conn is None:
         raise HTTPException(status_code=503, detail="Registration is unavailable (database not configured).")
     email = (body.email or "").strip().lower()
@@ -158,7 +180,7 @@ async def register(body: RegisterBody, conn=Depends(get_db)):
         token,
         expires_at,
     )
-    base = _verification_base_url()
+    base = _verification_base_url(request)
     link = f"{base}/verify-email?token={token}"
     send_verification_email(email, link)
 
@@ -201,7 +223,7 @@ class ResendVerificationBody(BaseModel):
 
 
 @app.post("/api/resend-verification", response_model=RegisterResponse)
-async def resend_verification(body: ResendVerificationBody, conn=Depends(get_db)):
+async def resend_verification(body: ResendVerificationBody, request: Request, conn=Depends(get_db)):
     if conn is None:
         raise HTTPException(status_code=503, detail="Resend is unavailable (database not configured).")
     email = (body.email or "").strip().lower()
@@ -223,7 +245,7 @@ async def resend_verification(body: ResendVerificationBody, conn=Depends(get_db)
         token,
         expires_at,
     )
-    base = _verification_base_url()
+    base = _verification_base_url(request)
     link = f"{base}/verify-email?token={token}"
     send_verification_email(email, link)
 
@@ -248,7 +270,7 @@ class RecoverPasswordBody(BaseModel):
 
 
 @app.post("/api/recover-password", response_model=RegisterResponse)
-async def recover_password(body: RecoverPasswordBody, conn=Depends(get_db)):
+async def recover_password(body: RecoverPasswordBody, request: Request, conn=Depends(get_db)):
     if conn is None:
         raise HTTPException(
             status_code=503,
@@ -280,7 +302,7 @@ async def recover_password(body: RecoverPasswordBody, conn=Depends(get_db)):
         token,
         expires_at,
     )
-    base = _verification_base_url().rstrip("/")
+    base = _verification_base_url(request)
     reset_link = f"{base}/reset-password?email={quote(email)}&token={token}"
     sent = send_password_reset_email(email, reset_link)
     if not sent:

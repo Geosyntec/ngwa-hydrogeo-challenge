@@ -51,7 +51,7 @@ At runtime, **the container’s own Python** is used (not the venv’s `bin/pyth
   - **MAILJET_FROM_EMAIL** (optional) – defaults to **no.reply@aquiferlab.com** (must match a verified sender in Mailjet if you override)
   - **MAILJET_FROM_NAME** (optional) – sender display name (defaults to Hydrogeology Challenge)  
   Then **Save** and **Restart** the Web App so the process picks up the new variables. If emails are still skipped, check Log stream for a warning that shows which of the two (API key / Secret key) is not set.  
-  The same Mailjet configuration is used for **email verification** and **password recovery** (`POST /api/recover-password` → reset link in email). Reset links use **VERIFICATION_BASE_URL** (same as verification emails) so they point at your deployed frontend (e.g. `https://your-app.azurewebsites.net`). After upgrading an existing database, run **DB bootstrap** once so the `password_reset_tokens` table exists (see above).
+  The same Mailjet configuration is used for **email verification** and **password recovery** (`POST /api/recover-password` → reset link in email). Link targets are built as **VERIFICATION_BASE_URL** if set; otherwise the server uses the **incoming request’s public host** (`Host` / `X-Forwarded-Host` and `X-Forwarded-Proto`), which matches production when the API and SPA are served from the same site (e.g. `https://prodsite.com/verify-email?…`). Set **VERIFICATION_BASE_URL** explicitly when the browser-facing origin differs from the API host (e.g. split dev: `http://localhost:5173`). After upgrading an existing database, run **DB bootstrap** once so the `password_reset_tokens` table exists (see above).
 
 ## Local deploy prep
 
