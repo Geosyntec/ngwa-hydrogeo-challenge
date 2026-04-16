@@ -50,7 +50,8 @@ At runtime, **the container’s own Python** is used (not the venv’s `bin/pyth
   - **MAILJET_SECRET_KEY** – your Mailjet Secret key
   - **MAILJET_FROM_EMAIL** (optional) – defaults to **no.reply@aquiferlab.com** (must match a verified sender in Mailjet if you override)
   - **MAILJET_FROM_NAME** (optional) – sender display name (defaults to Hydrogeology Challenge)  
-  Then **Save** and **Restart** the Web App so the process picks up the new variables. If emails are still skipped, check Log stream for a warning that shows which of the two (API key / Secret key) is not set.
+  Then **Save** and **Restart** the Web App so the process picks up the new variables. If emails are still skipped, check Log stream for a warning that shows which of the two (API key / Secret key) is not set.  
+  The same Mailjet configuration is used for **email verification** and **password recovery** (`POST /api/recover-password` → reset link in email). Reset links use **VERIFICATION_BASE_URL** (same as verification emails) so they point at your deployed frontend (e.g. `https://your-app.azurewebsites.net`). After upgrading an existing database, run **DB bootstrap** once so the `password_reset_tokens` table exists (see above).
 
 ## Local deploy prep
 

@@ -4,6 +4,7 @@ Run with: uvicorn backend.main:app --reload --port 8000
 In production (e.g. Azure App Service), serves the built React app from backend/static.
 """
 import json
+import logging
 import os
 import re
 import secrets
@@ -11,6 +12,7 @@ import uuid as uuid_mod
 from contextlib import asynccontextmanager
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
+from urllib.parse import quote
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -19,11 +21,13 @@ from fastapi import Depends, FastAPI, HTTPException, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 from backend.database import create_pool, close_pool, get_connection, Pool
 from backend.auth import verify_password, hash_password
-from backend.email_sender import send_verification_email
+from backend.email_sender import send_password_reset_email, send_verification_email
+
+logger = logging.getLogger(__name__)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -224,6 +228,116 @@ async def resend_verification(body: ResendVerificationBody, conn=Depends(get_db)
     send_verification_email(email, link)
 
     return RegisterResponse(ok=True, message="A new verification email has been sent.")
+
+
+# --- Password recovery (Mailjet + password_reset_tokens) ---
+def _new_password_policy_error(password: str) -> str | None:
+    if len(password) < 9:
+        return "Password must be longer than 8 characters."
+    if not re.search(r"[A-Z]", password):
+        return "Password must contain at least one capital letter."
+    if not re.search(r"\d", password):
+        return "Password must contain at least one number."
+    if not re.search(r'[!@#$%^&*()_+\-=[\]{};\':"\\|,.<>/?]', password):
+        return "Password must contain at least one special character."
+    return None
+
+
+class RecoverPasswordBody(BaseModel):
+    email: str
+
+
+@app.post("/api/recover-password", response_model=RegisterResponse)
+async def recover_password(body: RecoverPasswordBody, conn=Depends(get_db)):
+    if conn is None:
+        raise HTTPException(
+            status_code=503,
+            detail="Password recovery is unavailable (database not configured).",
+        )
+    email = (body.email or "").strip().lower()
+    if not email:
+        raise HTTPException(status_code=400, detail="Email is required.")
+    if not EMAIL_RE.match(email):
+        raise HTTPException(status_code=400, detail="Invalid email format.")
+
+    generic = RegisterResponse(
+        ok=True,
+        message="If an account exists for this email, a password reset link has been sent.",
+    )
+
+    user = await conn.fetchrow(
+        "SELECT id FROM users WHERE LOWER(email) = LOWER($1)", email,
+    )
+    if not user:
+        return generic
+
+    await conn.execute("DELETE FROM password_reset_tokens WHERE user_id = $1", user["id"])
+    token = secrets.token_urlsafe(32)
+    expires_at = datetime.now(timezone.utc) + timedelta(hours=1)
+    await conn.execute(
+        "INSERT INTO password_reset_tokens (user_id, token, expires_at) VALUES ($1, $2, $3)",
+        user["id"],
+        token,
+        expires_at,
+    )
+    base = _verification_base_url().rstrip("/")
+    reset_link = f"{base}/reset-password?email={quote(email)}&token={token}"
+    sent = send_password_reset_email(email, reset_link)
+    if not sent:
+        logger.warning("Password reset Mailjet send failed for %s", email)
+
+    return generic
+
+
+class NewPasswordBody(BaseModel):
+    model_config = ConfigDict(populate_by_name=True)
+    email: str
+    token: str
+    new_password: str = Field(validation_alias="newPassword")
+
+
+@app.post("/api/new-password", response_model=RegisterResponse)
+async def new_password(body: NewPasswordBody, conn=Depends(get_db)):
+    if conn is None:
+        raise HTTPException(
+            status_code=503,
+            detail="Password reset is unavailable (database not configured).",
+        )
+    email = (body.email or "").strip().lower()
+    token = (body.token or "").strip()
+    new_password = body.new_password or ""
+    if not email or not token:
+        raise HTTPException(status_code=400, detail="Invalid or expired reset link.")
+    policy_err = _new_password_policy_error(new_password)
+    if policy_err:
+        raise HTTPException(status_code=400, detail=policy_err)
+
+    row = await conn.fetchrow(
+        """
+        SELECT prt.expires_at, u.id AS user_id
+        FROM password_reset_tokens prt
+        JOIN users u ON u.id = prt.user_id
+        WHERE prt.token = $1 AND LOWER(u.email) = LOWER($2)
+        """,
+        token,
+        email,
+    )
+    now = datetime.now(timezone.utc)
+    if not row or row["expires_at"] <= now:
+        raise HTTPException(status_code=400, detail="Invalid or expired reset link.")
+
+    password_hash = hash_password(new_password)
+    await conn.execute(
+        "UPDATE users SET password_hash = $1 WHERE id = $2",
+        password_hash,
+        row["user_id"],
+    )
+    await conn.execute(
+        "DELETE FROM password_reset_tokens WHERE user_id = $1",
+        row["user_id"],
+    )
+
+    return RegisterResponse(ok=True, message="Password has been updated.")
 
 
 # --- Classes (DB-backed) ---

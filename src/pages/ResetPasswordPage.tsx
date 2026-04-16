@@ -8,7 +8,7 @@ import {
   Typography,
 } from '@mui/material'
 import { validatePassword } from '../utils/passwordValidation'
-import { setNewPassword } from '../api/mockNewPasswordApi'
+import { setNewPassword } from '../api/newPasswordApi'
 import { ROUTES } from '../app/routes'
 
 export default function ResetPasswordPage() {

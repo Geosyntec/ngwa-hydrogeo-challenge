@@ -51,18 +51,12 @@ def _get_auth_header() -> str | None:
     return "Basic " + base64.b64encode(raw.encode()).decode()
 
 
-def send_verification_email(to_email: str, verification_link: str) -> bool:
-    """
-    Send an email with the verification link. Returns True if sent, False if Mailjet not configured or send failed.
-    """
+def _mailjet_send_messages(messages: list[dict]) -> bool:
+    """POST Messages to Mailjet. Returns False if not configured, HTTP error, or non-2xx."""
     auth = _get_auth_header()
     if not auth:
-        has_key = bool(
-            (os.environ.get("MAILJET_API_KEY") or "").strip()
-        )
-        has_secret = bool(
-            (os.environ.get("MAILJET_SECRET_KEY") or "").strip()
-        )
+        has_key = bool((os.environ.get("MAILJET_API_KEY") or "").strip())
+        has_secret = bool((os.environ.get("MAILJET_SECRET_KEY") or "").strip())
         logger.warning(
             "Mailjet not configured: MAILJET_API_KEY set=%s, MAILJET_SECRET_KEY set=%s. "
             "Set both in Azure Application settings (exact names), then Restart the app.",
@@ -71,25 +65,7 @@ def send_verification_email(to_email: str, verification_link: str) -> bool:
         )
         return False
 
-    from_email, from_name = _mailjet_from()
-    logger.info("Mailjet: about to send email to %s", to_email)
-    body = {
-        "Messages": [
-            {
-                "From": {"Email": from_email, "Name": from_name},
-                "To": [{"Email": to_email.strip(), "Name": to_email.strip()}],
-                "Subject": "Verify your email",
-                "HTMLPart": (
-                    f"<p>Please verify your email by clicking the link below. The link expires in 1 hour.</p>"
-                    f"<p><a href=\"{verification_link}\">{verification_link}</a></p>"
-                    f"<p>If you did not create an account, you can ignore this email.</p>"
-                ),
-            }
-        ]
-    }
-
-    logger.warning("Mailjet: sending verification email to %s (from %s)", to_email, from_email)
-
+    body = {"Messages": messages}
     req = urllib.request.Request(
         MAILJET_SEND_URL,
         data=json.dumps(body).encode(),
@@ -140,3 +116,52 @@ def send_verification_email(to_email: str, verification_link: str) -> bool:
     except Exception as e:
         logger.exception("Mailjet send failed: %s", e)
         return False
+
+
+def send_verification_email(to_email: str, verification_link: str) -> bool:
+    """
+    Send an email with the verification link. Returns True if sent, False if Mailjet not configured or send failed.
+    """
+    from_email, from_name = _mailjet_from()
+    logger.info("Mailjet: about to send verification email to %s", to_email)
+    messages = [
+        {
+            "From": {"Email": from_email, "Name": from_name},
+            "To": [{"Email": to_email.strip(), "Name": to_email.strip()}],
+            "Subject": "Verify your email",
+            "HTMLPart": (
+                "<p>Please verify your email by clicking the link below. The link expires in 1 hour.</p>"
+                f"<p><a href=\"{verification_link}\">{verification_link}</a></p>"
+                "<p>If you did not create an account, you can ignore this email.</p>"
+            ),
+        }
+    ]
+    logger.warning(
+        "Mailjet: sending verification email to %s (from %s)", to_email, from_email
+    )
+    return _mailjet_send_messages(messages)
+
+
+def send_password_reset_email(to_email: str, reset_link: str) -> bool:
+    """
+    Send password reset link via Mailjet. Same success/failure contract as send_verification_email.
+    """
+    from_email, from_name = _mailjet_from()
+    logger.info("Mailjet: about to send password reset email to %s", to_email)
+    messages = [
+        {
+            "From": {"Email": from_email, "Name": from_name},
+            "To": [{"Email": to_email.strip(), "Name": to_email.strip()}],
+            "Subject": "Reset your password",
+            "HTMLPart": (
+                "<p>You requested a password reset. Click the link below to choose a new password. "
+                "The link expires in 1 hour.</p>"
+                f"<p><a href=\"{reset_link}\">{reset_link}</a></p>"
+                "<p>If you did not request this, you can ignore this email.</p>"
+            ),
+        }
+    ]
+    logger.warning(
+        "Mailjet: sending password reset email to %s (from %s)", to_email, from_email
+    )
+    return _mailjet_send_messages(messages)

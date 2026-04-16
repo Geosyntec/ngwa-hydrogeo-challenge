@@ -33,7 +33,7 @@ import asyncpg
 
 
 # ---------------------------------------------------------------------------
-# Schema (users with email + verified, email_verification_tokens, classes, students, grade_submissions)
+# Schema (users, email_verification_tokens, password_reset_tokens, classes, students, grade_submissions)
 # ---------------------------------------------------------------------------
 
 SCHEMA_SQL = """
@@ -68,6 +68,17 @@ CREATE TABLE IF NOT EXISTS email_verification_tokens (
 );
 CREATE INDEX IF NOT EXISTS idx_email_verification_tokens_token ON email_verification_tokens(token);
 CREATE INDEX IF NOT EXISTS idx_email_verification_tokens_expires_at ON email_verification_tokens(expires_at);
+
+-- One-time password reset links (expire in 1 hour)
+CREATE TABLE IF NOT EXISTS password_reset_tokens (
+  id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id    UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  token      TEXT NOT NULL UNIQUE,
+  expires_at TIMESTAMPTZ NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS idx_password_reset_tokens_token ON password_reset_tokens(token);
+CREATE INDEX IF NOT EXISTS idx_password_reset_tokens_expires_at ON password_reset_tokens(expires_at);
 
 -- Classes belong to a teacher; name is display name (e.g. "Hydrogeology 101")
 CREATE TABLE IF NOT EXISTS classes (
@@ -200,6 +211,7 @@ async def run() -> None:
             await conn.execute("DROP TABLE IF EXISTS grade_submissions")
             await conn.execute("DROP TABLE IF EXISTS students")
             await conn.execute("DROP TABLE IF EXISTS classes")
+            await conn.execute("DROP TABLE IF EXISTS password_reset_tokens")
             await conn.execute("DROP TABLE IF EXISTS email_verification_tokens")
             await conn.execute("DROP TABLE IF EXISTS users")
             print("Tables dropped.")

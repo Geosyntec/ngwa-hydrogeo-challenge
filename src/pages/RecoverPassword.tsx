@@ -5,7 +5,7 @@ import {
   TextField,
   Typography,
 } from '@mui/material'
-import { recoverPassword as recoverPasswordApi } from '../api/mockRecoverPasswordApi'
+import { recoverPassword as recoverPasswordApi } from '../api/recoverPasswordApi'
 
 export type RecoverPasswordProps = {
   onBack: () => void
@@ -40,8 +40,8 @@ export default function RecoverPassword({ onBack }: RecoverPasswordProps) {
     return (
       <Box sx={{ width: '100%' }}>
         <Typography color="success.main" sx={{ mb: 2 }}>
-          A password reset link has been sent to <strong>{email.trim()}</strong>.
-          Please check your inbox and use the link to set a new password.
+          If an account exists for <strong>{email.trim()}</strong>, a password reset email will arrive
+          shortly. Check your inbox (and spam) and use the link to set a new password.
         </Typography>
         <Button fullWidth variant="outlined" onClick={onBack}>
           Back to sign in
