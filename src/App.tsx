@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
-import { CssBaseline, ThemeProvider, createTheme } from '@mui/material'
+import { CssBaseline, ThemeProvider } from '@mui/material'
+import { appTheme } from './theme/theme'
 import AppLayout from './components/Layout/AppLayout'
 import TeacherPortalLayout from './components/Layout/TeacherPortalLayout'
 import ErrorBoundary from './components/ErrorBoundary'
@@ -19,11 +20,9 @@ import CreateTestPage from './pages/teacher/CreateTestPage'
 import { ROUTES } from './app/routes'
 import { getRouterBasename } from './app/routerBasename'
 
-const theme = createTheme()
-
 export default function App() {
   return (
-    <ThemeProvider theme={theme}>
+    <ThemeProvider theme={appTheme}>
       <CssBaseline />
       <ErrorBoundary>
         <BrowserRouter basename={getRouterBasename()}>
