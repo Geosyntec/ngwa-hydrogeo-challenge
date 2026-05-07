@@ -50,6 +50,7 @@ import { panelBindTextFieldSx } from "../panelBindTextFieldSx";
 import { ROUTES } from "../../../../../app/routes";
 import { store } from "../../../../../app/store";
 import { buildSubmitGradesPayload } from "../../../submitGradesPayload";
+import { dispatchReevaluateAllAnswersForGrading } from "../../../reevaluateAnswersForGrading";
 import { submitGrades } from "../../../../../api/submitGradesApi";
 import { PanelAccordionIcon } from "../PanelAccordionIcon";
 
@@ -112,6 +113,7 @@ export default function HorizontalVelocityPanel() {
   const [testSubmitError, setTestSubmitError] = useState<string | null>(null);
   const handleTestSubmit = useCallback(async () => {
     setTestSubmitError(null);
+    dispatchReevaluateAllAnswersForGrading(dispatch);
     const payload = buildSubmitGradesPayload(store.getState());
     if (!payload) {
       setTestSubmitError(
@@ -130,7 +132,7 @@ export default function HorizontalVelocityPanel() {
     } finally {
       setTestSubmitting(false);
     }
-  }, []);
+  }, [dispatch]);
 
   return (
     <Accordion
@@ -404,7 +406,10 @@ export default function HorizontalVelocityPanel() {
                     size="large"
                     fullWidth
                     disabled={!allPanelsComplete}
-                    onClick={() => setSubmitModalOpen(true)}
+                    onClick={() => {
+                      dispatchReevaluateAllAnswersForGrading(dispatch);
+                      setSubmitModalOpen(true);
+                    }}
                     sx={{ mt: 3 }}
                   >
                     Submit Answers
