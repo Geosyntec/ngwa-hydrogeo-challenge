@@ -165,77 +165,76 @@ export default function HorizontalVelocityPanel() {
                   <Typography variant="body2" color="text.secondary">
                     Find these values:
                   </Typography>
-                  <Grid container spacing={1} sx={{ mt: 1 }}>
+                  <Grid container spacing={2} sx={{ mt: 1 }}>
+                    {/* Fixed 4 / 2 / 6 layout at all breakpoints — avoids collapse between md and lg */}
                     <Grid
+                      container
                       item
-                      lg={12}
-                      sx={{ display: "flex", flexDirection: "row" }}
+                      xs={12}
+                      spacing={2}
+                      wrap="nowrap"
+                      sx={{
+                        overflowX: "auto",
+                        alignItems: "flex-start",
+                      }}
                     >
-                      <Grid
-                        item
-                        lg={4}
-                        sx={{ display: "flex", alignItems: "center" }}
-                      >
-                        <Typography variant="body2">i (gradient) = </Typography>
+                      <Grid item xs={4} sm={4} md={4} lg={4} sx={{ flexShrink: 0 }}>
+                        <Typography variant="body2" sx={{ whiteSpace: "nowrap" }}>
+                          i (gradient) ={" "}
+                        </Typography>
                       </Grid>
-                      <Grid item lg={2}>
+                      <Grid item xs={2} sm={2} md={2} lg={2} sx={{ flexShrink: 0 }}>
                         {bind("Gradient", "", "", 100)}
                       </Grid>
-                      <Grid
-                        item
-                        lg={6}
-                        sx={{ display: "flex", alignItems: "center" }}
-                      >
+                      <Grid item xs={6} sm={6} md={6} lg={6} sx={{ flexShrink: 0 }}>
                         <Typography variant="body2">
                           ft/ft (round to 4 Decimal Places)
                         </Typography>
                       </Grid>
                     </Grid>
                     <Grid
+                      container
                       item
-                      lg={12}
-                      sx={{ display: "flex", flexDirection: "row" }}
+                      xs={12}
+                      spacing={2}
+                      wrap="nowrap"
+                      sx={{
+                        overflowX: "auto",
+                        alignItems: "flex-start",
+                      }}
                     >
-                      <Grid
-                        item
-                        lg={4}
-                        sx={{ display: "flex", alignItems: "center" }}
-                      >
-                        <Typography variant="body2">
+                      <Grid item xs={4} sm={4} md={4} lg={4} sx={{ flexShrink: 0 }}>
+                        <Typography variant="body2" sx={{ whiteSpace: "nowrap" }}>
                           K (conductivity) ={" "}
                         </Typography>
                       </Grid>
-                      <Grid item lg={2}>
+                      <Grid item xs={2} sm={2} md={2} lg={2} sx={{ flexShrink: 0 }}>
                         {bind("Conductivity", "", "", 100)}
                       </Grid>
-                      <Grid
-                        item
-                        lg={6}
-                        sx={{ display: "flex", alignItems: "center" }}
-                      >
+                      <Grid item xs={6} sm={6} md={6} lg={6} sx={{ flexShrink: 0 }}>
                         <Typography variant="body2">ft/day</Typography>
                       </Grid>
                     </Grid>
                     <Grid
+                      container
                       item
-                      lg={12}
-                      sx={{ display: "flex", flexDirection: "row" }}
+                      xs={12}
+                      spacing={2}
+                      wrap="nowrap"
+                      sx={{
+                        overflowX: "auto",
+                        alignItems: "flex-start",
+                      }}
                     >
-                      <Grid
-                        item
-                        lg={4}
-                        sx={{ display: "flex", alignItems: "center" }}
-                      >
-                        <Typography variant="body2">n (porosity) = </Typography>
+                      <Grid item xs={4} sm={4} md={4} lg={4} sx={{ flexShrink: 0 }}>
+                        <Typography variant="body2" sx={{ whiteSpace: "nowrap" }}>
+                          n (porosity) ={" "}
+                        </Typography>
                       </Grid>
-                      <Grid item lg={2}>
+                      <Grid item xs={2} sm={2} md={2} lg={2} sx={{ flexShrink: 0 }}>
                         {bind("Porosity", "", "", 100)}
                       </Grid>
-                      <Grid
-                        item
-                        lg={6}
-                        sx={{ display: "flex", alignItems: "center" }}
-                      >
+                      <Grid item xs={6} sm={6} md={6} lg={6} sx={{ flexShrink: 0 }}>
                         <Typography variant="body2">
                           (Percentage expressed as a value from 0-1)
                         </Typography>
@@ -279,48 +278,49 @@ export default function HorizontalVelocityPanel() {
                     Use Darcy's Law to find the horizontal velocity of
                     groundwater between the wells:
                   </Typography>
-                  <Grid container spacing={1} sx={{ mt: 1 }}>
-                    <Grid
-                      item
-                      lg={6}
-                      columnSpacing={1}
-                      sx={{
-                        display: "flex",
-                        flexDirection: "row",
-                        flexWrap: "wrap",
-                      }}
-                    >
-                      <Grid item lg={4}>
-                        {bind("Conductivity2", "k", "", 100)}
-                      </Grid>
+                  <Grid container spacing={2} sx={{ mt: 1 }}>
+                    <Grid item xs={12} md={6} lg={6} sx={{ minWidth: 0 }}>
                       <Grid
-                        item
-                        lg={4}
+                        container
+                        spacing={2}
+                        wrap="nowrap"
                         sx={{
-                          display: "flex",
-                          paddingTop: "2%",
-                          justifyContent: "center",
+                          overflowX: "auto",
+                          alignItems: "flex-start",
                         }}
                       >
-                        <Typography variant="body2">x</Typography>
-                      </Grid>
-                      <Grid item lg={4}>
-                        {bind("Gradient2", "i", "", 100)}
-                      </Grid>
-                      <Grid lg={12}>
-                        <Box
+                        <Grid item xs={4} sm={4} md={4} lg={4} sx={{ flexShrink: 0 }}>
+                          {bind("Conductivity2", "k", "", 100)}
+                        </Grid>
+                        <Grid
+                          item
+                          xs={4}
+                          sm={4}
+                          md={4}
+                          lg={4}
                           sx={{
-                            borderTop: (t) => `2px solid ${t.palette.divider}`,
-                            alignSelf: "stretch",
                             flexShrink: 0,
-                            mt: 2,
-                            mb: 2,
+                            display: "flex",
+                            pt: "2%",
+                            justifyContent: "center",
                           }}
-                        />
+                        >
+                          <Typography variant="body2">x</Typography>
+                        </Grid>
+                        <Grid item xs={4} sm={4} md={4} lg={4} sx={{ flexShrink: 0 }}>
+                          {bind("Gradient2", "i", "", 100)}
+                        </Grid>
                       </Grid>
-                      <Grid
-                        item
-                        lg={12}
+                      <Box
+                        sx={{
+                          borderTop: (t) => `2px solid ${t.palette.divider}`,
+                          alignSelf: "stretch",
+                          flexShrink: 0,
+                          mt: 2,
+                          mb: 2,
+                        }}
+                      />
+                      <Box
                         sx={{
                           display: "flex",
                           justifyContent: "center",
@@ -328,42 +328,60 @@ export default function HorizontalVelocityPanel() {
                         }}
                       >
                         {bind("Porosity2", "n", "", 100)}
-                      </Grid>
+                      </Box>
                     </Grid>
                     <Grid
                       item
+                      xs={12}
+                      md={6}
                       lg={6}
                       sx={{
                         display: "flex",
                         alignItems: "center",
-                        flexDirection: "row",
+                        minWidth: 0,
+                        overflowX: "auto",
                       }}
                     >
                       <Grid
-                        item
-                        lg={2}
-                        sx={{
-                          display: "flex",
-                          paddingTop: "2%",
-                          justifyContent: "center",
-                        }}
+                        container
+                        spacing={2}
+                        wrap="nowrap"
+                        sx={{ alignItems: "center", width: "100%" }}
                       >
-                        <Typography variant="body2">=</Typography>
-                      </Grid>
-                      <Grid
-                        item
-                        lg={10}
-                        columnSpacing={1}
-                        sx={{
-                          display: "flex",
-                          alignItems: "center",
-                          flexDirection: "row",
-                        }}
-                      >
-                        {bind("HorizontalVelocity", "v", "", 100)}
-                        <Typography variant="body2" color="text.secondary">
-                          ft/day
-                        </Typography>
+                        <Grid
+                          item
+                          xs={2}
+                          sm={2}
+                          md={2}
+                          lg={2}
+                          sx={{
+                            flexShrink: 0,
+                            display: "flex",
+                            pt: "2%",
+                            justifyContent: "center",
+                          }}
+                        >
+                          <Typography variant="body2">=</Typography>
+                        </Grid>
+                        <Grid
+                          item
+                          xs={10}
+                          sm={10}
+                          md={10}
+                          lg={10}
+                          sx={{
+                            flexShrink: 0,
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 1,
+                            flexWrap: "nowrap",
+                          }}
+                        >
+                          {bind("HorizontalVelocity", "v", "", 100)}
+                          <Typography variant="body2" color="text.secondary" sx={{ whiteSpace: "nowrap" }}>
+                            ft/day
+                          </Typography>
+                        </Grid>
                       </Grid>
                     </Grid>
                   </Grid>
