@@ -114,7 +114,7 @@ export default function GradientPanel() {
                   <strong>Determine the distance 'Y':</strong> Distance 'Y' is
                   the measurement between the well with the highest water table
                   elevation and the water table contour line. Distance 'Y' is
-                  always perpendicaular to the water table contour line.
+                  always perpendicular to the water table contour line.
                 </Typography>
                 <Grid container spacing={1} sx={{ mt: 1 }}>
                   <Grid item xs={12} md={6}>
