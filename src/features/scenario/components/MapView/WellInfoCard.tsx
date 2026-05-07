@@ -327,8 +327,7 @@ export default function WellInfoCard({
                   fontWeight: 800,
                   fontSize: "3.25rem",
                   lineHeight: 1,
-                  color: "primary.main",
-                  opacity: 0.11,
+                  color: "black",
                   pointerEvents: "none",
                   userSelect: "none",
                   letterSpacing: "-0.06em",
@@ -360,7 +359,7 @@ export default function WellInfoCard({
                     sx={{ mt: 1 }}
                   >
                     <Checkbox
-                      size="small"
+                      size="medium"
                       checked={!!well.IsPumpingOn}
                       onChange={(e) => onTogglePumping?.(e.target.checked)}                    />
                     <Typography

@@ -268,7 +268,7 @@ export default memo(function MapOverlay() {
         <text
           textAnchor="middle"
           dominantBaseline="central"
-          fill="#ffffff"
+          fill="#000000"
           fontSize={12}
           fontWeight={700}
           style={{ userSelect: "none" }}

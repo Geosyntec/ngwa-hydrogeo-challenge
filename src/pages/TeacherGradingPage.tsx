@@ -36,11 +36,12 @@ export default function TeacherGradingPage() {
                 width: 300,
                 minWidth: 300,
                 flexShrink: 0,
+                backgroundColor: 'theme.palette.primary.main',
               }}
             >
               <CardActionArea onClick={() => navigate(route)}>
                 <CardContent sx={{ py: 3 }}>
-                  <Typography variant="h6" component="h2">
+                  <Typography variant="h6" component="h2" color="text.primary.contrastText">
                     {title}
                   </Typography>
                 </CardContent>
