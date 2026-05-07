@@ -43,8 +43,8 @@ export default function FDStep2() {
         How far from the highest well is that position?
       </Typography>
       <Grid container spacing={1}>
-        <Grid item lg={3}>
-          <Grid lg={12} sx={{display:'flex',justifyContent:'center'}}>
+        <Grid item xs={3}>
+          <Grid xs={12} sx={{display:'flex',justifyContent:'center'}}>
             {bind("DiffBtwnHighestMiddle2", "Δ Elev " + sorted[2].Name + " - " + sorted[1].Name)}
           </Grid>
           <Grid lg={12}>
@@ -52,49 +52,48 @@ export default function FDStep2() {
               sx={{
                 borderTop: (t) => `2px solid black`,
                 alignSelf: "stretch",
-                flexShrink: 0,
                 mt: 2,
                 mb: 2,
               }}
             />
           </Grid>
-          <Grid lg={12} sx={{display:'flex',justifyContent:'center'}}>
+          <Grid xs={12} sx={{display:'flex',justifyContent:'center'}}>
             {bind("DiffBtwnHighestLowest2", "Δ Elev " + sorted[2].Name + " - " + sorted[0].Name)}
           </Grid>
         </Grid>
         <Grid
           item
-          lg={3}
+          xs={3}
           sx={{ display: "flex", flexDirection: "row", alignItems: "center" }}
         >
-          <Grid item lg={2}>
+          <Grid item xs={2}>
             =
           </Grid>
-          <Grid item lg={10} sx={{display:'flex',justifyContent:'center'}}>
+          <Grid item xs={10} sx={{display:'flex',justifyContent:'center'}}>
             {bind("ElevationRatio", "","Round to 2 dp")}
           </Grid>
         </Grid>
         <Grid
           item
-          lg={3}
+          xs={3}
           sx={{ display: "flex", flexDirection: "row", alignItems: "center" }}
         >
-          <Grid item lg={12}>
+          <Grid item xs={12}>
             x
           </Grid>
-          <Grid item lg={12}>
+          <Grid item xs={12}>
             {bind("DistanceHighestLowest", "Dist " + sorted[2].Name + " to " + sorted[0].Name)}
           </Grid>
         </Grid>
         <Grid
           item
-          lg={3}
+          xs={3}
           sx={{ display: "flex", flexDirection: "row", alignItems: "center" }}
         >
-          <Grid item lg={12}>
+          <Grid item xs={12}>
             =
           </Grid>
-          <Grid item lg={12}>
+          <Grid item xs={12}>
             {bind("ElevResult_X_DistanceHighMid", sorted[2].Name + "-" + sorted[2].Name + sorted[1].Name.toLowerCase() + " Dist"
             )}
           </Grid>

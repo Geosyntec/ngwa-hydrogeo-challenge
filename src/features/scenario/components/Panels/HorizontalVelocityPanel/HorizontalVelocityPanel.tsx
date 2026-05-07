@@ -178,12 +178,12 @@ export default function HorizontalVelocityPanel() {
                         alignItems: "flex-start",
                       }}
                     >
-                      <Grid item xs={4} sm={4} md={4} lg={4} sx={{ flexShrink: 0 }}>
+                      <Grid item xs={3} sm={3} md={3} lg={3} sx={{ flexShrink: 0 }}>
                         <Typography variant="body2" sx={{ whiteSpace: "nowrap" }}>
                           i (gradient) ={" "}
                         </Typography>
                       </Grid>
-                      <Grid item xs={2} sm={2} md={2} lg={2} sx={{ flexShrink: 0 }}>
+                      <Grid item xs={3} sm={3} md={3} lg={3} sx={{ flexShrink: 0 }}>
                         {bind("Gradient", "", "", 100)}
                       </Grid>
                       <Grid item xs={6} sm={6} md={6} lg={6} sx={{ flexShrink: 0 }}>
@@ -203,12 +203,12 @@ export default function HorizontalVelocityPanel() {
                         alignItems: "flex-start",
                       }}
                     >
-                      <Grid item xs={4} sm={4} md={4} lg={4} sx={{ flexShrink: 0 }}>
+                      <Grid item xs={3} sx={{ flexShrink: 0 }}>
                         <Typography variant="body2" sx={{ whiteSpace: "nowrap" }}>
                           K (conductivity) ={" "}
                         </Typography>
                       </Grid>
-                      <Grid item xs={2} sm={2} md={2} lg={2} sx={{ flexShrink: 0 }}>
+                      <Grid item xs={3} sx={{ flexShrink: 0 }}>
                         {bind("Conductivity", "", "", 100)}
                       </Grid>
                       <Grid item xs={6} sm={6} md={6} lg={6} sx={{ flexShrink: 0 }}>
@@ -226,17 +226,17 @@ export default function HorizontalVelocityPanel() {
                         alignItems: "flex-start",
                       }}
                     >
-                      <Grid item xs={4} sm={4} md={4} lg={4} sx={{ flexShrink: 0 }}>
+                      <Grid item xs={3} sx={{ flexShrink: 0 }}>
                         <Typography variant="body2" sx={{ whiteSpace: "nowrap" }}>
                           n (porosity) ={" "}
                         </Typography>
                       </Grid>
-                      <Grid item xs={2} sm={2} md={2} lg={2} sx={{ flexShrink: 0 }}>
+                      <Grid item xs={3}  sx={{ flexShrink: 0 }}>
                         {bind("Porosity", "", "", 100)}
                       </Grid>
                       <Grid item xs={6} sm={6} md={6} lg={6} sx={{ flexShrink: 0 }}>
                         <Typography variant="body2">
-                          (Percentage expressed as a value from 0-1)
+                          (Value from 0-1)
                         </Typography>
                       </Grid>
                     </Grid>
@@ -290,7 +290,7 @@ export default function HorizontalVelocityPanel() {
                         }}
                       >
                         <Grid item xs={4} sm={4} md={4} lg={4} sx={{ flexShrink: 0 }}>
-                          {bind("Conductivity2", "k", "", 100)}
+                          {bind("Conductivity2", "k", "",75)}
                         </Grid>
                         <Grid
                           item
@@ -308,7 +308,7 @@ export default function HorizontalVelocityPanel() {
                           <Typography variant="body2">x</Typography>
                         </Grid>
                         <Grid item xs={4} sm={4} md={4} lg={4} sx={{ flexShrink: 0 }}>
-                          {bind("Gradient2", "i", "", 100)}
+                          {bind("Gradient2", "i", "",75)}
                         </Grid>
                       </Grid>
                       <Box
@@ -327,7 +327,7 @@ export default function HorizontalVelocityPanel() {
                           alignItems: "center",
                         }}
                       >
-                        {bind("Porosity2", "n", "", 100)}
+                        {bind("Porosity2", "n", "",75)}
                       </Box>
                     </Grid>
                     <Grid

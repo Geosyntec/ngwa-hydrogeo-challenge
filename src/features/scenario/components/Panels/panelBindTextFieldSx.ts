@@ -4,7 +4,7 @@ import type { SxProps, Theme } from "@mui/material";
 const ANSWER_HELPER_BG = "#1b5e20";
 
 /** Fixed helper row height so layout does not jump when answers appear. */
-const HELPER_SLOT_PX = 40;
+const HELPER_SLOT_PX = 25;
 
 /** Fixed OutlinedInput root height (size="small"). */
 const INPUT_ROOT_PX = 40;
