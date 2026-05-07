@@ -35,7 +35,7 @@ function useWellCardPlacements(): Record<string, WellInfoCardPlacement> {
 
     const placement: Record<string, WellInfoCardPlacement> = {};
     placement[topmost.id] = "above";
-    placement[bottommost.id] = bottomMost.Top<500?"below":"above"; //avoid having wellInfoCard overflow vertically when the well is close to the bottom of the map
+    placement[bottommost.id] = bottommost.Top<500?"below":"above"; //avoid having wellInfoCard overflow vertically when the well is close to the bottom of the map
     const middleLeftOfBoth =
       middle.Left < topmost.Left && middle.Left < bottommost.Left;
     placement[middle.id] = middleLeftOfBoth ? "left" : "right";
