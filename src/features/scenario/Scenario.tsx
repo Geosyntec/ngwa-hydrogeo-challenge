@@ -415,31 +415,7 @@ export default function Scenario({
       </Dialog>
 
       <Container maxWidth="xl" sx={{ py: 2 }}>
-        <Box sx={{ mb: 2 }}>
-          <FormControl size="small" sx={{ minWidth: 240 }}>
-            <Select
-              value={scenarioValue}
-              onChange={(e) => {
-                dispatch(selectScenarioByIndex(Number(e.target.value)));
-                dispatchResetChallenge(dispatch);
-              }}
-              displayEmpty
-              renderValue={() =>
-                currentScenario ? currentScenario.name : "Select a scenario"
-              }
-            >
-              {scenarios.map((s, i) => (
-                <MenuItem key={s.id} value={i}>
-                  {s.name}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-          <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-            Selecting a new scenario will reset the challenge and all progress
-            will be lost.
-          </Typography>
-        </Box>
+       
 
         <Box
           sx={{
@@ -467,6 +443,31 @@ export default function Scenario({
                 boxSizing: "border-box",
               }}
             >
+               <Box sx={{ mb: 2 }}>
+                <FormControl size="small" sx={{ minWidth: 240 }}>
+                  <Select
+                    value={scenarioValue}
+                    onChange={(e) => {
+                      dispatch(selectScenarioByIndex(Number(e.target.value)));
+                      dispatchResetChallenge(dispatch);
+                    }}
+                    displayEmpty
+                    renderValue={() =>
+                      currentScenario ? currentScenario.name : "Select a scenario"
+                    }
+                  >
+                    {scenarios.map((s, i) => (
+                      <MenuItem key={s.id} value={i}>
+                        {s.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+                <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                  Selecting a new scenario will reset the challenge and all progress
+                  will be lost.
+                </Typography>
+              </Box>
               <ChooseWellsPanel />
               <FlowDirectionPanel />
               <GradientPanel />
