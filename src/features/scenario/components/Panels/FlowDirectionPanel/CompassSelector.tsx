@@ -193,9 +193,7 @@ export default function CompassSelector({ display = true }: { display?: boolean 
           mt: 1,
         }}
       >
-        Degrees clockwise from North (legacy). Drag the blue dot with Alt/Option
-        held to snap to 5°. With focus on the compass: Alt+← / Alt+→ to nudge
-        5°.
+        Degrees clockwise from North
       </Box>
     </Box>
   );

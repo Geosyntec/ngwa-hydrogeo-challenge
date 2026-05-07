@@ -22,8 +22,7 @@ export default function FDStep3() {
         What direction do you thik the groundwater will flow?
       </Typography>
       <Typography variant="body2" color="text.secondary">
-        Choose the groundwater flow direction. Drag the compass dial with Alt/Option
-        to snap 5°, or focus the dial and use Alt+← / Alt+→ to nudge 5°.
+        Drag the compass dial or tab-select the dial and use Alt+← / Alt+→ to nudge 5°.
       </Typography>
       <Stack
         direction="column"
