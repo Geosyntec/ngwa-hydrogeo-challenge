@@ -58,6 +58,17 @@ export default function CompassSelector({ display = true }: { display?: boolean 
     [dragging, pointerToAngle, setAngle],
   );
   const onPointerUp = useCallback(() => setDragging(false), []);
+  const onKeyDown = useCallback(
+    (e: React.KeyboardEvent<SVGSVGElement>) => {
+      if (!e.altKey) return;
+      if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
+        e.preventDefault();
+        const delta = e.key === "ArrowRight" ? 5 : -5;
+        setAngle(DirectionAngle + delta, false);
+      }
+    },
+    [DirectionAngle, setAngle],
+  );
   useEffect(() => {
     const prev = document.body.style.userSelect;
     if (dragging) document.body.style.userSelect = "none";
@@ -83,9 +94,11 @@ export default function CompassSelector({ display = true }: { display?: boolean 
         aria-valuemin={0}
         aria-valuemax={360}
         aria-valuenow={Math.round(compassDegreesFromInternal(DirectionAngle))}
+        aria-keyshortcuts="Alt+ArrowRight Alt+ArrowLeft"
         tabIndex={0}
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}
+        onKeyDown={onKeyDown}
         style={{ cursor: dragging ? "grabbing" : "grab" }}
       >
         <circle
@@ -180,8 +193,9 @@ export default function CompassSelector({ display = true }: { display?: boolean 
           mt: 1,
         }}
       >
-        Degrees clockwise from North (legacy). Drag the blue dot (Alt/Option to
-        snap 5°).
+        Degrees clockwise from North (legacy). Drag the blue dot with Alt/Option
+        held to snap to 5°. With focus on the compass: Alt+← / Alt+→ to nudge
+        5°.
       </Box>
     </Box>
   );
