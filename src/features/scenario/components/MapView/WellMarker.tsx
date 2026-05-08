@@ -71,8 +71,8 @@ export default memo(function WellMarker({
           ref={markerAnchorRef}
           sx={{
             position: "absolute",
-            top: well.Top,
-            left: well.Left,
+            top: well.Point.y,
+            left: well.Point.x,
             zIndex: 1,
             // Center symbol on map coordinates (legacy-style disc marker, not pin tip)
             transform: "translate(-50%, -50%)",
