@@ -193,7 +193,7 @@ export default function HorizontalVelocityPanel() {
                       </Grid>
                       <Grid item xs={6} sm={6} md={6} lg={6} sx={{ flexShrink: 0 }}>
                         <Typography variant="body2">
-                          ft/ft (round to 4 Decimal Places)
+                          ft/ft (round to 4 dp)
                         </Typography>
                       </Grid>
                     </Grid>
@@ -294,15 +294,12 @@ export default function HorizontalVelocityPanel() {
                           alignItems: "flex-start",
                         }}
                       >
-                        <Grid item xs={4} sm={4} md={4} lg={4} sx={{ flexShrink: 0 }}>
-                          {bind("Conductivity2", "k", "",75)}
+                        <Grid item xs={5}sx={{ flexShrink: 0 }}>
+                          {bind("Conductivity2", "Cond. (k)", "",100)}
                         </Grid>
                         <Grid
                           item
-                          xs={4}
-                          sm={4}
-                          md={4}
-                          lg={4}
+                          xs={2}
                           sx={{
                             flexShrink: 0,
                             display: "flex",
@@ -312,8 +309,8 @@ export default function HorizontalVelocityPanel() {
                         >
                           <Typography variant="body2">x</Typography>
                         </Grid>
-                        <Grid item xs={4} sm={4} md={4} lg={4} sx={{ flexShrink: 0 }}>
-                          {bind("Gradient2", "i", "",75)}
+                        <Grid item xs={5}sx={{ flexShrink: 0 }}>
+                          {bind("Gradient2", "Gradient (i)", "",100)}
                         </Grid>
                       </Grid>
                       <Box
@@ -332,7 +329,7 @@ export default function HorizontalVelocityPanel() {
                           alignItems: "center",
                         }}
                       >
-                        {bind("Porosity2", "n", "",75)}
+                        {bind("Porosity2", "Porosity (n)", "",100)}
                       </Box>
                     </Grid>
                     <Grid
@@ -382,7 +379,7 @@ export default function HorizontalVelocityPanel() {
                             flexWrap: "nowrap",
                           }}
                         >
-                          {bind("HorizontalVelocity", "v", "", 100)}
+                          {bind("HorizontalVelocity", "v", "Round to 4 dp", 100)}
                           <Typography variant="body2" color="text.secondary" sx={{ whiteSpace: "nowrap" }}>
                             ft/day
                           </Typography>

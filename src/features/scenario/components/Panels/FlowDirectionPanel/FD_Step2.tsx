@@ -75,7 +75,7 @@ export default function FDStep2() {
             =
           </Grid>
           <Grid item xs={10} sx={{display:'flex',justifyContent:'center'}}>
-            {bind("ElevationRatio", "","Round to 2 dp")}
+            {bind("ElevationRatio", "Elev Ratio","Round to 2 dp")}
           </Grid>
         </Grid>
         <Grid
