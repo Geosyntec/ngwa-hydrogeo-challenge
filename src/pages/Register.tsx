@@ -48,7 +48,7 @@ export default function Register({ onBack }: RegisterProps) {
       <Box sx={{ width: '100%' }}>
         <Typography color="success.main" sx={{ mb: 2 }}>
           An email has been sent to <strong>{email.trim()}</strong> for verification.
-          Please check your inbox and follow the link to verify your account.
+          Please check your inbox and spam folder and follow the link to verify your account.
         </Typography>
         <Button fullWidth variant="outlined" onClick={onBack}>
           Back to sign in

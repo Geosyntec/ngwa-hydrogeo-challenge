@@ -94,7 +94,7 @@ export default function VerifyEmailPage() {
           </Typography>
           {resendSuccess ? (
             <Typography color="success.main" sx={{ mb: 2 }}>
-              A new verification email has been sent. Check your inbox.
+              A new verification email has been sent. Check your inbox and spam folder.
             </Typography>
           ) : (
             <Box component="form" onSubmit={handleResend} sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
