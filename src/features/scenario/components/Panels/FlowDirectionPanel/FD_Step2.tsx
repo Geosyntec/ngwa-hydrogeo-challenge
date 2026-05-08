@@ -27,7 +27,7 @@ export default function FDStep2() {
         error={f.checked && !f.isCorrect}
         helperText={
           f.showAnswer ? `${f.answer}` :
-            f.checked 
+            f.checked && !isTest
               ? f.isCorrect
                 ?"✅"
                 :"❌"

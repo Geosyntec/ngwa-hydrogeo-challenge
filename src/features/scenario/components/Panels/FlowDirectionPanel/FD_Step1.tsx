@@ -49,7 +49,7 @@ export default function FDStep1() {
         }}
         helperText={
           f.showAnswer ? `${f.answer}` :
-            f.checked 
+            f.checked && isTest
               ? f.isCorrect
                 ?"✅"
                 :"❌"

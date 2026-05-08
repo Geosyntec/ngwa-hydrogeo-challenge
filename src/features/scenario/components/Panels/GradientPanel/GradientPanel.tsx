@@ -35,7 +35,6 @@ export default function GradientPanel() {
   const sorted = useAppSelector(selectSortedByElevation);
   const ready = sorted.length === 3;
   const flowReady = useAppSelector(selectFlowAllStepsComplete);
-  const gradDone = useAppSelector(selectGradientStep2Complete);
   const { selectedPanel, isTest } = useAppSelector(selectScenarioState);
   const hi = ready ? waterTableElevationFt(sorted[2]) : 0;
   const mid = ready ? waterTableElevationFt(sorted[1]) : 0;
@@ -74,7 +73,7 @@ export default function GradientPanel() {
         error={f.checked && !f.isCorrect}
         helperText={
           f.showAnswer ? `${f.answer}` :
-            f.checked 
+            f.checked && !isTest
               ? f.isCorrect
                 ?"✅"
                 :"❌"

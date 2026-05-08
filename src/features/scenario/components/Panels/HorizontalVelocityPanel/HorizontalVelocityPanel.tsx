@@ -99,7 +99,7 @@ export default function HorizontalVelocityPanel() {
         error={f.checked && !f.isCorrect}
         helperText={
           f.showAnswer ? `${f.answer}` :
-            f.checked 
+            f.checked && !isTest 
               ? f.isCorrect
                 ?"✅"
                 :"❌"
@@ -471,12 +471,6 @@ export default function HorizontalVelocityPanel() {
             </DialogContent>
             <DialogActions>
               <Button onClick={() => navigate(ROUTES.home)}>Return home</Button>
-              <Button
-                variant="contained"
-                onClick={() => setTestSubmitSuccessOpen(false)}
-              >
-                Close
-              </Button>
             </DialogActions>
           </Dialog>
 

@@ -32,12 +32,12 @@ export default function FDStep3() {
         sx={{ mt: 1 }}
       >
         <CompassSelector display={stepReady} />
-        {showAnswerLine && (
+        {showAnswerLine && !isTest && (
           <Typography variant="body2" color={theme.palette.success.contrastText} sx={{ backgroundColor: theme.palette.success.main,padding:0.5,maxWidth: 280 }}>
             Answer: {flow.SelectedDirection.answer}
           </Typography>
         )}
-        {showIncorrect && (
+        {showIncorrect && !isTest && (
           <Typography variant="body2" color="error">
             Not within tolerance — use Show Step 3 Solution to see the answer.
           </Typography>
