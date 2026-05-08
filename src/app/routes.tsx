@@ -29,8 +29,8 @@ export function testHrefWithTeacherId(
 
 export const NAV_ITEMS = [
   { path: ROUTES.home, label: 'Home' },
-  { path: ROUTES.gettingStarted, label: 'Getting Started' },
+  // { path: ROUTES.gettingStarted, label: 'Getting Started' },
   { path: ROUTES.scenario, label: 'Practice' },
-  { path: ROUTES.reference, label: 'Reference' },
-  { path: ROUTES.about, label: 'About' },
+  // { path: ROUTES.reference, label: 'Reference' },
+  // { path: ROUTES.about, label: 'About' },
 ] as const
