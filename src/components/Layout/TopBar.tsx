@@ -92,7 +92,6 @@ export default function TopBar() {
           />
           <Typography
             component="span"
-            πhydrology
             variant="h6"
             sx={{
               color: brandColor,
