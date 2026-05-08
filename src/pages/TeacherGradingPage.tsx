@@ -6,44 +6,47 @@ import {
   CardContent,
   Stack,
   Typography,
+  useTheme
 } from '@mui/material'
 import { ROUTES } from '../app/routes'
 
 const PORTAL_CARDS = [
-  { title: 'Manage Classes', route: ROUTES.gradingClasses },
-  { title: 'View Grades', route: ROUTES.gradingGrades },
-  { title: 'Create a Test', route: ROUTES.gradingCreateTest },
+  { title: 'Manage Classes', subtitle:'Create groups of students ',route: ROUTES.gradingClasses },
+  { title: 'View Grades', subtitle:'',route: ROUTES.gradingGrades },
+  { title: 'Create a Test',subtitle:'', route: ROUTES.gradingCreateTest },
 ] as const
 
 export default function TeacherGradingPage() {
   const navigate = useNavigate()
+  const theme = useTheme()
 
   return (
     <Box>
       <Typography variant="h4" component="h1" gutterBottom>
         Teacher Portal
       </Typography>
-      <Typography color="text.secondary" sx={{ mb: 3 }}>
-        Review and grade student results.
-      </Typography>
+
 
       <Box sx={{ overflowX: 'auto', width: '100%', pb: 1 }}>
         <Stack direction="row" spacing={3} sx={{ flexWrap: 'nowrap', width: 'min-content' }}>
-          {PORTAL_CARDS.map(({ title, route }) => (
+          {PORTAL_CARDS.map(({ title, subtitle,route }) => (
             <Card
               key={route}
               sx={{
                 width: 300,
                 minWidth: 300,
                 flexShrink: 0,
-                backgroundColor: 'theme.palette.primary.main',
+                backgroundColor: theme.palette.primary.main,
               }}
             >
               <CardActionArea onClick={() => navigate(route)}>
                 <CardContent sx={{ py: 3 }}>
-                  <Typography variant="h6" component="h2" color="text.primary.contrastText">
+                  <Typography variant="h6" component="h2" color={theme.palette.primary.contrastText}>
                     {title}
                   </Typography>
+                  {/* <Typography variant="body2" color={theme.palette.primary.contrastText}>
+                    {subtitle}
+                  </Typography> */}
                 </CardContent>
               </CardActionArea>
             </Card>

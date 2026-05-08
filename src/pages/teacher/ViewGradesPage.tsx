@@ -48,7 +48,7 @@ type TestGroup = {
 
 function scenarioHeading(scenarioId: string): string {
   const t = testScenarios.find((s) => s.id === scenarioId)
-  return t ? `${t.name} — ${scenarioId}` : scenarioId
+  return t ? `${t.name}` : scenarioId
 }
 
 function buildGroups(submissions: TeacherGradeSubmissionRow[]): TestGroup[] {
@@ -204,7 +204,7 @@ export default function ViewGradesPage() {
       <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
         Grades are grouped by test, then class. Open a section to see each student&apos;s
         latest submission for that test. Use View to see full answers. Reset removes all
-        database rows for that student and test so they can submit again.
+        test data for that student so they can retake the test.
       </Typography>
 
       {resetError && (
