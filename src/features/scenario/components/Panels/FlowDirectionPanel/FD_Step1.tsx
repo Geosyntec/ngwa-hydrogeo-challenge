@@ -25,7 +25,7 @@ export default function FDStep1() {
         size="small"
         label={label}
         value={f.input}
-        onChange={(e) =>
+        onChange={(e) => {
           dispatch(
             setField({
               key,
@@ -34,12 +34,28 @@ export default function FDStep1() {
                 : e.target.value,
             })
           )
+          if (f.checked) {
+            dispatch(runCheckStep1({ checkAnswers: true }))
+          }
+        }
         }
         error={f.checked && !f.isCorrect}
+        FormHelperTextProps={{
+          sx: {
+            position: "relative",
+            left: "110%",
+            top: "-35px",
+          }
+        }}
         helperText={
-          f.showAnswer ? `${f.answer}` : helper != null && helper !== ""
-            ? helper
-            : "\u00a0"
+          f.showAnswer ? `${f.answer}` :
+            f.checked 
+              ? f.isCorrect
+                ?"✅"
+                :"❌"
+              : helper != null && helper !== ""
+                  ? helper
+                  : "\u00a0"
         }
         sx={panelBindTextFieldSx(width ?? 50, !!f.showAnswer)}
       />
@@ -51,7 +67,7 @@ export default function FDStep1() {
       <Typography variant="body2" color="text.secondary">
         What is the...
       </Typography>
-      <Grid container columnSpacing={0} rowSpacing={1}>
+      <Grid container columnSpacing={0} rowSpacing={0}>
         {/* Highest Well Row */}
         <Grid item xs={12} md={3}>
           <Typography variant="body2" color="text.secondary">
@@ -64,7 +80,7 @@ export default function FDStep1() {
         <Grid item md={2}></Grid>
         <Grid item xs={12} md={3}>
           <Typography variant="body2" color="text.secondary">
-            Enter its elevation:
+            Enter its elevation (ft):
           </Typography>
         </Grid>
         <Grid item xs={12} md={3}>
@@ -82,7 +98,7 @@ export default function FDStep1() {
         <Grid item md={2}></Grid>
         <Grid item xs={12} md={3}>
           <Typography variant="body2" color="text.secondary">
-            Enter its elevation:
+          Enter its elevation (ft):
           </Typography>
         </Grid>
         <Grid item xs={12} md={1}>
@@ -100,7 +116,7 @@ export default function FDStep1() {
         <Grid item md={2}></Grid>
         <Grid item xs={12} md={3}>
           <Typography variant="body2" color="text.secondary">
-            Enter its elevation:
+          Enter its elevation (ft):
           </Typography>
         </Grid>
         <Grid item xs={12} md={1}>
@@ -109,7 +125,7 @@ export default function FDStep1() {
         {/* Difference Rows */}
         <Grid item xs={12} md={6}>
           <Typography variant="body2" color="text.secondary">
-          What is the difference in elevation between the <strong>highest</strong> and <strong>lowest</strong> wells:
+          What is the difference in elevation between the <strong>highest</strong> and <strong>lowest</strong> wells (ft):
           </Typography>
         </Grid>
         <Grid item xs={12} md={6}>
@@ -117,7 +133,7 @@ export default function FDStep1() {
         </Grid>
         <Grid item xs={12} md={6}>
           <Typography variant="body2" color="text.secondary">
-          What is the difference in elevation between the <strong>highest</strong> and <strong>middle</strong> wells:
+          What is the difference in elevation between the <strong>highest</strong> and <strong>middle</strong> wells (ft):
           </Typography>
         </Grid>
         <Grid item xs={12} md={6}>

@@ -13,6 +13,7 @@ import {
   Select,
   TextField,
   Typography,
+  Snackbar
 } from "@mui/material";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import {
@@ -276,6 +277,11 @@ export default function Scenario({
 
   return (
     <>
+      <Snackbar
+          anchorOrigin={{ vertical: "top", horizontal: "center" }}
+        message={`Hello`}
+        key={`hello`}
+        />
       <Dialog
         open={showVerifyModal}
         onClose={() => {}}
@@ -414,7 +420,7 @@ export default function Scenario({
         </DialogActions>
       </Dialog>
 
-      <Container maxWidth="xl" sx={{ py: 2 }}>
+      <Container maxWidth="xl" sx={{ py: 0.5 }}>
        
 
         <Box
@@ -429,7 +435,7 @@ export default function Scenario({
               display: "flex",
               flexDirection: { xs: "column", md: "row" },
               alignItems: "flex-start",
-              gap: 2,
+              gap: 1,
               flexWrap: { md: "nowrap" },
               minWidth: { xs: 0, md: SCENARIO_ROW_MIN_WIDTH_MD },
             }}

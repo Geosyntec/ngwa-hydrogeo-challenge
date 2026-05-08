@@ -12,6 +12,7 @@ import {
   TableRow,
   Tooltip,
   Typography,
+  useTheme,
 } from "@mui/material";
 import type { Theme } from "@mui/material/styles";
 import OpenInFullIcon from "@mui/icons-material/OpenInFull";
@@ -165,7 +166,7 @@ export default function WellInfoCard({
 
   const OFFSET_X = 14;
   const OFFSET_Y = placement === "above" || placement === "below" ? -8 : 0;
-
+  const theme = useTheme();
   const placementStyle = PLACEMENT_STYLES[placement];
 
   useLayoutEffect(() => {
@@ -321,10 +322,10 @@ export default function WellInfoCard({
                 aria-hidden
                 sx={{
                   position: "absolute",
-                  right: 2,
+                  right: 10,
                   top: "42%",
                   transform: "translateY(-50%)",
-                  fontWeight: 800,
+                  fontWeight: 600,
                   fontSize: "3.25rem",
                   lineHeight: 1,
                   color: "black",
@@ -338,17 +339,17 @@ export default function WellInfoCard({
               <Stack spacing={0.5} sx={{ position: "relative", zIndex: 1 }}>
                 <Row
                   label="G"
-                  value={`${well.GroundElevationFt}`}
+                  value={`${well.GroundElevationFt} ft`}
                   explainer="Ground elevation"
                 />
                 <Row
                   label="S"
-                  value={`${well.StaticElevationFt}`}
+                  value={`${well.StaticElevationFt} ft`}
                   explainer="Water table elevation in static conditions"
                 />
                 <Row
                   label="P"
-                  value={`${well.PumpingElevationFt}`}
+                  value={`${well.PumpingElevationFt} ft`}
                   explainer="Water table elevation in pumping conditions"
                 />
                 {allowPumping && (
@@ -394,10 +395,10 @@ export default function WellInfoCard({
                   <Table size="small" sx={{ width: 400 }}>
                     <TableHead>
                       <TableRow>
-                        <TableCell sx={{fontSize:'0.7rem',backgroundColor:'lightblue'}}> Depth (ft)</TableCell>
-                        <TableCell sx={{fontSize:'0.7rem',backgroundColor:'lightblue'}}>Lithology</TableCell>
-                        <TableCell sx={{fontSize:'0.7rem',backgroundColor:'lightblue'}}>K</TableCell>
-                        <TableCell sx={{fontSize:'0.7rem',backgroundColor:'lightblue'}}>Porosity (%)</TableCell>
+                        <TableCell sx={{fontSize:'0.7rem',backgroundColor:theme.palette.secondary.main}}> <strong>Depth (ft)</strong></TableCell>
+                        <TableCell sx={{fontSize:'0.7rem',backgroundColor:theme.palette.secondary.main}}><strong>Lithology</strong></TableCell>
+                        <TableCell sx={{fontSize:'0.7rem',backgroundColor:theme.palette.secondary.main}}><strong>K</strong></TableCell>
+                        <TableCell sx={{fontSize:'0.7rem',backgroundColor:theme.palette.secondary.main}}><strong>Porosity (%)</strong></TableCell>
                       </TableRow>
                     </TableHead>
                     <TableBody>

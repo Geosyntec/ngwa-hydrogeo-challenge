@@ -26,9 +26,14 @@ export default function FDStep2() {
         onChange={(e) => dispatch(setField({ key, value: e.target.value }))}
         error={f.checked && !f.isCorrect}
         helperText={
-          f.showAnswer ? `${f.answer}` : helper != null && helper !== ""
-            ? helper
-            : "\u00a0"
+          f.showAnswer ? `${f.answer}` :
+            f.checked 
+              ? f.isCorrect
+                ?"✅"
+                :"❌"
+              : helper != null && helper !== ""
+                  ? helper
+                  : "\u00a0"
         }
         InputLabelProps={{ shrink: true }}
         sx={panelBindTextFieldSx(width ?? 100, !!f.showAnswer)}
@@ -45,7 +50,7 @@ export default function FDStep2() {
       <Grid container spacing={1}>
         <Grid item xs={3}>
           <Grid xs={12} sx={{display:'flex',justifyContent:'center'}}>
-            {bind("DiffBtwnHighestMiddle2", "Δ Elev " + sorted[2].Name + " - " + sorted[1].Name)}
+            {bind("DiffBtwnHighestMiddle2", "Δ Elev " + sorted[2].Name + " to " + sorted[1].Name)}
           </Grid>
           <Grid lg={12}>
             <Box
@@ -58,7 +63,7 @@ export default function FDStep2() {
             />
           </Grid>
           <Grid xs={12} sx={{display:'flex',justifyContent:'center'}}>
-            {bind("DiffBtwnHighestLowest2", "Δ Elev " + sorted[2].Name + " - " + sorted[0].Name)}
+            {bind("DiffBtwnHighestLowest2", "Δ Elev " + sorted[2].Name + " to " + sorted[0].Name)}
           </Grid>
         </Grid>
         <Grid
@@ -94,7 +99,7 @@ export default function FDStep2() {
             =
           </Grid>
           <Grid item xs={12}>
-            {bind("ElevResult_X_DistanceHighMid", sorted[2].Name + "-" + sorted[2].Name + sorted[1].Name.toLowerCase() + " Dist"
+            {bind("ElevResult_X_DistanceHighMid", sorted[2].Name + " to " + sorted[2].Name + sorted[1].Name.toLowerCase() + " Dist","Round to whole number"
             )}
           </Grid>
         </Grid>

@@ -1,10 +1,10 @@
 import type { SxProps, Theme } from "@mui/material";
 
-/** Green bar for revealed answers (contrast-friendly dark green). */
-const ANSWER_HELPER_BG = "#1b5e20";
+import { useTheme } from "@mui/material";
+
 
 /** Fixed helper row height so layout does not jump when answers appear. */
-const HELPER_SLOT_PX = 25;
+const HELPER_SLOT_PX = 30;
 
 /** Fixed OutlinedInput root height (size="small"). */
 const INPUT_ROOT_PX = 40;
@@ -17,6 +17,8 @@ export function panelBindTextFieldSx(
   width: number | string,
   showAnswer: boolean,
 ): SxProps<Theme> {
+  const theme = useTheme()
+
   return {
     width,
     "& .MuiInputBase-root": {
@@ -28,9 +30,8 @@ export function panelBindTextFieldSx(
     "& .MuiFormHelperText-root": {
       marginLeft: 0,
       marginRight: 0,
-      marginTop: "6px",
-      minHeight: HELPER_SLOT_PX,
-      maxHeight: HELPER_SLOT_PX,
+      marginTop: "0px",
+      height:"fit-content",
       overflowY: "auto",
       overflowX: "hidden",
       boxSizing: "border-box",
@@ -38,7 +39,8 @@ export function panelBindTextFieldSx(
       lineHeight: 1.25,
       ...(showAnswer
         ? {
-            backgroundColor: ANSWER_HELPER_BG,
+          backgroundColor: theme.palette.success.main,
+          width:"fit-content",
             color: "#fff",
             px: 1,
             py: 0.5,

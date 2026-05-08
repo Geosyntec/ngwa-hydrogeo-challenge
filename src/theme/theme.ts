@@ -50,9 +50,13 @@ export const appTheme = createTheme({
       main: '#fca965',
       contrastText: '#1f1f1f',
     },
+    success: {
+      main: '#1b5e20',
+      contrastText: '#ffffff',
+    },
     brown: {
-      main: '#ddb498',
-      contrastText: '#1f1f1f',
+      main: '#734c2a',
+      contrastText: '#ffffff',
     },
   },
   components: {

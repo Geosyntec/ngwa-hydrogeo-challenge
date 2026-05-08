@@ -279,6 +279,33 @@ export default memo(function MapOverlay() {
 
       )
       }
+      
+
+      {/* actual vs user direction (step 3) */}
+      {/* {computed.step3Engaged && (
+        <line
+          x1={hi.Point.x}
+          y1={hi.Point.y}
+          x2={computed.foot.x}
+          y2={computed.foot.y}
+          stroke="#0071BC"
+          strokeWidth={4}
+          strokeDasharray="6 6"
+          markerEnd="url(#arrowEndBlue)"
+        />
+      )} */}
+      {computed.step3Engaged && computed.userLine && (
+        <line
+          x1={hi.Point.x}
+          y1={hi.Point.y}
+          x2={computed.userLine.end.x}
+          y2={computed.userLine.end.y}
+          stroke="#0071BC"
+          strokeWidth={4}
+          strokeDasharray="6 6"
+          markerEnd="url(#arrowEndBlue)"
+        />
+      )}
       {/* Y distance */}
       {showY && (
         <>
@@ -290,20 +317,35 @@ export default memo(function MapOverlay() {
             stroke="red"
             strokeWidth={3}
           />
+          <circle
+            cx={(hi.Point.x + computed.foot.x) / 2}
+            cy={(hi.Point.y + computed.foot.y) / 2-12}
+            r={10}
+            stroke="white"
+            strokeWidth={2}
+            fill="red"
+          />
           <text
             x={(hi.Point.x + computed.foot.x) / 2}
             y={(hi.Point.y + computed.foot.y) / 2 - 8}
             fontSize={12}
-            fill="red"
+            fill="white"
             textAnchor="middle"
           >
             Y
           </text>
+          <rect
+            x={(hi.Point.x + computed.foot.x) / 2 - 35}
+            y={(hi.Point.y + computed.foot.y) / 2 +5}
+            width='70'
+            height='20'
+            fill="#5f8bc6"
+          />
           <text
             x={(hi.Point.x + computed.foot.x) / 2}
-            y={(hi.Point.y + computed.foot.y) / 2 + 12}
+            y={(hi.Point.y + computed.foot.y) / 2 + 19}
             fontSize={12}
-            fill="#6CB5F4"
+            fill="#000000"
             textAnchor="middle"
           >
             {computed.yLen_Ft.toLocaleString()} ft.
@@ -339,32 +381,6 @@ export default memo(function MapOverlay() {
             </>
           )}
         </>
-      )}
-
-      {/* actual vs user direction (step 3) */}
-      {/* {computed.step3Engaged && (
-        <line
-          x1={hi.Point.x}
-          y1={hi.Point.y}
-          x2={computed.foot.x}
-          y2={computed.foot.y}
-          stroke="#0071BC"
-          strokeWidth={4}
-          strokeDasharray="6 6"
-          markerEnd="url(#arrowEndBlue)"
-        />
-      )} */}
-      {computed.step3Engaged && computed.userLine && (
-        <line
-          x1={hi.Point.x}
-          y1={hi.Point.y}
-          x2={computed.userLine.end.x}
-          y2={computed.userLine.end.y}
-          stroke="#0071BC"
-          strokeWidth={4}
-          strokeDasharray="6 6"
-          markerEnd="url(#arrowEndBlue)"
-        />
       )}
     </svg>
   );
@@ -449,13 +465,13 @@ function LegacyMeasuredSide({
         y={geom.labelMid.y-20}
         width='70'
         height='20'
-        fill="lightblue"
+        fill="#5f8bc6"
       />
       <text
         x={geom.labelMid.x}
         y={geom.labelMid.y - 6}
         fontSize={12}
-        fill="#333"
+        fill="#000000"
         textAnchor="middle"
         color="white"
       >

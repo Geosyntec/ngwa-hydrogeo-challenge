@@ -1,4 +1,4 @@
-import { Stack, Typography, Button } from "@mui/material";
+import { Stack, Typography, Button,useTheme } from "@mui/material";
 import { useAppDispatch, useAppSelector } from "../../../../../app/hooks";
 import { selectFlow, selectFlowStep2Complete, runCheckStep3 } from "../../../flowDirection/flowSelectors";
 import { selectScenarioState } from "../../../ScenarioSlice";
@@ -14,6 +14,7 @@ export default function FDStep3() {
     flow.SelectedDirection.checked &&
     !flow.SelectedDirection.isCorrect &&
     !flow.SelectedDirection.showAnswer;
+  const theme = useTheme()
 
   return (
     <>
@@ -32,7 +33,7 @@ export default function FDStep3() {
       >
         <CompassSelector display={stepReady} />
         {showAnswerLine && (
-          <Typography variant="body2" color="text.secondary" sx={{ maxWidth: 280 }}>
+          <Typography variant="body2" color={theme.palette.success.contrastText} sx={{ backgroundColor: theme.palette.success.main,padding:0.5,maxWidth: 280 }}>
             Answer: {flow.SelectedDirection.answer}
           </Typography>
         )}
