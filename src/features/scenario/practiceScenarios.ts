@@ -11,8 +11,8 @@ export const practiceScenarios: ScenarioDefinition[] = [
     "name": "001-Choose Your Map: River Heights",
     "map": {
       "url": "assets/img/river_heights_map.jpg",
-      "width": 1024,
-      "height": 685,
+      "width": 782,
+      "height": 640,
       "physicalWidth": 10
     },
     "allowPumping": true,
@@ -315,7 +315,7 @@ export const practiceScenarios: ScenarioDefinition[] = [
         "Left": 467,
         "Point": {
           "x": 467,
-          "y": 644
+          "y": 600
         },
         "GeologyNew": [
           {
@@ -351,8 +351,8 @@ export const practiceScenarios: ScenarioDefinition[] = [
     "name": "002 -  Filmore Grove",
     "map": {
       "url": "assets/img/filmore_grove_map.jpg",
-      "width": 1024,
-      "height": 685,
+      "width": 782,
+      "height": 640,
       "physicalWidth": 4.5
     },
     "allowPumping": true,
@@ -556,7 +556,7 @@ export const practiceScenarios: ScenarioDefinition[] = [
         "Left": 243,
         "Point": {
           "x": 243,
-          "y": 639
+          "y": 600
         },
         "GeologyNew": [
           {
@@ -677,8 +677,8 @@ export const practiceScenarios: ScenarioDefinition[] = [
     "name": "003 - Filmore City",
     "map": {
       "url": "assets/img/filmore_city_map.jpg",
-      "width": 1024,
-      "height": 685,
+      "width": 782,
+      "height": 640,
       "physicalWidth": 6
     },
     "allowPumping": true,
@@ -973,8 +973,8 @@ export const practiceScenarios: ScenarioDefinition[] = [
     "name": "004 - Filmore Springs",
     "map": {
       "url": "assets/img/filmore_springs_map.jpg",
-      "width": 1024,
-      "height": 685,
+      "width": 782,
+      "height": 640,
       "physicalWidth": 4.5
     },
     "allowPumping": true,
@@ -1421,8 +1421,8 @@ export const practiceScenarios: ScenarioDefinition[] = [
     "name": "005 - High Plains Aquifer",
     "map": {
       "url": "assets/img/high_plains_aquifer_map.jpg",
-      "width": 1024,
-      "height": 685,
+      "width": 782,
+      "height": 640,
       "physicalWidth": 8
     },
     "allowPumping": true,
@@ -1718,8 +1718,8 @@ export const practiceScenarios: ScenarioDefinition[] = [
     "name": "006 - Peoria",
     "map": {
       "url": "assets/img/peoria_map.jpg",
-      "width": 1024,
-      "height": 685,
+      "width": 782,
+      "height": 640,
       "physicalWidth": 0.6
     },
     "allowPumping": true,
