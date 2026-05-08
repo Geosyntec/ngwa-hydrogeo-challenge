@@ -73,9 +73,14 @@ export default function GradientPanel() {
         onChange={(e) => dispatch(setField({ key, value: e.target.value }))}
         error={f.checked && !f.isCorrect}
         helperText={
-          f.showAnswer ? `${f.answer}` : helper != null && helper !== ""
-            ? helper
-            : "\u00a0"
+          f.showAnswer ? `${f.answer}` :
+            f.checked 
+              ? f.isCorrect
+                ?"✅"
+                :"❌"
+              : helper != null && helper !== ""
+                  ? helper
+                  : "\u00a0"
         }
         InputLabelProps={{ shrink: true }}
         sx={panelBindTextFieldSx(width ?? 280, !!f.showAnswer)}
@@ -96,7 +101,7 @@ export default function GradientPanel() {
           <Typography variant="h5">Gradient</Typography>
         </Stack>
       </AccordionSummary>
-      <AccordionDetails>
+      <AccordionDetails sx={{maxHeight:"300px",overflowY:"auto",minHeight:0}}>
         <Box sx={{ position: "relative", overflow: "visible" }}>
           <Typography
             variant="body2"
@@ -113,7 +118,7 @@ export default function GradientPanel() {
                 <Typography variant="body2" color="text.secondary">
                   <strong>Determine the distance 'Y':</strong> Distance 'Y' is
                   the measurement between the well with the highest water table
-                  elevation and the water table contour line. Distance 'Y' is
+                  elevation and the water table contour line (i.e. the line defined by your answer to step 2 of the Flow Direction module). Distance 'Y' is
                   always perpendicular to the water table contour line.
                 </Typography>
                 <Grid container spacing={1} sx={{ mt: 1 }}>
@@ -161,11 +166,11 @@ export default function GradientPanel() {
                 <Grid container spacing={1} sx={{ mt: 1 }}>
                   <Grid
                     item
-                    lg={6}
+                    xs={6}
                     columnSpacing={1}
                     sx={{ display: "flex", flexDirection: "row",flexWrap:"wrap" }}
                   >
-                    <Grid item lg={4}>
+                    <Grid item xs={4}>
                       {bind(
                         "HighestWaterTableValue",
                         "Elevation " + sorted[2].Name,
@@ -175,7 +180,7 @@ export default function GradientPanel() {
                     </Grid>
                     <Grid
                       item
-                      lg={4}
+                      xs={4}
                       sx={{
                         display: "flex",
                         paddingTop: "2%",
@@ -184,7 +189,7 @@ export default function GradientPanel() {
                     >
                       <Typography variant="body2">-</Typography>
                     </Grid>
-                    <Grid item lg={4}>
+                    <Grid item xs={4}>
                       {bind(
                         "RemainingWellValue",
                         "Elevation " + sorted[1].Name,
@@ -192,7 +197,7 @@ export default function GradientPanel() {
                         100
                       )}
                     </Grid>
-                    <Grid lg={12}>
+                    <Grid xs={12}>
                       <Box
                         sx={{
                           borderTop: (t) => `2px solid ${t.palette.divider}`,
@@ -205,7 +210,7 @@ export default function GradientPanel() {
                     </Grid>
                     <Grid
                       item
-                      lg={12}
+                      xs={12}
                       sx={{
                         display: "flex",
                         justifyContent: "center",
@@ -222,12 +227,12 @@ export default function GradientPanel() {
                   </Grid>
                   <Grid
                     item
-                    lg={6}
+                    xs={6}
                     sx={{ display: "flex", flexDirection: "row",alignItems:"center" }}
                   >
                     <Grid
                       item
-                      lg={2}
+                      xs={2}
                       sx={{
                         display: "flex",
                         paddingTop: "2%",
@@ -236,7 +241,7 @@ export default function GradientPanel() {
                     >
                       <Typography variant="body2">=</Typography>
                     </Grid>
-                    <Grid item lg={10}>
+                    <Grid item xs={10}>
                       {bind("Gradient", "Gradient (4 dp)", "", 150)}
                     </Grid>
                   </Grid>
@@ -274,8 +279,8 @@ export default function GradientPanel() {
               </div>
             </Stack>
           )}
-
-          {!isTest && (
+          {/*Disabling reality checks for now  */}
+          {false && (
             <RealityCheck
               title="Reality Check: Gradient"
               open={rcOpen}

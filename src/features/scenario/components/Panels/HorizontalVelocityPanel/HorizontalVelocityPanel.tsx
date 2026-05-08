@@ -98,9 +98,14 @@ export default function HorizontalVelocityPanel() {
         onChange={(e) => dispatch(setField({ key, value: e.target.value }))}
         error={f.checked && !f.isCorrect}
         helperText={
-          f.showAnswer ? `${f.answer}` : helper != null && helper !== ""
-            ? helper
-            : "\u00a0"
+          f.showAnswer ? `${f.answer}` :
+            f.checked 
+              ? f.isCorrect
+                ?"✅"
+                :"❌"
+              : helper != null && helper !== ""
+                  ? helper
+                  : "\u00a0"
         }
         InputLabelProps={{ shrink: true }}
         sx={panelBindTextFieldSx(width ?? 50, !!f.showAnswer)}
@@ -146,7 +151,7 @@ export default function HorizontalVelocityPanel() {
           <Typography variant="h5">Horizontal Velocity</Typography>
         </Stack>
       </AccordionSummary>
-      <AccordionDetails>
+      <AccordionDetails sx={{maxHeight:"300px",overflowY:"auto",minHeight:0}}>
         <Box sx={{ position: "relative", overflow: "visible" }}>
           {gradReady && ready && (
             <>
@@ -499,8 +504,8 @@ export default function HorizontalVelocityPanel() {
               navigate(ROUTES.home);
             }}
           />
-
-          {!isTest && (
+          {/* disabling reality checks for now */}
+          {false && (
             <RealityCheck
               title="Reality Check: Horizontal Velocity"
               open={rcOpen}

@@ -7,6 +7,7 @@ import {
   Typography,
   Button,
   Box,
+  Snackbar,
 } from "@mui/material";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { useAppDispatch, useAppSelector } from "../../../../../app/hooks";
@@ -33,19 +34,7 @@ export default function FlowDirectionPanel() {
   const flowDone = useAppSelector(selectFlowStep3Complete);
   const { selectedPanel, isTest } = useAppSelector(selectScenarioState);
   const [rcOpen, setRcOpen] = useState(false);
-
-  // useEffect(() => {
-  //   if (ready && !selectedPanel) {
-  //     dispatch(setSelectedPanel("flow"));
-  //   }
-  // }, [ready, selectedPanel, dispatch]);
-
-  // useEffect(() => {
-  //   console.log("flow done?:",flowDone)
-  //   if (flowDone) {
-  //     dispatch(setSelectedPanel("gradient"));
-  //   }
-  // }, [flowDone, dispatch]);
+  const [firstChallenge,setFirstChallenge] = useState(true)
 
   const onToggle = useCallback(
     (_e: any, expanded: boolean) => {
@@ -55,23 +44,34 @@ export default function FlowDirectionPanel() {
   );
 
   return (
-    <Accordion
+    <>
+      <Snackbar
+          open={ready && firstChallenge}
+          anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+        autoHideDuration={5000}
+        onClose={()=>setFirstChallenge(false)}
+          message = {`Wells selected. Drag well info boxes as needed, hover over elevations for more info, and expand for additional details`}
+        />
+      <Accordion
       disabled={!ready}
       expanded={selectedPanel === "flow"}
       onChange={onToggle}
-      // sx={{
-      //   maxHeight: "20%",
-      //   overflow:"scroll"
-      // }}
     >
       <AccordionSummary
         expandIcon={<ExpandMoreIcon />}
-        sx={{ position: "sticky", top: 0 }}
+          sx={{
+            position: "sticky",
+            top: 0, 
+            "& .Mui-expanded": {
+              mt: 0,
+              mb:0
+            }
+          }}
       >
         <Stack
           direction="row"
           alignItems="center"
-          spacing={1.5}
+          spacing={1}
           sx={{ width: "100%", pr: 1, minWidth: 0 }}
         >
           <PanelAccordionIcon panel="flowDirection" />
@@ -105,7 +105,7 @@ export default function FlowDirectionPanel() {
         </Stack>
       </AccordionSummary>
 
-      <AccordionDetails sx={{maxHeight:"400px",overflowY:"auto",minHeight:0}}>
+      <AccordionDetails sx={{maxHeight:"300px",overflowY:"auto",minHeight:0}}>
         {/* Host container for the slide-out: must be relative + overflow visible */}
         <Box sx={{ position: "relative", overflow: "visible" }}>
           {ready && (
@@ -113,7 +113,7 @@ export default function FlowDirectionPanel() {
             <Typography variant="body2" color="text.secondary" sx={{marginBottom:"12px"}}>
             To determine the flow direction of groundwater between three wells you will need to work through three basic steps.
           </Typography>
-            <Stack spacing={2}>
+            <Stack spacing={1}>
               <FDStep1 />
               <Divider />
               <FDStep2 />
@@ -127,5 +127,6 @@ export default function FlowDirectionPanel() {
         </Box>
       </AccordionDetails>
     </Accordion>
+    </>
   );
 }
