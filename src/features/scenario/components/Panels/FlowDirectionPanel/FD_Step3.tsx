@@ -20,7 +20,7 @@ export default function FDStep3() {
     <>
       <Typography variant="h6">Step 3</Typography>
       <Typography variant="body2" color="text.secondary">
-        What direction do you thik the groundwater will flow?
+      Groundwater usually flows perpendicular, or at a right angle, to the water table contour line. Starting from the well with the highest water table elevation, what direction do you think the groundwater will flow?
       </Typography>
       <Typography variant="body2" color="text.secondary">
         Drag the compass dial or tab-select the dial and use Alt+← / Alt+→ to nudge 5°.

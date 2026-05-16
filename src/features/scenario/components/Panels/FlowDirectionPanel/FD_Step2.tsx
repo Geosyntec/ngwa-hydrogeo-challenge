@@ -44,8 +44,7 @@ export default function FDStep2() {
     <>
       <Typography variant="h6">Step 2</Typography>
       <Typography variant="body2" color="text.secondary">
-        Somewhere between the highest and lowest wells the groundwater elevation will be equal to the middle well elevation.
-        How far from the highest well is that position?
+      Somewhere along the path between the highest and lowest wells, the water table elevation will be equal to the middle well’s elevation. Use the equation below to determine where along the path this point is. Remember, use answers from Step 1 where applicable.
       </Typography>
       <Grid container spacing={1}>
         <Grid item xs={3}>
@@ -104,6 +103,9 @@ export default function FDStep2() {
           </Grid>
         </Grid>
       </Grid>
+      <Typography variant="body2" color="text.secondary">
+      The path between the middle elevation well to this new point is called the Water Table Contour Line.
+      </Typography>
       {!isTest && (
         <Stack direction="row" spacing={1}>
           <Button

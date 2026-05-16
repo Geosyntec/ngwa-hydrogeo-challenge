@@ -111,7 +111,7 @@ export default function FlowDirectionPanel() {
           {ready && (
             <Box>
             <Typography variant="body2" color="text.secondary" sx={{marginBottom:"12px"}}>
-            To determine the flow direction of groundwater between three wells you will need to work through three basic steps.
+            To determine the flow direction of groundwater between three wells, follow these three essential steps. First, identify and calculate the key elevation data for each well. Enter your answers in the boxes provided below.
           </Typography>
             <Stack spacing={1}>
               <FDStep1 />

@@ -168,7 +168,11 @@ export default function HorizontalVelocityPanel() {
                 <div>
                   <Typography variant="h6">Step 1</Typography>
                   <Typography variant="body2" color="text.secondary">
-                    Find these values:
+                  Gather and fill in the values below. The gradient (i) value will come from the previous steps. Hydraulic conductivity (K) and porosity (n) are characteristics of the geologic material the aquifer is made of.
+                  <br/>
+                  <strong>Note: </strong>In this simplified modeling activity, we treat hydraulic conductivity as a fixed number and we assume that groundwater moves only through this layer. 
+                  <br/>
+                  In reality, conditions can be very different from one well to another and water can flow through all types of wet rock and soil with vastly different conductivity levels, even those that let water through very slowly, like clay.
                   </Typography>
                   <Grid container spacing={2} sx={{ mt: 1 }}>
                     {/* Fixed 4 / 2 / 6 layout at all breakpoints — avoids collapse between md and lg */}
@@ -183,7 +187,12 @@ export default function HorizontalVelocityPanel() {
                         alignItems: "flex-start",
                       }}
                     >
-                      <Grid item xs={3} sm={3} md={3} lg={3} sx={{ flexShrink: 0 }}>
+                    <Grid item xs={12}>
+                      <Typography variant="body2" color="text.secondary">
+                      For this activity, identify the soil layer with the highest hydraulic conductivity and use that number for K.
+                      </Typography>
+                    </Grid>  
+                    <Grid item xs={3} sm={3} md={3} lg={3} sx={{ flexShrink: 0 }}>
                         <Typography variant="body2" sx={{ whiteSpace: "nowrap" }}>
                           i (gradient) ={" "}
                         </Typography>
@@ -196,6 +205,11 @@ export default function HorizontalVelocityPanel() {
                           ft/ft (round to 4 dp)
                         </Typography>
                       </Grid>
+                    </Grid>
+                    <Grid item xs={12}>
+                      <Typography variant="body2" color="text.secondary">
+                      For this activity, identify the soil layer with the highest hydraulic conductivity and use that number for K.
+                      </Typography>
                     </Grid>
                     <Grid
                       container
@@ -219,6 +233,11 @@ export default function HorizontalVelocityPanel() {
                       <Grid item xs={6} sm={6} md={6} lg={6} sx={{ flexShrink: 0 }}>
                         <Typography variant="body2">ft/day</Typography>
                       </Grid>
+                    </Grid>
+                    <Grid item xs={12}>
+                      <Typography variant="body2" color="text.secondary">
+                      Identify the porosity that corresponds to the soil layer with the highest hydraulic conductivity which was used for K. You must format the porosity as a decimal when you input it into the equation.
+                      </Typography>
                     </Grid>
                     <Grid
                       container
@@ -280,8 +299,7 @@ export default function HorizontalVelocityPanel() {
                 <div>
                   <Typography variant="h6">Step 2</Typography>
                   <Typography variant="body2" color="text.secondary">
-                    Use Darcy's Law to find the horizontal velocity of
-                    groundwater between the wells:
+                  Use data gathered in the previous step and the simplified version of Darcy’s Law below to calculate the horizontal velocity of the groundwater between the selected three wells. Round the final answer to four decimal places (dp).
                   </Typography>
                   <Grid container spacing={2} sx={{ mt: 1 }}>
                     <Grid item xs={12} md={6} lg={6} sx={{ minWidth: 0 }}>

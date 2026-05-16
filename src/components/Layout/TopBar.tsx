@@ -81,7 +81,7 @@ export default function TopBar() {
           <Box
             component="img"
             src={resolvePublicAssetUrl("/assets/img/gw_logo.png")}
-            alt="AquiferLab"
+            alt="Aquifer Lab"
             sx={{
               height: { xs: 28, sm: 32 },
               width: "auto",
@@ -99,7 +99,7 @@ export default function TopBar() {
               display: { xs: "none", sm: "block" },
             }}
           >
-            AquiferLab
+            Aquifer Lab
           </Typography>
         </Box>
 

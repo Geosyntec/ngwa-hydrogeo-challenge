@@ -115,10 +115,8 @@ export default function GradientPanel() {
               <div>
                 <Typography variant="h6">Step 1</Typography>
                 <Typography variant="body2" color="text.secondary">
-                  <strong>Determine the distance 'Y':</strong> Distance 'Y' is
-                  the measurement between the well with the highest water table
-                  elevation and the water table contour line (i.e. the line defined by your answer to step 2 of the Flow Direction module). Distance 'Y' is
-                  always perpendicular to the water table contour line.
+                  <strong>Determine the distance 'Y':</strong> 
+                  This step involves identifying distance ‘Y’. Distance Y is the measurement from the well with the highest water table elevation to the water table contour line. It follows the direction of groundwater flow, so it is always perpendicular to the water table contour line. Distance Y could be calculated using geometry, but to keep the modeling activity simple, distance Y is already provided.
                 </Typography>
                 <Grid container spacing={1} sx={{ mt: 1 }}>
                   <Grid item xs={12} md={6}>
@@ -159,8 +157,7 @@ export default function GradientPanel() {
               <div>
                 <Typography variant="h6">Step 2</Typography>
                 <Typography variant="body2" color="text.secondary">
-                  Verify elevations, Y, and compute the{" "}
-                  <strong>Gradient</strong> (4 dp).
+                Use the formula below to compute the Gradient. Remember, use answers from previous steps where applicable. The final answer should be rounded to four decimal places (dp).
                 </Typography>
                 <Grid container spacing={1} sx={{ mt: 1 }}>
                   <Grid

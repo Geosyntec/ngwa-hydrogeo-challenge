@@ -99,7 +99,7 @@ async def login(body: LoginBody, conn=Depends(get_db)):
     if not row["verified"]:
         raise HTTPException(
             status_code=403,
-            detail="Please verify your email before signing in. Check your inbox for the verification link.",
+            detail="Please verify your email before signing in. Check your inbox and spam folder for the verification link.",
         )
 
     return LoginResponse(
@@ -184,7 +184,7 @@ async def register(body: RegisterBody, request: Request, conn=Depends(get_db)):
     link = f"{base}/verify-email?token={token}"
     send_verification_email(email, link)
 
-    return RegisterResponse(ok=True, message="Verification email has been sent. Please check your inbox.")
+    return RegisterResponse(ok=True, message="Verification email has been sent. Please check your inbox and spam folder.")
 
 
 class VerifyEmailBody(BaseModel):
