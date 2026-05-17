@@ -73,6 +73,10 @@ export default function ManageClassesPage() {
   const [editError, setEditError] = useState<string | null>(null)
   const [deleteConfirm, setDeleteConfirm] = useState<{ className: string; classId: string } | null>(null)
   const [deleteSubmitting, setDeleteSubmitting] = useState(false)
+  const [studentDeleteConfirm, setStudentDeleteConfirm] = useState<{
+    index: number
+    displayName: string
+  } | null>(null)
   const nextNewIdRef = useRef(0)
 
   const loadClasses = useCallback(() => {
@@ -130,6 +134,7 @@ export default function ManageClassesPage() {
     setEditClassName('')
     setEditStudents([])
     setEditError(null)
+    setStudentDeleteConfirm(null)
   }
 
   const setStudentFirst = (index: number, first_name: string) => {
@@ -153,6 +158,31 @@ export default function ManageClassesPage() {
 
   const removeStudent = (index: number) => {
     setEditStudents((prev) => prev.filter((_, i) => i !== index))
+    setStudentDeleteConfirm((pending) =>
+      pending?.index === index ? null : pending,
+    )
+  }
+
+  const requestRemoveStudent = (index: number) => {
+    const student = editStudents[index]
+    if (!student) return
+    if (student.isNew) {
+      removeStudent(index)
+      return
+    }
+    const name = [student.first_name, student.last_name]
+      .map((s) => s.trim())
+      .filter(Boolean)
+      .join(' ')
+    setStudentDeleteConfirm({
+      index,
+      displayName: name || 'this student',
+    })
+  }
+
+  const confirmRemoveStudent = () => {
+    if (studentDeleteConfirm === null) return
+    removeStudent(studentDeleteConfirm.index)
   }
 
   const handleDeleteClass = async () => {
@@ -406,7 +436,7 @@ export default function ManageClassesPage() {
                 <IconButton
                   aria-label="Remove student"
                   size="small"
-                  onClick={() => removeStudent(index)}
+                  onClick={() => requestRemoveStudent(index)}
                   color="error"
                 >
                   <DeleteOutline />
@@ -438,6 +468,25 @@ export default function ManageClassesPage() {
             }
           >
             {editSubmitting ? 'Saving…' : editingClass ? 'Save changes' : 'Create class'}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog
+        open={!!studentDeleteConfirm}
+        onClose={() => setStudentDeleteConfirm(null)}
+      >
+        <DialogTitle>Delete student</DialogTitle>
+        <DialogContent>
+          <Typography>
+            Remove &quot;{studentDeleteConfirm?.displayName}&quot; from this class? Any test
+            results associated with this student will be deleted. This cannot be undone.
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setStudentDeleteConfirm(null)}>Cancel</Button>
+          <Button color="error" variant="contained" onClick={confirmRemoveStudent}>
+            Delete
           </Button>
         </DialogActions>
       </Dialog>
