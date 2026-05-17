@@ -443,6 +443,7 @@ export default function HorizontalVelocityPanel() {
                     disabled={!allPanelsComplete}
                     onClick={() => {
                       dispatchReevaluateAllAnswersForGrading(dispatch);
+                      dispatch(setSelectedPanel(null));
                       setSubmitModalOpen(true);
                     }}
                     sx={{ mt: 3 }}
