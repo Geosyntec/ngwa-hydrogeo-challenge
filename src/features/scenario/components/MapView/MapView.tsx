@@ -1,11 +1,13 @@
-import { useMemo } from "react";
-import { Box } from "@mui/material";
+import { useMemo, useState } from "react";
+import { Box, IconButton } from "@mui/material";
+import InfoOutlined from "@mui/icons-material/InfoOutlined";
 import { useAppSelector } from "../../../../app/hooks";
 import { selectMap, selectWells, selectSelectedWellIds, selectAllWellsSelected } from "../../ScenarioSlice";
 import type { WellModel } from "../../scenarioTypes";
 import type { WellInfoCardPlacement } from "./WellInfoCard";
 import WellMarker from "./WellMarker";
 import MapOverlay from "./MapOverlay";
+import ScenarioInfoModal from "./ScenarioInfoModal";
 import { resolvePublicAssetUrl } from "../../../../utils/publicAssetUrl";
 
 /**
@@ -48,6 +50,7 @@ export default function MapView() {
   const map = useAppSelector(selectMap);
   const wells = useAppSelector(selectWells);
   const cardPlacements = useWellCardPlacements();
+  const [infoOpen, setInfoOpen] = useState(false);
 
   return (
     <Box
@@ -63,6 +66,23 @@ export default function MapView() {
         backgroundPosition: "center",
       }}
     >
+      <IconButton
+        aria-label="Scenario instructions"
+        onClick={() => setInfoOpen(true)}
+        size="small"
+        sx={{
+          position: "absolute",
+          top: 8,
+          left: 8,
+          zIndex: 20,
+          bgcolor: "background.paper",
+          boxShadow: 2,
+          "&:hover": { bgcolor: "background.paper" },
+        }}
+      >
+        <InfoOutlined fontSize="small" />
+      </IconButton>
+      <ScenarioInfoModal open={infoOpen} onClose={() => setInfoOpen(false)} />
       <MapOverlay />
       {wells.map((w) => (
         <WellMarker
