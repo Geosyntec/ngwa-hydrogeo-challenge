@@ -118,6 +118,7 @@ export default function HorizontalVelocityPanel() {
   const [testSubmitError, setTestSubmitError] = useState<string | null>(null);
   const handleTestSubmit = useCallback(async () => {
     setTestSubmitError(null);
+    setSelectedPanel(null);
     dispatchReevaluateAllAnswersForGrading(dispatch);
     const payload = buildSubmitGradesPayload(store.getState());
     if (!payload) {
