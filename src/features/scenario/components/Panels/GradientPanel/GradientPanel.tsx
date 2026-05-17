@@ -24,10 +24,12 @@ import {
 } from "../../../flowDirection/flowSlice";
 import { selectFlowAllStepsComplete } from "../../../flowDirection/flowSelectors";
 import { selectScenarioState, setSelectedPanel } from "../../../ScenarioSlice";
+import { computeYLengthFeet } from "../../../services/drawingMath";
 import RealityCheck from "../../RealityCheck/RealityCheck";
 import { panelBindTextFieldSx } from "../panelBindTextFieldSx";
 import { PanelAccordionIcon } from "../PanelAccordionIcon";
 import { useCallback, useEffect, useState } from "react";
+import { store } from "../../../../../app/store";
 
 export default function GradientPanel() {
   const dispatch = useAppDispatch();
@@ -87,6 +89,21 @@ export default function GradientPanel() {
     );
   };
   const [rcOpen, setRcOpen] = useState(false);
+  const [distanceYRevealed, setDistanceYRevealed] = useState(false);
+
+  useEffect(() => {
+    if (!g.WhatIsDistanceYValue.input && !g.WhatIsDistanceYValue.checked) {
+      setDistanceYRevealed(false);
+    }
+  }, [g.WhatIsDistanceYValue.input, g.WhatIsDistanceYValue.checked]);
+
+  const handleRevealDistanceY = () => {
+    const Y = computeYLengthFeet(store.getState());
+    if (Y != null) {
+      dispatch(setField({ key: "WhatIsDistanceYValue", value: String(Y) }));
+    }
+    setDistanceYRevealed(true);
+  };
 
   return (
     <Accordion
@@ -118,41 +135,51 @@ export default function GradientPanel() {
                   <strong>Determine the distance 'Y':</strong> 
                   This step involves identifying distance ‘Y’. Distance Y is the measurement from the well with the highest water table elevation to the water table contour line. It follows the direction of groundwater flow, so it is always perpendicular to the water table contour line. Distance Y could be calculated using geometry, but to keep the modeling activity simple, distance Y is already provided.
                 </Typography>
-                <Grid container spacing={1} sx={{ mt: 1 }}>
-                  <Grid item xs={12} md={6}>
-                    {bind("WhatIsDistanceYValue", "What is distance Y (ft)?")}
-                  </Grid>
-                </Grid>
-                {!isTest && (
-                  <Stack direction="row" spacing={1} sx={{ mt: 1 }}>
-                    <Button
-                      variant="outlined"
-                      onClick={() =>
-                        dispatch(
-                          checkStep1({
-                            show: false,
-                            check: true,
-                          })
-                        )
-                      }
-                    >
-                      Check Step 1
+                <Box sx={{ mt: 1 }}>
+                  {!distanceYRevealed ? (
+                    <Button variant="outlined" onClick={handleRevealDistanceY}>
+                      Reveal Distance Y
                     </Button>
-                    <Button
-                      variant="outlined"
-                      onClick={() =>
-                        dispatch(
-                          checkStep1({
-                            check: true,
-                            show: true,
-                          })
-                        )
-                      }
-                    >
-                      Show Step 1 Solution
-                    </Button>
-                  </Stack>
-                )}
+                  ) : (
+                    <>
+                      <Grid container spacing={1}>
+                        <Grid item xs={12} md={6}>
+                          {bind("WhatIsDistanceYValue", "What is distance Y (ft)?")}
+                        </Grid>
+                      </Grid>
+                      {!isTest && (
+                        <Stack direction="row" spacing={1} sx={{ mt: 1 }}>
+                          <Button
+                            variant="outlined"
+                            onClick={() =>
+                              dispatch(
+                                checkStep1({
+                                  show: false,
+                                  check: true,
+                                })
+                              )
+                            }
+                          >
+                            Check Step 1
+                          </Button>
+                          <Button
+                            variant="outlined"
+                            onClick={() =>
+                              dispatch(
+                                checkStep1({
+                                  check: true,
+                                  show: true,
+                                })
+                              )
+                            }
+                          >
+                            Show Step 1 Solution
+                          </Button>
+                        </Stack>
+                      )}
+                    </>
+                  )}
+                </Box>
               </div>
               <div>
                 <Typography variant="h6">Step 2</Typography>
