@@ -37,7 +37,7 @@ async def lifespan(app: FastAPI):
     await close_pool(app.state.db_pool)
 
 
-app = FastAPI(title="Hydrogeology Challenge API", lifespan=lifespan)
+app = FastAPI(title="Aquifer Lab API", lifespan=lifespan)
 
 
 async def get_db(request: Request):

@@ -27,7 +27,7 @@ MAILJET_SEND_URL = "https://api.mailjet.com/v3.1/send"
 
 # Verified sender in Mailjet; override with MAILJET_FROM_EMAIL if needed.
 DEFAULT_MAILJET_FROM_EMAIL = "no.reply@aquiferlab.com"
-DEFAULT_MAILJET_FROM_NAME = "Hydrogeology Challenge"
+DEFAULT_MAILJET_FROM_NAME = "Aquifer Lab"
 
 
 def _mailjet_from() -> tuple[str, str]:
