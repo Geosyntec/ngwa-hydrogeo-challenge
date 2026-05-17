@@ -55,18 +55,27 @@ const VELOCITY_ANSWER_KEYS = [
   "HorizontalVelocity",
 ] as const;
 
+type AnswerFieldSlice = {
+  input?: string;
+  isCorrect?: boolean;
+};
+
 function getAnswersFromFields(
-  stateSlice: Record<string, { input?: string }>,
-  keys: readonly string[]
+  stateSlice: Record<string, AnswerFieldSlice>,
+  keys: readonly string[],
 ): SubmitGradesAnswers {
   const out: SubmitGradesAnswers = {};
   for (const key of keys) {
     const field = stateSlice[key];
-    if (field && field.input !== undefined) {
-      const raw = field.input.trim();
-      const num = Number(raw);
-      out[key] = Number.isNaN(num) ? raw : num;
+    if (!field || typeof field !== "object" || !("input" in field)) {
+      continue;
     }
+    const raw = (field.input ?? "").trim();
+    const num = Number(raw);
+    out[key] = {
+      value: raw === "" ? "" : Number.isNaN(num) ? raw : num,
+      isCorrect: Boolean(field.isCorrect),
+    };
   }
   return out;
 }
@@ -93,9 +102,9 @@ export function buildSubmitGradesPayload(
     selectedWells.three,
   ].filter((id): id is string => !!id);
 
-  const flowState = selectFlow(state) as unknown as Record<string, { input?: string }>;
-  const gradientState = selectGradient(state) as unknown as Record<string, { input?: string }>;
-  const velocityState = selectVelocity(state) as unknown as Record<string, { input?: string }>;
+  const flowState = selectFlow(state) as unknown as Record<string, AnswerFieldSlice>;
+  const gradientState = selectGradient(state) as unknown as Record<string, AnswerFieldSlice>;
+  const velocityState = selectVelocity(state) as unknown as Record<string, AnswerFieldSlice>;
 
   const answers: SubmitGradesAnswers = {
     ...getAnswersFromFields(flowState, FLOW_ANSWER_KEYS),

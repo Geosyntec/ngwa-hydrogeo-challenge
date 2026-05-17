@@ -2,6 +2,7 @@ import {
   Accordion,
   AccordionDetails,
   AccordionSummary,
+  Box,
   Button,
   Dialog,
   DialogActions,
@@ -92,7 +93,13 @@ export default function GradesModal({
               <AccordionDetails>
                 <Table size="small">
                   <TableBody>
-                    {Object.entries(data.answers).map(([key, value]) => (
+                    <TableRow>
+                      <TableCell sx={{ fontWeight: 600 }}>Question</TableCell>
+                      <TableCell align="right" sx={{ fontWeight: 600 }}>
+                        Answer
+                      </TableCell>
+                    </TableRow>
+                    {Object.entries(data.answers).map(([key, entry]) => (
                       <TableRow key={key}>
                         <TableCell
                           sx={{
@@ -103,7 +110,25 @@ export default function GradesModal({
                         >
                           {key}
                         </TableCell>
-                        <TableCell align="right">{String(value)}</TableCell>
+                        <TableCell align="right">
+                          <Box
+                            component="span"
+                            sx={{
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              justifyContent: 'flex-end',
+                              gap: 0.75,
+                              width: '100%',
+                            }}
+                          >
+                            <span>{String(entry.value)}</span>
+                            {entry.isCorrect !== undefined && (
+                              <span aria-label={entry.isCorrect ? 'Correct' : 'Incorrect'}>
+                                {entry.isCorrect ? '✅' : '❌'}
+                              </span>
+                            )}
+                          </Box>
+                        </TableCell>
                       </TableRow>
                     ))}
                   </TableBody>

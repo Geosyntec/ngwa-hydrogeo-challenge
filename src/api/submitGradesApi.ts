@@ -16,8 +16,51 @@ export type SubmitGradesOverallGrades = {
   percentage: number
 }
 
-/** Question key -> student's answer (string or number). */
-export type SubmitGradesAnswers = Record<string, string | number>
+/** One graded question in a submission (`grade_submissions.answers` JSON). */
+export type SubmitGradesAnswerEntry = {
+  /** Student's submitted answer (string or number). */
+  value: string | number
+  /**
+   * Present only for submissions graded on submit (`dispatchReevaluateAllAnswersForGrading`).
+   * Omitted for legacy JSONB rows that stored a scalar per key.
+   */
+  isCorrect?: boolean
+}
+
+/** Question id -> answer entry. */
+export type SubmitGradesAnswers = Record<string, SubmitGradesAnswerEntry>
+
+/** Coerce stored JSON (new shape or legacy scalar per key) for display. */
+export function normalizeSubmitGradesAnswers(raw: unknown): SubmitGradesAnswers {
+  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) {
+    return {}
+  }
+  const out: SubmitGradesAnswers = {}
+  for (const [key, entry] of Object.entries(raw as Record<string, unknown>)) {
+    if (entry && typeof entry === 'object' && !Array.isArray(entry)) {
+      const obj = entry as Record<string, unknown>
+      const v = obj.value ?? obj.answer
+      if ('isCorrect' in obj || 'value' in obj || 'answer' in obj || v !== undefined) {
+        const value =
+          typeof v === 'number' || typeof v === 'string'
+            ? v
+            : v != null
+              ? String(v)
+              : ''
+        if ('isCorrect' in obj) {
+          out[key] = { value, isCorrect: Boolean(obj.isCorrect) }
+        } else {
+          out[key] = { value }
+        }
+        continue
+      }
+    }
+    if (typeof entry === 'string' || typeof entry === 'number') {
+      out[key] = { value: entry }
+    }
+  }
+  return out
+}
 
 /**
  * Request body keys match `grade_submissions` columns (excluding generated id and submitted_at).

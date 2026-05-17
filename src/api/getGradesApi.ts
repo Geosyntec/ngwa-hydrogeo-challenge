@@ -3,7 +3,11 @@
  */
 
 import { getApiUrl } from '../app/apiConfig'
-import type { SubmitGradesAnswers, SubmitGradesOverallGrades } from './submitGradesApi'
+import {
+  normalizeSubmitGradesAnswers,
+  type SubmitGradesAnswers,
+  type SubmitGradesOverallGrades,
+} from './submitGradesApi'
 
 export type GetGradesResponse = {
   gradesSummary: SubmitGradesOverallGrades
@@ -79,14 +83,13 @@ export async function fetchGradeSubmissionDetail(
     const msg = typeof data.detail === 'string' ? data.detail : 'Failed to load submission.'
     throw new Error(msg)
   }
-  const answers = data.answers && typeof data.answers === 'object' ? data.answers : {}
   const g = data.gradesSummary
   if (!g) {
     throw new Error('Invalid response from server.')
   }
   return {
     gradesSummary: g,
-    answers: answers as SubmitGradesAnswers,
+    answers: normalizeSubmitGradesAnswers(data.answers),
   }
 }
 
