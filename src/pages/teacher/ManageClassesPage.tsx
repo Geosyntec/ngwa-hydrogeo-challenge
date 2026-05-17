@@ -361,7 +361,7 @@ export default function ManageClassesPage() {
       )}
 
       <Dialog open={editModalOpen} onClose={closeEditModal} maxWidth="sm" fullWidth>
-        <DialogTitle>
+        <DialogTitle sx={{mb:2}}>
           {editingClass ? `Edit class ${editingClass.className}` : 'Add new class'}
         </DialogTitle>
         <DialogContent>
@@ -379,7 +379,7 @@ export default function ManageClassesPage() {
           <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
             {editingClass
               ? 'Update student first and last names or add new students. New students will receive an ID when you submit.'
-              : 'Optionally add students now. You can add more later by editing the class.'}
+              : 'Optionally add students now. You can add more later by editing the class. Note that class names will be visible to students when taking tests.'}
           </Typography>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
             {editStudents.map((student, index) => (

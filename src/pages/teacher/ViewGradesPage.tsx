@@ -48,7 +48,7 @@ type TestGroup = {
 
 function scenarioHeading(scenarioId: string): string {
   const t = testScenarios.find((s) => s.id === scenarioId)
-  return t ? `${t.name}` : scenarioId
+  return t ? `${t.name} Test Results` : scenarioId
 }
 
 function buildGroups(submissions: TeacherGradeSubmissionRow[]): TestGroup[] {
@@ -202,9 +202,9 @@ export default function ViewGradesPage() {
         View Grades
       </Typography>
       <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-        Grades are grouped by test, then class. Open a section to see each student&apos;s
-        latest submission for that test. Use View to see full answers. Reset removes all
-        test data for that student so they can retake the test.
+       Grades are grouped by class. Open a section to see each student&apos;s
+        latest submission for that test. Click the 'View' button to see the full list of submitted answers.
+        Click the 'Reset' button to remove all test data for that student so they can retake the test.
       </Typography>
 
       {resetError && (
@@ -242,6 +242,7 @@ export default function ViewGradesPage() {
           {grouped.map((test) => (
             <Accordion
               key={test.scenarioId}
+              defaultExpanded={true}
               disableGutters
               elevation={0}
               sx={{

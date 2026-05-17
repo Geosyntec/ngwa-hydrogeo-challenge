@@ -72,9 +72,8 @@ export default function CreateTestPage() {
         Create a Test
       </Typography>
       <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-        Each row is a published test scenario. Copy the student link or open a
-        preview. Students use the link to sign in and take the test; previews
-        open while you are signed in as a teacher.
+        Use this page to share test links with your students (using the 'Copy Link button')
+        or to preview the test for yourself (using the 'Preview' button).
       </Typography>
 
       {!teacherId && teacherEmail && (

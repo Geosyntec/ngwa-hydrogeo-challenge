@@ -2,7 +2,7 @@ import { Outlet } from 'react-router-dom'
 import { Box } from '@mui/material'
 
 /** Minimum width of teacher portal content; below this (inside the 80vw shell) scrolls horizontally. */
-export const TEACHER_PORTAL_CONTENT_MIN_WIDTH_PX = 1120
+export const TEACHER_PORTAL_CONTENT_MIN_WIDTH_PX = 800
 
 /**
  * Teacher grading routes: ~80vw centered column on grey gutters; inner content keeps
