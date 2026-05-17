@@ -12,10 +12,11 @@ export default function LandingPage() {
           Aquifer Lab
         </Typography>
         <Typography variant="h6" color="#000000" align="left" sx={{ mb: 4 }}>
-          The Groundwater Foundation presents Aquifer Lab, a learning tool designed to introduce
-          basic groundwater modeling concepts to the eager student. It uses
-          simple calculations and assumptions to present groundwater flow in a
-          fun and easy to understand way.
+        The Groundwater Foundation present Aquifer Lab, a learning tool designed to introduce 
+        basic groundwater modeling concepts to the eager student. It uses simple calculations 
+        and assumptions to present groundwater flow in a fun and easy to understand way. 
+        For more information about the Aquifer Lab and additional learning materials
+         visit the Aquifer Lab page.
         </Typography>
         <Button
           component={Link}
