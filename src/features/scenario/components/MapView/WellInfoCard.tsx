@@ -62,7 +62,7 @@ export type WellInfoCardProps = {
 
 /**
  * A non-modal hover card that anchors near a well marker.
- * G/S/P and pumping are always visible; Geology & Hydrology is hidden by default
+ * G/S/P and pumping are always visible; Geology & Hydrogeology is hidden by default
  * and toggled with an icon (legacy expand/collapse behavior). Card has a max width
  * with horizontal/vertical scroll when content overflows.
  */
@@ -389,7 +389,7 @@ export default function WellInfoCard({
                       <strong>Geology</strong>
                   </Typography>
                   <Typography variant="subtitle2" sx={{ mb: 0.5,flexGrow:0.5 }}>
-                      <strong>Hydrology</strong>
+                      <strong>Hydrogeology</strong>
                   </Typography>
                   </Box>
                   <Table size="small" sx={{ width: 400 }}>
@@ -420,8 +420,8 @@ export default function WellInfoCard({
               onClick={() => setGeologyExpanded((e) => !e)}
               aria-label={
                 geologyExpanded
-                  ? "Hide Geology & Hydrology"
-                  : "Show Geology & Hydrology"
+                  ? "Hide Geology & Hydrogeology"
+                  : "Show Geology & Hydrogeology"
               }
               sx={{ mt: -0.5, ml: "auto", mr: "24px", flexShrink: 0 }}
             >

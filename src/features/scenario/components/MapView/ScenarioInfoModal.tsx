@@ -16,17 +16,28 @@ export type ScenarioInstructionItem = {
 };
 
 /** Placeholder steps until scenario copy is finalized. */
-const PLACEHOLDER_INSTRUCTIONS: ScenarioInstructionItem[] = [
+const MAP_INSTRUCTIONS: ScenarioInstructionItem[] = [
   {
-    primary: "Instructions for this scenario will appear here.",
+    primary:
+      "Hovering over or clicking on a well will reveal an info card with the following components:",
     nestedItems: [
-      "Review the map and well locations.",
-      "Complete each panel in order.",
+      "Elevation data (see below for more details)",
+      "A checkbox to toggle groundwater pumping on/off",
+      "A geology and hydrogeology table that can be displayed by clicking the 'Expand' icon in the top-right corner",
     ],
   },
   {
-    primary: "Additional guidance will be added in a future update.",
+    primary:
+      "Elevation data should be interpreted as follows (definitions appear when hovering over icons):",
+    nestedItems: [
+      "G: Ground elevation",
+      "S: Water table elevation in static conditions",
+      "P: Water table elevation in pumping conditions",
+    ],
   },
+  {
+    primary:"Well info cards can be repositioned by dragging them around the map."
+  }
 ];
 
 export type ScenarioInfoModalProps = {
@@ -40,13 +51,14 @@ export default function ScenarioInfoModal({
 }: ScenarioInfoModalProps) {
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-      <DialogTitle>Scenario instructions</DialogTitle>
+      <DialogTitle>How to Use the Map</DialogTitle>
       <DialogContent>
         <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-          Follow these steps to complete the challenge.
+          Follow these steps to interpret well information and complete the
+          challenge.{" "}
         </Typography>
         <List dense disablePadding component="ol" sx={{ pl: 2.5, m: 0 }}>
-          {PLACEHOLDER_INSTRUCTIONS.map((item, index) => (
+          {MAP_INSTRUCTIONS.map((item, index) => (
             <ListItem
               key={index}
               disableGutters
@@ -63,18 +75,7 @@ export default function ScenarioInfoModal({
                 primaryTypographyProps={{ variant: "body2" }}
               />
               {item.nestedItems != null && item.nestedItems.length > 0 ? (
-                <List
-                  dense
-                  disablePadding
-                  component="ul"
-                  sx={{
-                    pl: 2.5,
-                    m: 0,
-                    mt: 0.5,
-                    width: "100%",
-                    listStyleType: "disc",
-                  }}
-                >
+                <List dense disablePadding component="ul" sx={{ pl: 4, m: 0 }}>
                   {item.nestedItems.map((nested, nestedIndex) => (
                     <ListItem
                       key={nestedIndex}
@@ -85,10 +86,7 @@ export default function ScenarioInfoModal({
                         py: 0.25,
                       }}
                     >
-                      <ListItemText
-                        primary={nested}
-                        primaryTypographyProps={{ variant: "body2" }}
-                      />
+                      <ListItemText primary={nested}></ListItemText>
                     </ListItem>
                   ))}
                 </List>
