@@ -28,15 +28,13 @@ export default function TeacherGradingPage() {
 
 
       <Box sx={{ overflowX: 'auto', width: '100%', pb: 1 }}>
-        <Stack direction="row" spacing={3} sx={{ flexWrap: 'nowrap', width: 'min-content' }}>
+        <Stack direction={{sm:'column',md:'row'}} spacing={3} sx={{flexWrap:'wrap' }}>
           {PORTAL_CARDS.map(({ title, subtitle,route }) => (
             <Card
               key={route}
               sx={{
-                width: 300,
-                minWidth: 300,
-                flexShrink: 0,
-                backgroundColor: theme.palette.primary.main,
+                minWidth: 200,
+                backgroundColor: theme.palette.primary.main
               }}
             >
               <CardActionArea onClick={() => navigate(route)}>
