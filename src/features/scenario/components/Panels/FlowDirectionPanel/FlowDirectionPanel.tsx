@@ -50,7 +50,7 @@ export default function FlowDirectionPanel() {
           anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
         autoHideDuration={5000}
         onClose={()=>setFirstChallenge(false)}
-          message = {`Wells selected. Drag well info boxes as needed, hover over elevations for more info, and expand for additional details`}
+          message = {`Wells selected. Click the info icon in the top-left corner of the map for detailed instructions on how to proceed.`}
         />
       <Accordion
       disabled={!ready}
