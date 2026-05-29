@@ -27,6 +27,7 @@ import { selectScenarioState, setSelectedPanel } from "../../../ScenarioSlice";
 import { computeYLengthFeet } from "../../../services/drawingMath";
 import RealityCheck from "../../RealityCheck/RealityCheck";
 import { panelBindTextFieldSx } from "../panelBindTextFieldSx";
+import { renderHelperText } from "../renderHelperText";
 import { PanelAccordionIcon } from "../PanelAccordionIcon";
 import { useCallback, useEffect, useState } from "react";
 import { store } from "../../../../../app/store";
@@ -73,16 +74,13 @@ export default function GradientPanel() {
         value={f.input}
         onChange={(e) => dispatch(setField({ key, value: e.target.value }))}
         error={f.checked && !f.isCorrect}
-        helperText={
-          f.showAnswer ? `${f.answer}` :
-            f.checked && !isTest
-              ? f.isCorrect
-                ?"✅"
-                :"❌"
-              : helper != null && helper !== ""
-                  ? helper
-                  : "\u00a0"
-        }
+        helperText={renderHelperText(
+          f.showAnswer,
+          f.checked && !isTest,
+          f.isCorrect,
+          f.answer,
+          helper,
+        )}
         InputLabelProps={{ shrink: true }}
         sx={panelBindTextFieldSx(width ?? 280, !!f.showAnswer)}
       />

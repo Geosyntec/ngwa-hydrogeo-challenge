@@ -1,6 +1,7 @@
 import { Grid, TextField, Typography, Stack, Button, Box } from "@mui/material";
 import { useAppDispatch, useAppSelector } from "../../../../../app/hooks";
 import { panelBindTextFieldSx } from "../panelBindTextFieldSx";
+import { renderHelperText } from "../renderHelperText";
 import { setField,selectSortedByElevation } from "../../../flowDirection/flowSlice";
 import {
   selectFlow,
@@ -25,16 +26,13 @@ export default function FDStep2() {
         disabled={!stepReady}
         onChange={(e) => dispatch(setField({ key, value: e.target.value }))}
         error={f.checked && !f.isCorrect}
-        helperText={
-          f.showAnswer ? `${f.answer}` :
-            f.checked && !isTest
-              ? f.isCorrect
-                ?"✅"
-                :"❌"
-              : helper != null && helper !== ""
-                  ? helper
-                  : "\u00a0"
-        }
+        helperText={renderHelperText(
+          f.showAnswer,
+          f.checked && !isTest,
+          f.isCorrect,
+          f.answer,
+          helper,
+        )}
         InputLabelProps={{ shrink: true }}
         sx={panelBindTextFieldSx(width ?? 100, !!f.showAnswer)}
       />

@@ -1,6 +1,7 @@
 import { Grid, TextField, Typography, Stack, Button } from "@mui/material";
 import { useAppDispatch, useAppSelector } from "../../../../../app/hooks";
 import { panelBindTextFieldSx } from "../panelBindTextFieldSx";
+import { renderHelperText } from "../renderHelperText";
 import { setField } from "../../../flowDirection/flowSlice";
 import {
   selectFlow,
@@ -47,16 +48,13 @@ export default function FDStep1() {
             top: "-35px",
           }
         }}
-        helperText={
-          f.showAnswer ? `${f.answer}` :
-            f.checked && isTest
-              ? f.isCorrect
-                ?"✅"
-                :"❌"
-              : helper != null && helper !== ""
-                  ? helper
-                  : "\u00a0"
-        }
+        helperText={renderHelperText(
+          f.showAnswer,
+          f.checked && !isTest,
+          f.isCorrect,
+          f.answer,
+          helper,
+        )}
         sx={panelBindTextFieldSx(width ?? 50, !!f.showAnswer)}
       />
     );

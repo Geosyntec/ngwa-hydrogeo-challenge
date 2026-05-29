@@ -47,6 +47,7 @@ import { useNavigate } from "react-router-dom";
 import RealityCheck from "../../RealityCheck/RealityCheck";
 import SubmitResultsModal from "../SubmitResultsModal";
 import { panelBindTextFieldSx } from "../panelBindTextFieldSx";
+import { renderHelperText } from "../renderHelperText";
 import { ROUTES } from "../../../../../app/routes";
 import { store } from "../../../../../app/store";
 import { buildSubmitGradesPayload } from "../../../submitGradesPayload";
@@ -97,16 +98,13 @@ export default function HorizontalVelocityPanel() {
         value={f.input}
         onChange={(e) => dispatch(setField({ key, value: e.target.value }))}
         error={f.checked && !f.isCorrect}
-        helperText={
-          f.showAnswer ? `${f.answer}` :
-            f.checked && !isTest 
-              ? f.isCorrect
-                ?"✅"
-                :"❌"
-              : helper != null && helper !== ""
-                  ? helper
-                  : "\u00a0"
-        }
+        helperText={renderHelperText(
+          f.showAnswer,
+          f.checked && !isTest,
+          f.isCorrect,
+          f.answer,
+          helper,
+        )}
         InputLabelProps={{ shrink: true }}
         sx={panelBindTextFieldSx(width ?? 50, !!f.showAnswer)}
       />
@@ -118,7 +116,7 @@ export default function HorizontalVelocityPanel() {
   const [testSubmitError, setTestSubmitError] = useState<string | null>(null);
   const handleTestSubmit = useCallback(async () => {
     setTestSubmitError(null);
-    setSelectedPanel(null);
+    dispatch(setSelectedPanel(null));
     dispatchReevaluateAllAnswersForGrading(dispatch);
     const payload = buildSubmitGradesPayload(store.getState());
     if (!payload) {
@@ -297,7 +295,7 @@ export default function HorizontalVelocityPanel() {
                 <div>
                   <Typography variant="h6">Step 2</Typography>
                   <Typography variant="body2" color="text.secondary">
-                  Use data gathered in the previous step and the simplified version of Darcy’s Law below to calculate the horizontal velocity of the groundwater between the selected three wells. Round the final answer to four decimal places (dp).
+                  Use data gathered in the previous step and the simplified version of Darcy’s Law below to calculate the horizontal velocity of the groundwater between the selected three wells. Round the final answer to two decimal places (dp).
                   </Typography>
                   <Grid container spacing={2} sx={{ mt: 1 }}>
                     <Grid item xs={12} md={6} lg={6} sx={{ minWidth: 0 }}>
