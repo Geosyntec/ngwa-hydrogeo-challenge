@@ -40,7 +40,7 @@ export default function FDStep1() {
           }
         }
         }
-        error={f.checked && !f.isCorrect}
+        error={f.checked && !f.isCorrect && !isTest}
         FormHelperTextProps={{
           sx: {
             position: "relative",
@@ -56,6 +56,7 @@ export default function FDStep1() {
           f.isCorrect,
           f.answer,
           helper,
+          isTest
         )}
         sx={panelBindTextFieldSx(width ?? 50, !!f.showAnswer)}
       />

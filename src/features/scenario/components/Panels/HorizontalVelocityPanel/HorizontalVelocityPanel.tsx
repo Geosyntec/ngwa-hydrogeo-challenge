@@ -97,7 +97,7 @@ export default function HorizontalVelocityPanel() {
         label={label}
         value={f.input}
         onChange={(e) => dispatch(setField({ key, value: e.target.value }))}
-        error={f.checked && !f.isCorrect}
+        error={f.checked && !f.isCorrect && !isTest}
         helperText={renderHelperText(
           f.showAnswer,
           f.checked && !isTest,
