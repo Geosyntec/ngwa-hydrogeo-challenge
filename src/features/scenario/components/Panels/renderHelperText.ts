@@ -9,8 +9,11 @@ export function renderHelperText(
   isCorrect: boolean,
   answer?: string | number,
   helper?: string,
+  isTest?:boolean
 ): string {
   const parts: string[] = [];
+
+  if (isTest) return "\u00a0"
 
   if (showAnswer && answer != null && `${answer}` !== "") {
     parts.push(`${answer}`);
