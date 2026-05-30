@@ -104,6 +104,7 @@ export default function HorizontalVelocityPanel() {
           f.isCorrect,
           f.answer,
           helper,
+          isTest
         )}
         InputLabelProps={{ shrink: true }}
         sx={panelBindTextFieldSx(width ?? 50, !!f.showAnswer)}
@@ -393,7 +394,7 @@ export default function HorizontalVelocityPanel() {
                             flexWrap: "nowrap",
                           }}
                         >
-                          {bind("HorizontalVelocity", "v", "Round to 4 dp", 100)}
+                          {bind("HorizontalVelocity", "v", "Round to 2 dp", 100)}
                           <Typography variant="body2" color="text.secondary" sx={{ whiteSpace: "nowrap" }}>
                             ft/day
                           </Typography>
@@ -441,8 +442,8 @@ export default function HorizontalVelocityPanel() {
                     fullWidth
                     disabled={!allPanelsComplete}
                     onClick={() => {
-                      dispatchReevaluateAllAnswersForGrading(dispatch);
                       dispatch(setSelectedPanel(null));
+                      dispatchReevaluateAllAnswersForGrading(dispatch);
                       setSubmitModalOpen(true);
                     }}
                     sx={{ mt: 3 }}
