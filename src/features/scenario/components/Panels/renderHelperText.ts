@@ -8,9 +8,9 @@ export function renderHelperText(
   answer?: string | number,
   helper?: string,
 ): string {
-  var renderedAnswer:string, renderedIcon:string, renderedHelper:string = ""
+  var renderedAnswer:string="", renderedIcon:string="", renderedHelper:string = ""
   if (showAnswer) {
-    renderedAnswer = answer ?? `${answer}`
+    renderedAnswer = answer != null ? `${answer}` : ""
     //return answer != null ? `${answer}` : "";
   }
   if (checked) {
@@ -21,5 +21,5 @@ export function renderHelperText(
     renderedHelper = helper
     return helper;
   }
-  return renderedAnswer+" "renderedIcon + " " +renderedHelper;
+  return renderedAnswer+" "+renderedIcon + " " +renderedHelper;
 }
