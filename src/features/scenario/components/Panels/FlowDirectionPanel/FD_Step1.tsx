@@ -46,7 +46,9 @@ export default function FDStep1() {
             position: "relative",
             left: "110%",
             top: "-35px",
-          }
+            maxWidth: "none",
+            width: "max-content",
+          },
         }}
         helperText={renderHelperText(
           f.showAnswer,

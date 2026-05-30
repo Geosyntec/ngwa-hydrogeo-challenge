@@ -1,5 +1,7 @@
 /**
- * Helper text for scenario panel TextFields: revealed answer, check feedback, or hint.
+ * Helper text for scenario panel TextFields: revealed answer, check feedback, and/or hint.
+ * Combines answer + check icon when both apply; returns a non-breaking space when empty
+ * so the helper slot keeps a stable height and the form does not jump.
  */
 export function renderHelperText(
   showAnswer: boolean,
@@ -8,18 +10,17 @@ export function renderHelperText(
   answer?: string | number,
   helper?: string,
 ): string {
-  var renderedAnswer:string="", renderedIcon:string="", renderedHelper:string = ""
-  if (showAnswer) {
-    renderedAnswer = answer != null ? `${answer}` : ""
-    //return answer != null ? `${answer}` : "";
+  const parts: string[] = [];
+
+  if (showAnswer && answer != null && `${answer}` !== "") {
+    parts.push(`${answer}`);
   }
   if (checked) {
-    renderedIcon = isCorrect ? "✅" : "❌";
-    return isCorrect ? "✅" : "❌";
+    parts.push(isCorrect ? "✅" : "❌");
   }
-  if (helper != null && helper !== "") {
-    renderedHelper = helper
-    return helper;
+  if (parts.length === 0 && helper != null && helper !== "") {
+    parts.push(helper);
   }
-  return renderedAnswer+" "+renderedIcon + " " +renderedHelper;
+
+  return parts.length > 0 ? parts.join(" ") : "\u00a0";
 }
