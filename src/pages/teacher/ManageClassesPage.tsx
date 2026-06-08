@@ -403,7 +403,7 @@ export default function ManageClassesPage() {
               value={editClassName}
               onChange={(e) => setEditClassName(e.target.value)}
               placeholder="e.g. Hydrogeology 101"
-              sx={{ mb: 2 }}
+              sx={{ my: 2 }}
             />
           )}
           <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>

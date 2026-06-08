@@ -58,7 +58,7 @@ export default function SubmitResultsModal({
           </Typography>
         </Stack>
       </DialogContent>
-      <DialogActions sx={{ px: 3, pb: 2, flexDirection: 'column', alignItems: 'stretch', gap: 1 }}>
+      <DialogActions sx={{ px: 3, pb: 2, flexDirection: 'column', alignItems: 'flex-end', gap: 1 }}>
         <Button
           variant="contained"
           startIcon={<Replay />}
