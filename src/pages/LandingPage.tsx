@@ -32,7 +32,7 @@ export default function LandingPage() {
           Created by NGWA and Geosyntec Consultants Inc.
         </Typography>
         <Typography variant="body2" align="center" color="primary">
-          Version 1.0.0
+          Version 1.0.1
         </Typography>
       </Box>
     </Container>
