@@ -25,13 +25,14 @@ export default function FDStep2() {
         value={f.input}
         disabled={!stepReady}
         onChange={(e) => dispatch(setField({ key, value: e.target.value }))}
-        error={f.checked && !f.isCorrect}
+        error={f.checked && !f.isCorrect && !isTest}
         helperText={renderHelperText(
           f.showAnswer,
           f.checked && !isTest,
           f.isCorrect,
           f.answer,
           helper,
+          isTest
         )}
         InputLabelProps={{ shrink: true }}
         sx={panelBindTextFieldSx(width ?? 100, !!f.showAnswer)}

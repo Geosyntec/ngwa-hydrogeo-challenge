@@ -73,13 +73,14 @@ export default function GradientPanel() {
         label={label}
         value={f.input}
         onChange={(e) => dispatch(setField({ key, value: e.target.value }))}
-        error={f.checked && !f.isCorrect}
+        error={f.checked && !f.isCorrect && !isTest}
         helperText={renderHelperText(
           f.showAnswer,
           f.checked && !isTest,
           f.isCorrect,
           f.answer,
           helper,
+          isTest
         )}
         InputLabelProps={{ shrink: true }}
         sx={panelBindTextFieldSx(width ?? 280, !!f.showAnswer)}
